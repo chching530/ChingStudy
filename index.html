@@ -9,7 +9,7 @@
     <title>◇ Ching Study</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background: #0b0b0b; color: #f0f0f0; padding: 16px; padding-bottom: 80px; max-width: 1000px; margin: 0 auto; min-height: 100vh; }
+        body { background: #0b0b0b; color: #f0f0f0; padding: 16px; padding-bottom: 110px; max-width: 1000px; margin: 0 auto; min-height: 100vh; }
         button, .main-card, .subject-item, .chapter-card, .habit-box, .link-item, .item-card .actions button, .chapter-file-item .actions button, .stat-filter-btn, .folder-item, .file-item, .bottom-bar button {
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
@@ -84,14 +84,14 @@
         .footnote { color: #555; font-size: 12px; text-align: center; margin-top: 20px; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
         /* ===== FOLDER STRUCTURE ===== */
-        .folder-item { background: #151515; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 14px; margin-bottom: 4px; cursor: pointer; transition: 0.1s; touch-action: manipulation; }
-        .folder-item:active { background: #2a2a2a; }
+        .folder-item { background: #151515; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 14px; margin-bottom: 6px; cursor: pointer; transition: 0.1s; touch-action: manipulation; }
         .folder-item .folder-header { display: flex; align-items: center; gap: 8px; }
         .folder-item .folder-header .folder-icon { font-size: 20px; }
         .folder-item .folder-header .folder-name { font-weight: 400; color: #fff; flex: 1; }
         .folder-item .folder-header .folder-actions { display: flex; gap: 6px; }
         .folder-item .folder-header .folder-actions button { background: none; border: none; color: #888; font-size: 14px; cursor: pointer; padding: 0 4px; }
-        .folder-item .folder-children { margin-left: 16px; margin-top: 6px; padding-left: 8px; border-left: 1px solid #2a2a2a; }
+        .folder-children { margin-left: 16px; margin-top: 6px; padding-left: 8px; border-left: 1px solid #2a2a2a; }
+        .folder-children.collapsed { display: none; }
         .file-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px; padding: 8px 12px; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
         .file-item .file-info { display: flex; align-items: center; gap: 8px; flex: 1; }
         .file-item .file-info .file-icon { font-size: 16px; }
@@ -234,7 +234,7 @@
             border: none;
             color: #888;
             font-size: 12px;
-            padding: 4px 10px;
+            padding: 6px 10px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -254,7 +254,7 @@
         /* ===== MODAL ===== */
         .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); display:none; justify-content:center; align-items:center; z-index:999; }
         .modal-overlay.show { display:flex; }
-        .modal-box { background:#1c1c1c; width:90%; max-width:400px; border-radius:24px; padding:24px; max-height:80vh; overflow-y:auto; border:1px solid #333; }
+        .modal-box { background:#1c1c1c; width:90%; max-width:480px; border-radius:24px; padding:24px; max-height:80vh; overflow-y:auto; border:1px solid #333; }
         .modal-box h3 { display:flex; justify-content:space-between; align-items:center; font-weight:300; font-size:20px; color:#fff; margin-bottom:16px; }
         .modal-box .close-modal { background:none; border:none; font-size:24px; color:#aaa; cursor:pointer; touch-action: manipulation; }
         .modal-box input, .modal-box select, .modal-box textarea { width:100%; margin-bottom:10px; padding:12px; background:#222; border:1px solid #444; border-radius:12px; color:#fff; font-size:14px; }
@@ -306,11 +306,11 @@
             .bottom-bar button .btn-icon { font-size: 16px; }
         }
         @media (min-width: 800px) {
-            body { max-width: 1000px; padding: 24px; padding-bottom: 90px; }
+            body { max-width: 1000px; padding: 24px; padding-bottom: 120px; }
             .habits-container { grid-template-columns: repeat(4, 1fr); }
         }
         @media (min-width: 768px) and (max-width: 1024px) {
-            body { padding: 30px; padding-bottom: 90px; }
+            body { padding: 30px; padding-bottom: 120px; }
             .habits-container { grid-template-columns: repeat(3, 1fr); }
         }
         input, select, textarea { border-radius: 12px !important; }
@@ -364,29 +364,29 @@
         <div class="subject-grid" id="subjectGrid"></div>
     </div>
 
-    <!-- PAGE: DETAIL (Information / DSE) -->
+    <!-- PAGE: DETAIL (Information / DSE / Quiz subjects) -->
     <div id="page-detail" class="page">
         <button class="back-btn" onclick="goBackFromDetail()">← Back to subjects</button>
         <h2 id="detailTitle" style="font-weight:300; font-size:20px;">Subject</h2>
         <div id="detailContent"></div>
     </div>
 
-    <!-- PAGE: QUIZ CHAPTERS -->
+    <!-- PAGE: QUIZ -->
     <div id="page-quiz" class="page">
-        <button class="back-btn" onclick="goBackFromQuiz()">← Back to subjects</button>
-        <h2 id="quizTitle" style="font-weight:300; font-size:20px;">Subject</h2>
+        <button class="back-btn" onclick="goBackFromQuiz()">← Back</button>
+        <h2 id="quizTitle" style="font-weight:300; font-size:20px;">Quiz</h2>
         <div id="quizContent"></div>
     </div>
 
-    <!-- PAGE: CHAPTER LINKS & FILES (Quiz) -->
+    <!-- PAGE: CHAPTER LINKS & FILES (shared) -->
     <div id="page-chapter-links" class="page">
-        <button class="back-btn" onclick="goBackFromChapterLinks()">← Back to chapters</button>
+        <button class="back-btn" onclick="goBackFromChapterLinks()">← Back</button>
         <h2 id="chapterLinksTitle" style="font-weight:300; font-size:20px;">Chapter</h2>
         <div style="margin-top: 8px;">
             <div class="section-title" style="font-size:15px;">Links</div>
             <div class="input-group">
                 <input type="text" id="chapterLinkName" placeholder="Link name" />
-                <input type="text" id="chapterLinkURL" placeholder="URL" />
+                <input type="text" id="chapterLinkURL" placeholder="URL (https://...)" />
                 <button onclick="addChapterLink()">Add</button>
             </div>
             <div id="chapterLinksList"></div>
@@ -396,6 +396,7 @@
             <div class="file-input-wrapper">
                 <input type="file" id="chapterFileInput" />
                 <button onclick="addChapterFile()">Upload</button>
+                <button onclick="uploadChapterFolder()" class="btn-secondary">Upload Folder (keep structure)</button>
             </div>
             <div id="chapterFilesList"></div>
         </div>
@@ -442,97 +443,38 @@
         </div>
     </div>
 
-    <!-- PAGE: TIMER -->
-    <div id="page-timer" class="page">
+    <!-- PAGE: TOOLS -->
+    <div id="page-tools" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
-        <h2 style="font-weight:300; font-size:22px;">Timer</h2>
-        <div class="timer-container">
-            <div class="timer-mode">
-                <button id="timerModeStopwatch" class="active" onclick="setTimerMode('stopwatch')">Stopwatch</button>
-                <button id="timerModeCountdown" onclick="setTimerMode('countdown')">Countdown</button>
-            </div>
-            <div class="timer-input" id="timerInputArea" style="display:none;">
-                <input type="number" id="timerHours" placeholder="0" min="0" max="23" value="0" />
-                <span>h</span>
-                <input type="number" id="timerMinutes" placeholder="0" min="0" max="59" value="5" />
-                <span>m</span>
-                <input type="number" id="timerSeconds" placeholder="0" min="0" max="59" value="0" />
-                <span>s</span>
-                <button onclick="setCountdownTime()" style="background:#444; border:none; color:#fff; padding:6px 16px; border-radius:30px; cursor:pointer;">Set</button>
-            </div>
-            <div class="timer-clock">
-                <svg viewBox="0 0 240 240">
-                    <circle class="circle-bg" cx="120" cy="120" r="100" />
-                    <circle class="circle-progress" id="timerCircle" cx="120" cy="120" r="100" stroke-dasharray="628.32" stroke-dashoffset="0" />
-                </svg>
-                <div class="timer-display" id="timerDisplay">00:00:00</div>
-            </div>
-            <div class="timer-controls">
-                <button class="primary" id="timerStartBtn" onclick="timerStartPause()">Start</button>
-                <button onclick="timerReset()">Reset</button>
-            </div>
+        <h2 style="font-weight:300; font-size:22px;">Tools</h2>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn-secondary" onclick="showTool('calculator')">Calculator</button>
+            <button class="btn-secondary" onclick="showTool('grade')">Grade Calculator</button>
         </div>
+        <div id="toolsContent" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- PAGE: AI links management -->
+    <div id="page-ai" class="page">
+        <button class="back-btn" onclick="navigateTo('home')">← Back</button>
+        <h2 style="font-weight:300; font-size:22px;">AI Links</h2>
+        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+            <input id="aiName" placeholder="Name" />
+            <input id="aiURL" placeholder="URL (https://...)" />
+            <button class="btn-secondary" onclick="addAiLink()">Add</button>
+        </div>
+        <div id="aiLinksList" style="margin-top:12px;"></div>
     </div>
 
     <!-- PAGE: CALENDAR -->
     <div id="page-calendar" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
         <h2 style="font-weight:300; font-size:22px;">Calendar</h2>
-        <div class="cal-header" style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 12px;">
-            <button onclick="changeMonth(-1)" style="background:#222; border:1px solid #444; padding:6px 16px; border-radius:30px; font-size:18px; color:#ddd; cursor:pointer;">◀</button>
-            <span class="month-year" id="calMonthYear" style="font-size:18px; font-weight:300; color:#fff;">2026-06</span>
-            <button onclick="changeMonth(1)" style="background:#222; border:1px solid #444; padding:6px 16px; border-radius:30px; font-size:18px; color:#ddd; cursor:pointer;">▶</button>
-        </div>
-        <div class="cal-grid" id="calGrid"></div>
-        <div style="display:flex; gap:10px; margin:16px 0 12px; flex-wrap:wrap;">
-            <select id="eventFilter" style="flex:1; background:#222; border:1px solid #444; border-radius:30px; padding:10px 16px; color:#ddd;">
-                <option value="all">All (Future)</option>
-                <option value="countdown">Countdown</option>
-                <option value="schedule">Schedule</option>
-            </select>
-            <button onclick="openAddEvent()" style="background:#444; border:none; color:#fff; padding:10px 20px; border-radius:30px; cursor:pointer;">+ Add</button>
-        </div>
-        <div class="event-list" id="eventList"></div>
-        <div class="study-log-container" id="studyLogContainer">
-            <div class="log-title">📖 Study Log</div>
-            <div id="studyLogContent" class="study-log-empty">Select a date to see study records.</div>
-        </div>
+        <div class="cal-grid" id="calGrid" style="margin-top:12px;"></div>
+        <div id="eventList" style="margin-top:12px;"></div>
     </div>
 
-    <!-- NOTIFICATION MODAL -->
-    <div class="modal-overlay" id="notifModal">
-        <div class="modal-box">
-            <h3>Notifications <button class="close-modal" onclick="closeNotif()">✕</button></h3>
-            <div class="notif-item" style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #2a2a2a;">
-                <span style="font-size:20px; color:#aaa;">✉</span>
-                <span style="flex:1; color:#eee;">Contact tutor</span>
-                <a href="mailto:?subject=Study Question" style="color:#8ab4f8; text-decoration:none; font-weight:500;">Email</a>
-            </div>
-            <div class="notif-item" style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #2a2a2a;">
-                <span style="font-size:20px; color:#aaa;">✆</span>
-                <span style="flex:1; color:#eee;">Remind yourself</span>
-                <a href="sms:?body=Time to study!" style="color:#8ab4f8; text-decoration:none; font-weight:500;">SMS</a>
-            </div>
-            <div class="notif-item" style="display:flex; align-items:center; gap:12px; padding:12px 0;">
-                <span style="font-size:20px; color:#aaa;">📌</span>
-                <span style="flex:1; color:#eee;">Daily reminder: review your notes</span>
-                <span style="color:#666; font-size:13px;">Read</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- ADD EVENT MODAL -->
-    <div class="modal-overlay" id="eventModal">
-        <div class="modal-box">
-            <h3>Add Event <button class="close-modal" onclick="closeEventModal()">✕</button></h3>
-            <input id="evTitle" placeholder="Title" />
-            <input id="evDate" type="date" />
-            <select id="evType"><option value="schedule">Schedule</option><option value="countdown">Countdown</option></select>
-            <button onclick="saveEvent()">Save</button>
-        </div>
-    </div>
-
-    <!-- ADD CHAPTER MODAL (Quiz) -->
+    <!-- CHAPTER MODAL -->
     <div class="modal-overlay" id="chapterModal">
         <div class="modal-box">
             <h3>New Chapter <button class="close-modal" onclick="closeChapterModal()">✕</button></h3>
@@ -541,82 +483,12 @@
         </div>
     </div>
 
-    <!-- ADD FOLDER MODAL (Information / DSE) -->
-    <div class="modal-overlay" id="folderModal">
-        <div class="modal-box">
-            <h3>New Folder <button class="close-modal" onclick="closeFolderModal()">✕</button></h3>
-            <input id="folderName" placeholder="Folder name" />
-            <div class="icon-selector" id="folderIconSelector">
-                <span style="color:#888; font-size:13px; width:100%; margin-bottom:4px;">Choose icon:</span>
-                <span class="icon-option selected" data-icon="📁" onclick="selectIcon(this)">📁</span>
-                <span class="icon-option" data-icon="📚" onclick="selectIcon(this)">📚</span>
-                <span class="icon-option" data-icon="📖" onclick="selectIcon(this)">📖</span>
-                <span class="icon-option" data-icon="📝" onclick="selectIcon(this)">📝</span>
-                <span class="icon-option" data-icon="📄" onclick="selectIcon(this)">📄</span>
-                <span class="icon-option" data-icon="🗂️" onclick="selectIcon(this)">🗂️</span>
-                <span class="icon-option" data-icon="⭐" onclick="selectIcon(this)">⭐</span>
-                <span class="icon-option" data-icon="🎯" onclick="selectIcon(this)">🎯</span>
-                <span class="icon-option" data-icon="💡" onclick="selectIcon(this)">💡</span>
-                <label class="icon-upload" style="background:#222; border:1px solid #444; border-radius:8px; padding:4px 10px; color:#aaa; font-size:13px; cursor:pointer;">
-                    📤 Upload
-                    <input type="file" accept="image/*" onchange="uploadIcon(this)" />
-                </label>
-            </div>
-            <button onclick="saveFolder()">Create</button>
-        </div>
-    </div>
-
-    <!-- ADD ITEM MODAL (File / Link) -->
-    <div class="modal-overlay" id="itemModal">
-        <div class="modal-box">
-            <h3>Add Item <button class="close-modal" onclick="closeItemModal()">✕</button></h3>
-            <select id="itemType" onchange="toggleItemFields()">
-                <option value="file">📄 File</option>
-                <option value="link">🔗 Link</option>
-            </select>
-            <input id="itemName" placeholder="Name" />
-            <div id="itemFileField" style="margin-bottom:10px;">
-                <input type="file" id="itemFileInput" />
-            </div>
-            <div id="itemLinkField" style="display:none; margin-bottom:10px;">
-                <input id="itemURL" placeholder="URL (e.g. https://...)" />
-            </div>
-            <div class="icon-selector" id="itemIconSelector">
-                <span style="color:#888; font-size:13px; width:100%; margin-bottom:4px;">Choose icon (optional):</span>
-                <span class="icon-option selected" data-icon="" onclick="selectItemIcon(this)">None</span>
-                <span class="icon-option" data-icon="📄" onclick="selectItemIcon(this)">📄</span>
-                <span class="icon-option" data-icon="📎" onclick="selectItemIcon(this)">📎</span>
-                <span class="icon-option" data-icon="🔗" onclick="selectItemIcon(this)">🔗</span>
-                <span class="icon-option" data-icon="📊" onclick="selectItemIcon(this)">📊</span>
-                <span class="icon-option" data-icon="📈" onclick="selectItemIcon(this)">📈</span>
-                <label class="icon-upload" style="background:#222; border:1px solid #444; border-radius:8px; padding:4px 10px; color:#aaa; font-size:13px; cursor:pointer;">
-                    📤 Upload
-                    <input type="file" accept="image/*" onchange="uploadItemIcon(this)" />
-                </label>
-            </div>
-            <button onclick="saveItem()">Add</button>
-        </div>
-    </div>
-
-    <!-- ADD CUSTOM BUTTON MODAL -->
+    <!-- CUSTOM BUTTON MODAL (text only) -->
     <div class="modal-overlay" id="customBtnModal">
         <div class="modal-box">
             <h3>Add Custom Button <button class="close-modal" onclick="closeCustomBtnModal()">✕</button></h3>
             <input id="customBtnName" placeholder="Button name" />
-            <input id="customBtnURL" placeholder="URL (e.g. https://...)" />
-            <div class="icon-selector" id="customIconSelector">
-                <span style="color:#888; font-size:13px; width:100%; margin-bottom:4px;">Choose icon:</span>
-                <span class="icon-option selected" data-icon="🔗" onclick="selectCustomIcon(this)">🔗</span>
-                <span class="icon-option" data-icon="🌐" onclick="selectCustomIcon(this)">🌐</span>
-                <span class="icon-option" data-icon="📱" onclick="selectCustomIcon(this)">📱</span>
-                <span class="icon-option" data-icon="💻" onclick="selectCustomIcon(this)">💻</span>
-                <span class="icon-option" data-icon="⚡" onclick="selectCustomIcon(this)">⚡</span>
-                <span class="icon-option" data-icon="🎨" onclick="selectCustomIcon(this)">🎨</span>
-                <label class="icon-upload" style="background:#222; border:1px solid #444; border-radius:8px; padding:4px 10px; color:#aaa; font-size:13px; cursor:pointer;">
-                    📤 Upload
-                    <input type="file" accept="image/*" onchange="uploadCustomIcon(this)" />
-                </label>
-            </div>
+            <input id="customBtnURL" placeholder="URL (https://...)" />
             <button onclick="saveCustomButton()">Add</button>
         </div>
     </div>
@@ -636,213 +508,187 @@
 <!-- ===== BOTTOM BAR ===== -->
 <div class="bottom-bar-wrapper">
     <div class="bottom-bar" id="bottomBar">
-        <button onclick="navigateTo('home')" class="active" id="bbHome">
-            <span class="btn-icon">🏠</span>
-            <span class="btn-label">Home</span>
-        </button>
-        <button onclick="openAI()" id="bbAI">
-            <span class="btn-icon" style="font-size:12px; font-weight:400;">DeepSeek</span>
-            <span class="btn-label" style="font-size:10px;">&nbsp;</span>
-        </button>
-        <div id="customButtonsContainer" style="display:inline-flex; gap:2px;"></div>
-        <button onclick="openCustomBtnModal()" id="bbAdd">
-            <span class="btn-icon">➕</span>
-            <span class="btn-label">Add</span>
-        </button>
+        <button onclick="navigateTo('home')" class="active" id="bbHome">Home</button>
+        <button id="bbAI" onclick="navigateTo('ai')">AI</button>
+        <div id="customButtonsContainer" style="display:inline-flex; gap:4px;"></div>
+        <button onclick="openCustomBtnModal()" id="bbAdd">+ Add</button>
         <div class="bb-spacer"></div>
     </div>
 </div>
 
 <script>
     // ============================================================
-    // 1. LOGIN
+    // Data model & helpers
     // ============================================================
-    const CORRECT_PASSWORD = "ching";
-    function checkLoginStatus() {
-        if (localStorage.getItem('loggedIn') === 'true') showApp();
+    const CATEGORIES = ['Information', 'Quiz', 'DSE'];
+    const SUBJECTS = ['Chinese', 'English', 'Mathematics', 'CS', 'Economics', 'Bafs', 'Ict'];
+    const HOME_DEFAULT_ORDER = ['information','quiz','dse','links','objectives','statistics','tools','ai','timer'];
+    function keyFor(category, subject){ return `${category}_${subject}`; }
+
+    function generateId(){ return Date.now() + '_' + Math.random().toString(36).substr(2,6); }
+    function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
+
+    function defaultData(){
+        const chapters = {};
+        CATEGORIES.forEach(c => SUBJECTS.forEach(s => chapters[keyFor(c,s)] = []));
+        return {
+            chapters,
+            events: [],
+            links: [{ name: 'DeepSeek', url: 'https://deepseek.com' }, { name: 'Google', url: 'https://google.com' }],
+            habits: {},
+            objectives: {},
+            customButtons: [],
+            homeOrder: HOME_DEFAULT_ORDER.slice(),
+            aiLinks: []
+        };
     }
-    function verifyPassword() {
-        const input = document.getElementById('passwordInput');
-        const error = document.getElementById('loginError');
-        if (input.value.trim() === CORRECT_PASSWORD) {
-            localStorage.setItem('loggedIn', 'true');
-            showApp();
-        } else {
-            error.textContent = 'Wrong password, try again';
-            input.value = '';
-            input.focus();
+
+    function loadData(){
+        try {
+            const raw = localStorage.getItem('ching_study_data');
+            if (!raw) return defaultData();
+            const parsed = JSON.parse(raw);
+
+            // ensure chapters exist for each category/subject
+            if (!parsed.chapters) parsed.chapters = {};
+            CATEGORIES.forEach(c => SUBJECTS.forEach(s => {
+                const k = keyFor(c,s);
+                if (!parsed.chapters[k]) parsed.chapters[k] = [];
+            }));
+
+            if (!parsed.links) parsed.links = [];
+            if (!parsed.habits) parsed.habits = {};
+            if (!parsed.objectives) parsed.objectives = {};
+            if (!parsed.customButtons) parsed.customButtons = [];
+            if (!parsed.homeOrder) parsed.homeOrder = HOME_DEFAULT_ORDER.slice();
+            if (!parsed.aiLinks) parsed.aiLinks = [];
+
+            // Migrate old infoFolders/dseFolders (if present) into chapters structure
+            if (parsed.infoFolders) {
+                SUBJECTS.forEach(s => {
+                    const arr = parsed.infoFolders[s] || [];
+                    const k = keyFor('Information', s);
+                    arr.forEach(item => {
+                        if (item.type === 'folder') {
+                            parsed.chapters[k].push({ name: item.name || 'Folder', links: [], files: item.children || [] });
+                        } else {
+                            // put non-folder items into a default chapter
+                            let defaultCh = parsed.chapters[k].find(ch => ch.name === 'Files');
+                            if (!defaultCh) { defaultCh = { name: 'Files', links: [], files: [] }; parsed.chapters[k].push(defaultCh); }
+                            defaultCh.files.push(item);
+                        }
+                    });
+                });
+                delete parsed.infoFolders;
+            }
+            if (parsed.dseFolders) {
+                SUBJECTS.forEach(s => {
+                    const arr = parsed.dseFolders[s] || [];
+                    const k = keyFor('DSE', s);
+                    arr.forEach(item => {
+                        if (item.type === 'folder') {
+                            parsed.chapters[k].push({ name: item.name || 'Folder', links: [], files: item.children || [] });
+                        } else {
+                            let defaultCh = parsed.chapters[k].find(ch => ch.name === 'Files');
+                            if (!defaultCh) { defaultCh = { name: 'Files', links: [], files: [] }; parsed.chapters[k].push(defaultCh); }
+                            defaultCh.files.push(item);
+                        }
+                    });
+                });
+                delete parsed.dseFolders;
+            }
+
+            // ensure objectives for each subject
+            SUBJECTS.forEach(s => {
+                if (!parsed.objectives[s]) parsed.objectives[s] = { target: '5', current: '4' };
+            });
+
+            return parsed;
+        } catch(e) {
+            console.error(e);
+            return defaultData();
         }
     }
+
+    function saveData(){
+        localStorage.setItem('ching_study_data', JSON.stringify(data));
+    }
+
+    // ============================================================
+    // Login & init
+    // ============================================================
+    const CORRECT_PASSWORD = 'ching';
+    function checkLoginStatus(){ if (localStorage.getItem('loggedIn') === 'true') showApp(); }
+    function verifyPassword(){
+        const v = document.getElementById('passwordInput').value.trim();
+        if (v === CORRECT_PASSWORD) { localStorage.setItem('loggedIn','true'); showApp(); }
+        else { document.getElementById('loginError').textContent = 'Wrong password, try again'; }
+    }
     document.getElementById('passwordInput').addEventListener('keydown', e => { if (e.key === 'Enter') verifyPassword(); });
-    function showApp() {
+    function showApp(){
         document.getElementById('loginContainer').style.display = 'none';
         document.getElementById('appContainer').classList.add('active');
         initApp();
     }
-    function logout() {
-        if (confirm('Logout?')) {
-            localStorage.removeItem('loggedIn');
-            location.reload();
-        }
-    }
+    function logout(){ if(confirm('Logout?')) { localStorage.removeItem('loggedIn'); location.reload(); } }
 
     // ============================================================
-    // 2. DATA
+    // Header clock
     // ============================================================
-    const CATEGORIES = ['Information', 'Quiz', 'DSE'];
-    const SUBJECTS = ['Chinese', 'English', 'Mathematics', 'CS', 'Economics', 'Bafs', 'Ict'];
-    const GRADE_LEVELS = ['1', '2', '3', '4', '5', '5*', '5**'];
-    const CS_GRADE_LEVELS = ['U', 'A'];
-    const HOME_CARDS = [
-        { id: 'information', title: 'Information', desc: 'Folders & Files' },
-        { id: 'quiz', title: 'Quiz', desc: 'Chapters & Files' },
-        { id: 'dse', title: 'DSE', desc: 'Folders & Files' },
-        { id: 'links', title: 'Links', desc: 'Bookmarks & app shortcuts' },
-        { id: 'objectives', title: 'Objectives', desc: 'Target & Current Grades' },
-        { id: 'statistics', title: 'Statistics', desc: 'Study habit trends' },
-        { id: 'timer', title: 'Timer', desc: 'Stopwatch & Countdown' }
-    ];
-
-    let data = {};
-    let currentFolderPath = [];
-    let currentCategory = null;
-    let currentSubject = null;
-    let currentChapterIndex = null;
-    let selectedIcon = '📁';
-    let selectedItemIcon = '';
-    let selectedCustomIcon = '🔗';
-    let deleteTarget = null;
-    let deleteCallback = null;
-
-    function defaultData() {
-        let chapters = {};
-        CATEGORIES.forEach(c => SUBJECTS.forEach(s => {
-            const key = c + '_' + s;
-            if (c === 'Quiz') {
-                chapters[key] = [];
-            }
-        }));
-        return {
-            infoFolders: {},
-            dseFolders: {},
-            chapters: chapters,
-            events: [],
-            links: [
-                { name: 'DeepSeek', url: 'https://deepseek.com' },
-                { name: 'Google', url: 'https://google.com' }
-            ],
-            habits: {},
-            objectives: {},
-            customButtons: [],
-            homeOrder: ['information', 'quiz', 'dse', 'links', 'objectives', 'statistics', 'timer']
-        };
-    }
-
-    function getTodayLocal() {
-        const d = new Date();
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return y + '-' + m + '-' + day;
-    }
-
-    function loadData() {
-        try {
-            const raw = localStorage.getItem('ching_study_data');
-            if (raw) {
-                const parsed = JSON.parse(raw);
-                // 確保 Quiz chapters 存在
-                CATEGORIES.forEach(c => SUBJECTS.forEach(s => {
-                    const key = c + '_' + s;
-                    if (c === 'Quiz') {
-                        if (!parsed.chapters) parsed.chapters = {};
-                        if (!parsed.chapters[key]) parsed.chapters[key] = [];
-                    }
-                }));
-                if (!parsed.infoFolders) parsed.infoFolders = {};
-                if (!parsed.dseFolders) parsed.dseFolders = {};
-                if (!parsed.events) parsed.events = [];
-                if (!parsed.links) parsed.links = [];
-                if (!parsed.habits) parsed.habits = {};
-                if (!parsed.objectives) parsed.objectives = {};
-                if (!parsed.customButtons) parsed.customButtons = [];
-                if (!parsed.homeOrder) parsed.homeOrder = ['information', 'quiz', 'dse', 'links', 'objectives', 'statistics', 'timer'];
-                SUBJECTS.forEach(s => {
-                    if (!parsed.objectives[s]) parsed.objectives[s] = { target: '5', current: '4' };
-                    if (!parsed.infoFolders[s]) parsed.infoFolders[s] = [];
-                    if (!parsed.dseFolders[s]) parsed.dseFolders[s] = [];
-                });
-                return parsed;
-            }
-        } catch (e) {}
-        return defaultData();
-    }
-
-    function saveData() {
-        localStorage.setItem('ching_study_data', JSON.stringify(data));
-    }
-
-    function resetHabitsIfNewDay() {
-        const today = getTodayLocal();
-        if (!data.habits[today]) {
-            data.habits[today] = {};
-            SUBJECTS.forEach(s => data.habits[today][s] = false);
-            saveData();
-            renderHabits();
-        }
-    }
-
-    // ============================================================
-    // 3. HEADER CLOCK
-    // ============================================================
-    function updateHeaderClock() {
+    function updateHeaderClock(){
         const now = new Date();
-        const h = String(now.getHours()).padStart(2, '0');
-        const m = String(now.getMinutes()).padStart(2, '0');
-        const s = String(now.getSeconds()).padStart(2, '0');
+        const h = String(now.getHours()).padStart(2,'0');
+        const m = String(now.getMinutes()).padStart(2,'0');
+        const s = String(now.getSeconds()).padStart(2,'0');
         const y = now.getFullYear();
-        const mo = String(now.getMonth() + 1).padStart(2, '0');
-        const d = String(now.getDate()).padStart(2, '0');
-        document.getElementById('headerDateTime').textContent = h + ':' + m + ':' + s + '  ' + y + '-' + mo + '-' + d;
+        const mo = String(now.getMonth() + 1).padStart(2,'0');
+        const d = String(now.getDate()).padStart(2,'0');
+        document.getElementById('headerDateTime').textContent = `${h}:${m}:${s}  ${y}-${mo}-${d}`;
     }
     setInterval(updateHeaderClock, 1000);
 
     // ============================================================
-    // 4. NAVIGATION
+    // Navigation
     // ============================================================
     const pageMap = {
         home: 'page-home',
         subjects: 'page-subjects',
         detail: 'page-detail',
         quiz: 'page-quiz',
-        calendar: 'page-calendar',
+        chapterLinks: 'page-chapter-links',
         links: 'page-links',
         objectives: 'page-objectives',
         statistics: 'page-statistics',
-        timer: 'page-timer',
-        chapterLinks: 'page-chapter-links'
+        tools: 'page-tools',
+        ai: 'page-ai',
+        calendar: 'page-calendar',
+        timer: 'page-timer'
     };
 
     function navigateTo(page) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         const el = document.getElementById(pageMap[page]);
         if (el) el.classList.add('active');
-        if (page === 'calendar') { renderCalendar(); resetHabitsIfNewDay(); }
-        if (page === 'home') { renderHomeCards(); renderHabits(); renderObjectives(); resetHabitsIfNewDay(); renderBottomBar(); }
+        if (page === 'home') { renderHomeCards(); renderHabits(); renderObjectives(); renderBottomBar(); }
+        if (page === 'subjects') { /* nothing */ }
+        if (page === 'detail') { renderDetail(); }
+        if (page === 'quiz') { openQuiz(); }
+        if (page === 'chapterLinks') { renderChapterLinks(); renderChapterFiles(); }
+        if (page === 'links') { renderLinks(); }
         if (page === 'objectives') renderObjectives();
-        if (page === 'links') renderLinks();
         if (page === 'statistics') renderStatistics();
-        if (page === 'timer') initTimer();
+        if (page === 'tools') { navigateToToolsDefault(); }
+        if (page === 'ai') renderAiLinks();
+        if (page === 'calendar') renderCalendar();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // ============================================================
-    // 5. HOME CARDS (DRAG & DROP)
+    // Home cards (order from data.homeOrder, migration safe)
     // ============================================================
-    // --------------- REPLACED renderHomeCards ---------------
-    function renderHomeCards() {
+    function renderHomeCards(){
         const container = document.getElementById('homeCardGrid');
-        const order = data.homeOrder || ['information', 'quiz', 'dse', 'links', 'objectives', 'statistics', 'timer'];
+        const order = data.homeOrder || HOME_DEFAULT_ORDER.slice();
         const cardMap = {
             information: { title: 'Information', desc: 'Folders & Files' },
             quiz: { title: 'Quiz', desc: 'Chapters & Files' },
@@ -850,15 +696,16 @@
             links: { title: 'Links', desc: 'Bookmarks & app shortcuts' },
             objectives: { title: 'Objectives', desc: 'Target & Current Grades' },
             statistics: { title: 'Statistics', desc: 'Study habit trends' },
+            tools: { title: 'Tools', desc: 'Calculator & Grade' },
+            ai: { title: 'AI', desc: 'Manage AI links' },
             timer: { title: 'Timer', desc: 'Stopwatch & Countdown' }
         };
         let html = '';
         order.forEach(id => {
             if (!cardMap[id]) return;
-            // 為 statistics card 加入一個小畫布作為 preview
             if (id === 'statistics') {
                 html += `
-                    <div class="main-card" draggable="true" data-card-id="${id}" onclick="handleCardClick('${id}')">
+                    <div class="main-card" data-card-id="${id}" onclick="handleCardClick('${id}')">
                         <div style="display:flex; align-items:center; gap:6px;">
                             <span class="title">${cardMap[id].title}</span>
                             <span class="desc">${cardMap[id].desc}</span>
@@ -870,7 +717,7 @@
                 `;
             } else {
                 html += `
-                    <div class="main-card" draggable="true" data-card-id="${id}" onclick="handleCardClick('${id}')">
+                    <div class="main-card" data-card-id="${id}" onclick="handleCardClick('${id}')">
                         <div style="display:flex; align-items:center; gap:6px;">
                             <span class="title">${cardMap[id].title}</span>
                             <span class="desc">${cardMap[id].desc}</span>
@@ -881,86 +728,33 @@
             }
         });
         container.innerHTML = html;
-
-        document.querySelectorAll('.main-card').forEach(card => {
-            card.addEventListener('dragstart', handleCardDragStart);
-            card.addEventListener('dragend', handleCardDragEnd);
-            card.addEventListener('dragover', handleCardDragOver);
-            card.addEventListener('dragenter', handleCardDragEnter);
-            card.addEventListener('dragleave', handleCardDragLeave);
-            card.addEventListener('drop', handleCardDrop);
-        });
-
-        // 畫 preview（如果有 data 的話）
-        setTimeout(renderStatPreview, 50);
+        // draw preview
+        setTimeout(renderStatPreview, 60);
     }
 
     function handleCardClick(id) {
-        if (id === 'information' || id === 'dse') {
-            openCategory(id.charAt(0).toUpperCase() + id.slice(1));
-        } else if (id === 'quiz') {
-            openQuiz();
-        } else if (id === 'links') {
-            navigateTo('links');
-        } else if (id === 'objectives') {
-            navigateTo('objectives');
-        } else if (id === 'statistics') {
-            navigateTo('statistics');
-        } else if (id === 'timer') {
-            navigateTo('timer');
-        }
-    }
-
-    let dragCardSrc = null;
-    function handleCardDragStart(e) {
-        this.classList.add('dragging');
-        dragCardSrc = this.dataset.cardId;
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', this.dataset.cardId);
-    }
-    function handleCardDragEnd(e) {
-        this.classList.remove('dragging');
-        document.querySelectorAll('.main-card.drag-over').forEach(el => el.classList.remove('drag-over'));
-    }
-    function handleCardDragOver(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-    }
-    function handleCardDragEnter(e) {
-        e.preventDefault();
-        if (this !== document.querySelector('.main-card.dragging')) {
-            this.classList.add('drag-over');
-        }
-    }
-    function handleCardDragLeave(e) {
-        this.classList.remove('drag-over');
-    }
-    function handleCardDrop(e) {
-        e.preventDefault();
-        this.classList.remove('drag-over');
-        const draggedId = e.dataTransfer.getData('text/plain');
-        const targetId = this.dataset.cardId;
-        if (draggedId === targetId) return;
-        const order = data.homeOrder || [];
-        const srcIdx = order.indexOf(draggedId);
-        const tgtIdx = order.indexOf(targetId);
-        if (srcIdx > -1 && tgtIdx > -1) {
-            order.splice(srcIdx, 1);
-            order.splice(tgtIdx, 0, draggedId);
-            data.homeOrder = order;
-            saveData();
-            renderHomeCards();
-        }
+        if (id === 'information' || id === 'dse') openCategory(id.charAt(0).toUpperCase() + id.slice(1));
+        else if (id === 'quiz') openQuiz();
+        else if (id === 'links') navigateTo('links');
+        else if (id === 'objectives') navigateTo('objectives');
+        else if (id === 'statistics') navigateTo('statistics');
+        else if (id === 'tools') navigateTo('tools');
+        else if (id === 'ai') navigateTo('ai');
+        else if (id === 'timer') navigateTo('timer');
     }
 
     // ============================================================
-    // 6. CATEGORIES (Information / DSE)
+    // Categories & subjects
     // ============================================================
+    let currentCategory = null;
+    let currentSubject = null;
+    let currentChapterKey = null;
+    let currentChapterIndex = null;
+
     function openCategory(category) {
         currentCategory = category;
         document.getElementById('categoryTitle').innerText = category;
-        const grid = document.getElementById('subjectGrid');
-        grid.innerHTML = '';
+        const grid = document.getElementById('subjectGrid'); grid.innerHTML = '';
         SUBJECTS.forEach(subj => {
             const div = document.createElement('div');
             div.className = 'subject-item';
@@ -974,7 +768,7 @@
     function openSubjectDetail(category, subject) {
         currentCategory = category;
         currentSubject = subject;
-        document.getElementById('detailTitle').innerText = subject;
+        document.getElementById('detailTitle').innerText = `${subject} (${category})`;
         renderDetail();
         navigateTo('detail');
     }
@@ -985,69 +779,31 @@
     }
 
     // ============================================================
-    // 7. QUIZ (完全獨立)
+    // Chapters (unified for Information / Quiz / DSE)
     // ============================================================
-    function openQuiz() {
-        currentCategory = 'Quiz';
-        document.getElementById('quizTitle').innerText = 'Quiz';
-        const grid = document.getElementById('subjectGrid');
-        grid.innerHTML = '';
-        SUBJECTS.forEach(subj => {
-            const div = document.createElement('div');
-            div.className = 'subject-item';
-            div.innerHTML = `<div class="subj-name">${subj}</div>`;
-            div.onclick = () => openQuizSubject(subj);
-            grid.appendChild(div);
-        });
-        // 用同一個 grid，但放喺 quiz page
-        document.getElementById('quizContent').innerHTML = '';
-        const container = document.getElementById('quizContent');
-        container.innerHTML = `<div id="quizSubjectGrid" class="subject-grid"></div>`;
-        const grid2 = document.getElementById('quizSubjectGrid');
-        grid2.innerHTML = '';
-        SUBJECTS.forEach(subj => {
-            const div = document.createElement('div');
-            div.className = 'subject-item';
-            div.innerHTML = `<div class="subj-name">${subj}</div>`;
-            div.onclick = () => openQuizSubject(subj);
-            grid2.appendChild(div);
-        });
-        navigateTo('quiz');
-    }
-
-    function goBackFromQuiz() {
-        navigateTo('home');
-    }
-
-    function openQuizSubject(subject) {
-        currentSubject = subject;
-        document.getElementById('quizTitle').innerText = subject;
-        const key = 'Quiz_' + subject;
-        const container = document.getElementById('quizContent');
-        container.innerHTML = renderQuizChapters(key);
-        navigateTo('quiz');
-    }
-
-    function renderQuizChapters(key) {
+    function renderDetail() {
+        const container = document.getElementById('detailContent');
+        if (!currentCategory || !currentSubject) { container.innerHTML = '<div class="empty-state">Select a subject.</div>'; return; }
+        const key = keyFor(currentCategory, currentSubject);
+        const chapters = data.chapters[key] || [];
         let html = `
-            <div class="flex-between" style="margin:8px 0 12px;">
-                <span class="section-title" style="border-bottom:none; margin:0;">Chapters</span>
-                <button class="btn-secondary" onclick="openChapterModal('${key}')">+ New Chapter</button>
+            <div class="flex-between" style="margin-bottom:12px;align-items:center;">
+                <div style="font-size:16px;font-weight:300;">${currentSubject} — ${currentCategory}</div>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn-secondary" onclick="openChapterModal('${key}')">+ New Chapter</button>
+                </div>
             </div>
             <div id="chapterList_${key}"></div>
         `;
-        setTimeout(() => renderChapterList(key), 0);
-        return html;
+        container.innerHTML = html;
+        renderChapterList(key);
     }
 
     function renderChapterList(key) {
         const container = document.getElementById('chapterList_' + key);
         if (!container) return;
         const chapters = data.chapters[key] || [];
-        if (chapters.length === 0) {
-            container.innerHTML = '<div class="empty-state">No chapters yet. Create one!</div>';
-            return;
-        }
+        if (chapters.length === 0) { container.innerHTML = '<div class="empty-state">No chapters yet. Create one!</div>'; return; }
         container.innerHTML = chapters.map((ch, idx) => {
             const linkCount = ch.links ? ch.links.length : 0;
             const fileCount = ch.files ? ch.files.length : 0;
@@ -1059,7 +815,7 @@
                     </div>
                     <div style="display:flex; gap:8px; margin-top:6px;">
                         <button class="btn-secondary" onclick="event.stopPropagation(); openChapterModal('${key}', ${idx})">Rename</button>
-                        <button class="btn-secondary" style="color:#e74c3c;" onclick="event.stopPropagation(); deleteChapter('${key}', ${idx})">Delete</button>
+                        <button class="btn-secondary" style="background:#e74c3c" onclick="event.stopPropagation(); deleteChapter('${key}', ${idx})">Delete</button>
                     </div>
                 </div>
             `;
@@ -1074,21 +830,17 @@
         modal.classList.add('show');
     }
 
-    function closeChapterModal() {
-        document.getElementById('chapterModal').classList.remove('show');
-    }
+    function closeChapterModal() { document.getElementById('chapterModal').classList.remove('show'); }
 
     function saveChapter() {
-        const key = document.getElementById('chapterModal').dataset.key;
-        const editIdx = document.getElementById('chapterModal').dataset.editIdx;
+        const modal = document.getElementById('chapterModal');
+        const key = modal.dataset.key;
+        const editIdx = modal.dataset.editIdx;
         const name = document.getElementById('chapterName').value.trim();
         if (!name) return alert('Enter a chapter name.');
         if (!data.chapters[key]) data.chapters[key] = [];
-        if (editIdx !== '') {
-            data.chapters[key][parseInt(editIdx)].name = name;
-        } else {
-            data.chapters[key].push({ name: name, links: [], files: [] });
-        }
+        if (editIdx !== '') data.chapters[key][parseInt(editIdx)].name = name;
+        else data.chapters[key].push({ name: name, links: [], files: [] });
         saveData();
         closeChapterModal();
         renderChapterList(key);
@@ -1101,11 +853,14 @@
         renderChapterList(key);
     }
 
-    // ----- Chapter Links & Files (Quiz) -----
+    // ============================================================
+    // Chapter Links & Files (shared)
+    // ============================================================
     function openChapterLinks(key, chIdx) {
-        currentSubject = key.replace(/^.*_/, '');
+        currentChapterKey = key;
         currentChapterIndex = chIdx;
-        document.getElementById('chapterLinksTitle').textContent = data.chapters[key][chIdx].name;
+        const ch = data.chapters[key][chIdx];
+        document.getElementById('chapterLinksTitle').textContent = ch.name;
         document.getElementById('chapterLinksList').dataset.key = key;
         document.getElementById('chapterLinksList').dataset.chIdx = chIdx;
         document.getElementById('chapterFilesList').dataset.key = key;
@@ -1116,8 +871,8 @@
     }
 
     function goBackFromChapterLinks() {
-        // 返回 Quiz 嘅 subjects 頁面
-        openQuiz();
+        renderDetail();
+        navigateTo('detail');
     }
 
     function renderChapterLinks() {
@@ -1127,13 +882,10 @@
         const chapters = data.chapters[key] || [];
         if (chIdx >= chapters.length) return;
         const links = chapters[chIdx].links || [];
-        if (links.length === 0) {
-            container.innerHTML = '<div class="empty-state">No links in this chapter.</div>';
-            return;
-        }
+        if (links.length === 0) { container.innerHTML = '<div class="empty-state">No links in this chapter.</div>'; return; }
         container.innerHTML = links.map((link, idx) =>
             `<div class="chapter-link-item">
-                <a href="${link.url}" target="_blank">${link.name}</a>
+                <a href="${escapeAttr(link.url)}" target="_blank">${link.name}</a>
                 <button class="del-link" onclick="deleteChapterLink(${idx})">✕</button>
             </div>`
         ).join('');
@@ -1168,6 +920,9 @@
         renderChapterList(key);
     }
 
+    // ============================================================
+    // Files: rendering nested tree with expand/collapse and helpers
+    // ============================================================
     function renderChapterFiles() {
         const container = document.getElementById('chapterFilesList');
         const key = container.dataset.key;
@@ -1175,549 +930,223 @@
         const chapters = data.chapters[key] || [];
         if (chIdx >= chapters.length) return;
         const files = chapters[chIdx].files || [];
-        if (files.length === 0) {
-            container.innerHTML = '<div class="empty-state">No files in this chapter.</div>';
-            return;
-        }
-        container.innerHTML = files.map((f, idx) =>
-            `<div class="chapter-file-item">
-                <div class="info">
-                    <span class="title">${f.name}</span>
-                    <div class="sub">${(f.size/1024).toFixed(1)} KB</div>
-                </div>
-                <div class="actions">
-                    <button class="open-btn" onclick="openFile('${f.data}', '${f.name}')" title="Open">📂</button>
-                    <a class="download-btn" href="${f.data}" download="${f.name}" title="Download">⬇</a>
-                    <button onclick="deleteChapterFile(${idx})">✕</button>
-                </div>
-            </div>`
-        ).join('');
+        if (files.length === 0) { container.innerHTML = '<div class="empty-state">No files in this chapter.</div>'; return; }
+        container.innerHTML = renderFileTreeHtml(files);
     }
 
+    function renderFileTreeHtml(list) {
+        // recursive HTML builder that creates folder headers with toggle
+        return list.map(item => {
+            if (item.type === 'folder') {
+                // ensure id exists
+                if (!item.id) item.id = generateId();
+                return `
+                    <div class="folder-item" data-folder-id="${item.id}">
+                        <div class="folder-header">
+                            <button class="btn-secondary" style="padding:6px 8px;font-size:13px;" onclick="toggleFolderById('${item.id}'); event.stopPropagation();">▾</button>
+                            <div class="folder-name" style="flex:1;color:#fff;font-weight:500;padding-left:6px;" onclick="toggleFolderById('${item.id}')">${item.name}</div>
+                            <div class="folder-actions">
+                                <button onclick="event.stopPropagation(); renameFolderById('${item.id}')">✎</button>
+                                <button onclick="event.stopPropagation(); deleteFolderById('${item.id}')">✕</button>
+                            </div>
+                        </div>
+                        <div id="folder_children_${item.id}" class="folder-children">
+                            ${renderFileTreeHtml(item.children || [])}
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="chapter-file-item">
+                        <div class="info">
+                            <span class="title">${item.name}</span>
+                            <div class="sub">${item.size ? (Math.round(item.size/1024) + ' KB') : ''}</div>
+                        </div>
+                        <div class="actions">
+                            ${item.data ? `<button class="open-btn" onclick="openFile('${item.data}', '${escapeAttr(item.name)}')">📂</button>` : ''}
+                            ${item.data ? `<a class="download-btn" href="${item.data}" download="${escapeAttr(item.name)}">⬇</a>` : ''}
+                            <button onclick="deleteFileById('${item.id || ''}')">✕</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }).join('');
+    }
+
+    function toggleFolderById(id) {
+        const el = document.getElementById('folder_children_' + id);
+        if (!el) return;
+        el.classList.toggle('collapsed');
+        // also toggle caret symbol — simple approach: find the previous sibling button and rotate
+        // (we used a button with inner text "▾"; we can rotate by toggling style)
+        // keep simple: no caret rotation necessary
+    }
+
+    // helpers to find node and its parent array by id within a chapter
+    function findNodeAndParentArray(key, chIdx, id) {
+        const rootArr = data.chapters[key][chIdx].files || [];
+        let parent = null;
+        let parentArr = rootArr;
+
+        function recurse(arr){
+            for (let i=0;i<arr.length;i++){
+                const it = arr[i];
+                if (it.id === id) return { node: it, parentArr: arr, index: i };
+                if (it.type === 'folder' && it.children) {
+                    const res = recurse(it.children);
+                    if (res) return res;
+                }
+            }
+            return null;
+        }
+        return recurse(rootArr);
+    }
+
+    function deleteFileById(id) {
+        if (!confirm('Delete this file?')) return;
+        // search across all chapters currently open (we know currentChapterKey/index)
+        const key = document.getElementById('chapterFilesList').dataset.key;
+        const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+        const root = data.chapters[key][chIdx];
+        if (!root) return;
+        let found = null;
+        function recurse(arr){
+            for (let i=0;i<arr.length;i++){
+                const it = arr[i];
+                if (it.id === id) { arr.splice(i,1); return true; }
+                if (it.type === 'folder' && it.children) {
+                    if (recurse(it.children)) return true;
+                }
+            }
+            return false;
+        }
+        if (recurse(root.files || [])) { saveData(); renderChapterFiles(); renderChapterList(key); }
+    }
+
+    function deleteFolderById(id) {
+        if (!confirm('Delete folder and all its contents?')) return;
+        const key = document.getElementById('chapterFilesList').dataset.key;
+        const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+        const chapter = data.chapters[key][chIdx];
+        if (!chapter) return;
+        function recurse(arr) {
+            for (let i=0;i<arr.length;i++){
+                const it = arr[i];
+                if (it.type === 'folder' && it.id === id) { arr.splice(i,1); return true; }
+                if (it.type === 'folder' && it.children) {
+                    if (recurse(it.children)) return true;
+                }
+            }
+            return false;
+        }
+        if (recurse(chapter.files || [])) { saveData(); renderChapterFiles(); renderChapterList(key); }
+    }
+
+    function renameFolderById(id) {
+        const key = document.getElementById('chapterFilesList').dataset.key;
+        const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+        const chapter = data.chapters[key][chIdx];
+        if (!chapter) return;
+        function recurse(arr) {
+            for (let i=0;i<arr.length;i++){
+                const it = arr[i];
+                if (it.type === 'folder' && it.id === id) {
+                    const newName = prompt('Rename folder:', it.name);
+                    if (newName && newName.trim() !== '') {
+                        it.name = newName.trim(); saveData(); renderChapterFiles(); renderChapterList(key);
+                    }
+                    return true;
+                }
+                if (it.type === 'folder' && it.children) {
+                    if (recurse(it.children)) return true;
+                }
+            }
+            return false;
+        }
+        recurse(chapter.files || []);
+    }
+
+    // ============================================================
+    // File upload helpers: add single file at root
+    // ============================================================
     function addChapterFile() {
-        const container = document.getElementById('chapterFilesList');
-        const key = container.dataset.key;
-        const chIdx = parseInt(container.dataset.chIdx);
         const input = document.getElementById('chapterFileInput');
         const file = input.files[0];
         if (!file) return alert('Please select a file.');
         const reader = new FileReader();
+        const key = document.getElementById('chapterFilesList').dataset.key;
+        const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
         reader.onload = function(e) {
-            const base64 = e.target.result;
-            const entry = { name: file.name, type: file.type, data: base64, size: file.size };
-            const chapters = data.chapters[key] || [];
-            if (chIdx >= chapters.length) return;
-            if (!chapters[chIdx].files) chapters[chIdx].files = [];
-            chapters[chIdx].files.push(entry);
+            const entry = { id: generateId(), name: file.name, type: 'file', data: e.target.result, size: file.size };
+            if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
+            data.chapters[key][chIdx].files.push(entry);
             saveData();
-            renderChapterFiles();
             input.value = '';
+            renderChapterFiles();
             renderChapterList(key);
         };
         reader.readAsDataURL(file);
     }
 
-    function deleteChapterFile(idx) {
-        if (!confirm('Delete this file?')) return;
-        const container = document.getElementById('chapterFilesList');
-        const key = container.dataset.key;
-        const chIdx = parseInt(container.dataset.chIdx);
-        data.chapters[key][chIdx].files.splice(idx, 1);
-        saveData();
-        renderChapterFiles();
-        renderChapterList(key);
-    }
-
-    // ============================================================
-    // 8. FOLDER SYSTEM (Information & DSE - 完全獨立)
-    // ============================================================
-    function renderDetail() {
-        const container = document.getElementById('detailContent');
-        if (currentCategory === 'Information') {
-            container.innerHTML = renderFolderSystem('infoFolders', currentSubject);
-        } else if (currentCategory === 'DSE') {
-            container.innerHTML = renderFolderSystem('dseFolders', currentSubject);
-        }
-    }
-
-    function renderFolderSystem(folderType, subject, path = []) {
-        const folders = data[folderType]?.[subject] || [];
-        let current = folders;
-        for (const p of path) {
-            const found = current.find(f => f.id === p);
-            if (found && found.type === 'folder') current = found.children || [];
-            else break;
-        }
-
-        let html = `
-            <div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;">
-                <button class="btn-secondary" onclick="openFolderModal('${folderType}','${subject}','${path.join(',')}')">+ New Folder</button>
-                <button class="btn-secondary" onclick="openItemModal('${folderType}','${subject}','${path.join(',')}')">+ Add Item</button>
-                <button class="btn-secondary" onclick="uploadFolder('${folderType}','${subject}','${path.join(',')}')">📤 Upload Folder</button>
-            </div>
-        `;
-
-        if (current.length === 0) {
-            html += `<div class="empty-state">No folders or items. Create one above.</div>`;
-        } else {
-            html += `<div class="folder-list">`;
-            for (const item of current) {
-                if (item.type === 'folder') {
-                    html += `
-                        <div class="folder-item">
-                            <div class="folder-header">
-                                <span class="folder-icon">${item.icon || '📁'}</span>
-                                <span class="folder-name" onclick="openFolder('${folderType}','${subject}','${path.join(',')}','${item.id}')">${item.name}</span>
-                                <div class="folder-actions">
-                                    <button onclick="event.stopPropagation(); editFolder('${folderType}','${subject}','${path.join(',')}','${item.id}')">✎</button>
-                                    <button onclick="event.stopPropagation(); deleteFolderItem('${folderType}','${subject}','${path.join(',')}','${item.id}')">✕</button>
-                                </div>
-                            </div>
-                            <div class="folder-children" id="folder_children_${item.id}"></div>
-                        </div>
-                    `;
-                } else {
-                    const icon = item.icon || (item.type === 'link' ? '🔗' : '📄');
-                    html += `
-                        <div class="file-item">
-                            <div class="file-info">
-                                <span class="file-icon">${icon}</span>
-                                <span class="file-name">${item.name}</span>
-                            </div>
-                            <div class="file-actions">
-                                ${item.type === 'link' ? `<a href="${item.url}" target="_blank" style="color:#8ab4f8; font-size:14px; text-decoration:none; margin-right:6px;">↗</a>` : ''}
-                                ${item.type === 'file' ? `<button onclick="openFile('${item.data}', '${item.name}')" style="color:#8ab4f8;">📂</button>` : ''}
-                                ${item.type === 'file' ? `<a href="${item.data}" download="${item.name}" style="color:#8ab4f8; font-size:14px; text-decoration:none; margin-right:4px;">⬇</a>` : ''}
-                                <button class="del-btn" onclick="deleteFolderItem('${folderType}','${subject}','${path.join(',')}','${item.id}')">✕</button>
-                            </div>
-                        </div>
-                    `;
-                }
-            }
-            html += `</div>`;
-        }
-
-        setTimeout(() => {
-            for (const p of path) {
-                const el = document.getElementById('folder_children_' + p);
-                if (el) {
-                    const subPath = path.slice(0, path.indexOf(p) + 1);
-                    el.innerHTML = renderFolderSystem(folderType, subject, subPath);
-                }
-            }
-        }, 50);
-
-        return html;
-    }
-
-    function openFolder(folderType, subject, pathStr, folderId) {
-        const path = pathStr ? pathStr.split(',') : [];
-        const newPath = [...path, folderId];
-        const container = document.getElementById('detailContent');
-        container.innerHTML = renderFolderSystem(folderType, subject, newPath);
-    }
-
-    function generateId() { return Date.now() + '_' + Math.random().toString(36).substr(2, 6); }
-
-    function openFolderModal(folderType, subject, pathStr) {
-        document.getElementById('folderModal').dataset.folderType = folderType;
-        document.getElementById('folderModal').dataset.subject = subject;
-        document.getElementById('folderModal').dataset.path = pathStr;
-        document.getElementById('folderName').value = '';
-        document.querySelectorAll('#folderIconSelector .icon-option').forEach(el => el.classList.remove('selected'));
-        document.querySelector('#folderIconSelector .icon-option[data-icon="📁"]').classList.add('selected');
-        selectedIcon = '📁';
-        document.getElementById('folderModal').classList.add('show');
-    }
-
-    function closeFolderModal() {
-        document.getElementById('folderModal').classList.remove('show');
-    }
-
-    function selectIcon(el) {
-        document.querySelectorAll('#folderIconSelector .icon-option').forEach(e => e.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedIcon = el.dataset.icon || '📁';
-    }
-
-    function uploadIcon(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            const container = document.getElementById('folderIconSelector');
-            const span = document.createElement('span');
-            span.className = 'icon-option selected';
-            span.style.background = '#1a2a3a';
-            span.style.border = '2px solid #8ab4f8';
-            span.style.borderRadius = '8px';
-            span.style.padding = '4px 8px';
-            span.style.display = 'inline-flex';
-            span.style.alignItems = 'center';
-            span.style.justifyContent = 'center';
-            span.style.width = '40px';
-            span.style.height = '40px';
-            const img = document.createElement('img');
-            img.src = base64;
-            img.style.width = '32px';
-            img.style.height = '32px';
-            img.style.objectFit = 'contain';
-            img.style.borderRadius = '4px';
-            span.appendChild(img);
-            span.onclick = function() {
-                document.querySelectorAll('#folderIconSelector .icon-option').forEach(e => e.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedIcon = this.querySelector('img') ? this.querySelector('img').src : '📁';
-            };
-            container.appendChild(span);
-            selectedIcon = base64;
-            input.value = '';
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function saveFolder() {
-        const modal = document.getElementById('folderModal');
-        const folderType = modal.dataset.folderType;
-        const subject = modal.dataset.subject;
-        const pathStr = modal.dataset.path;
-        const name = document.getElementById('folderName').value.trim();
-        if (!name) return alert('Enter a folder name.');
-
-        const folders = data[folderType]?.[subject] || [];
-        const path = pathStr ? pathStr.split(',') : [];
-        let current = folders;
-        for (const p of path) {
-            const found = current.find(f => f.id === p);
-            if (found && found.type === 'folder') current = found.children || [];
-            else return alert('Folder not found.');
-        }
-
-        const newFolder = {
-            id: generateId(),
-            name: name,
-            icon: selectedIcon || '📁',
-            type: 'folder',
-            children: []
-        };
-        current.push(newFolder);
-        saveData();
-        closeFolderModal();
-        const container = document.getElementById('detailContent');
-        container.innerHTML = renderFolderSystem(folderType, subject, path);
-    }
-
-    function deleteFolderItem(folderType, subject, pathStr, itemId) {
-        showDeleteConfirm(`Delete "${itemId}"?`, () => {
-            const folders = data[folderType]?.[subject] || [];
-            const path = pathStr ? pathStr.split(',') : [];
-            let current = folders;
-            for (const p of path) {
-                const found = current.find(f => f.id === p);
-                if (found && found.type === 'folder') current = found.children || [];
-                else return;
-            }
-            const idx = current.findIndex(f => f.id === itemId);
-            if (idx === -1) return;
-            current.splice(idx, 1);
-            saveData();
-            const container = document.getElementById('detailContent');
-            container.innerHTML = renderFolderSystem(folderType, subject, path);
-        });
-    }
-
-    function editFolder(folderType, subject, pathStr, folderId) {
-        const folders = data[folderType]?.[subject] || [];
-        const path = pathStr ? pathStr.split(',') : [];
-        let current = folders;
-        for (const p of path) {
-            const found = current.find(f => f.id === p);
-            if (found && found.type === 'folder') current = found.children || [];
-            else return;
-        }
-        const folder = current.find(f => f.id === folderId);
-        if (!folder) return;
-        const newName = prompt('Rename folder:', folder.name);
-        if (newName === null || newName.trim() === '') return;
-        folder.name = newName.trim();
-        saveData();
-        const container = document.getElementById('detailContent');
-        container.innerHTML = renderFolderSystem(folderType, subject, path);
-    }
-
-    function openItemModal(folderType, subject, pathStr) {
-        document.getElementById('itemModal').dataset.folderType = folderType;
-        document.getElementById('itemModal').dataset.subject = subject;
-        document.getElementById('itemModal').dataset.path = pathStr;
-        document.getElementById('itemName').value = '';
-        document.getElementById('itemURL').value = '';
-        document.getElementById('itemFileInput').value = '';
-        document.getElementById('itemType').value = 'file';
-        toggleItemFields();
-        document.querySelectorAll('#itemIconSelector .icon-option').forEach(el => el.classList.remove('selected'));
-        document.querySelector('#itemIconSelector .icon-option[data-icon=""]').classList.add('selected');
-        selectedItemIcon = '';
-        document.getElementById('itemModal').classList.add('show');
-    }
-
-    function closeItemModal() {
-        document.getElementById('itemModal').classList.remove('show');
-    }
-
-    function toggleItemFields() {
-        const type = document.getElementById('itemType').value;
-        document.getElementById('itemFileField').style.display = type === 'file' ? '' : 'none';
-        document.getElementById('itemLinkField').style.display = type === 'link' ? '' : 'none';
-    }
-
-    function selectItemIcon(el) {
-        document.querySelectorAll('#itemIconSelector .icon-option').forEach(e => e.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedItemIcon = el.dataset.icon || '';
-    }
-
-    function uploadItemIcon(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            const container = document.getElementById('itemIconSelector');
-            const span = document.createElement('span');
-            span.className = 'icon-option selected';
-            span.style.background = '#1a2a3a';
-            span.style.border = '2px solid #8ab4f8';
-            span.style.borderRadius = '8px';
-            span.style.padding = '4px 8px';
-            span.style.display = 'inline-flex';
-            span.style.alignItems = 'center';
-            span.style.justifyContent = 'center';
-            span.style.width = '40px';
-            span.style.height = '40px';
-            const img = document.createElement('img');
-            img.src = base64;
-            img.style.width = '32px';
-            img.style.height = '32px';
-            img.style.objectFit = 'contain';
-            img.style.borderRadius = '4px';
-            span.appendChild(img);
-            span.onclick = function() {
-                document.querySelectorAll('#itemIconSelector .icon-option').forEach(e => e.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedItemIcon = this.querySelector('img') ? this.querySelector('img').src : '';
-            };
-            container.appendChild(span);
-            selectedItemIcon = base64;
-            input.value = '';
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function saveItem() {
-        const modal = document.getElementById('itemModal');
-        const folderType = modal.dataset.folderType;
-        const subject = modal.dataset.subject;
-        const pathStr = modal.dataset.path;
-        const type = document.getElementById('itemType').value;
-        const name = document.getElementById('itemName').value.trim();
-        if (!name) return alert('Enter a name.');
-
-        const folders = data[folderType]?.[subject] || [];
-        const path = pathStr ? pathStr.split(',') : [];
-        let current = folders;
-        for (const p of path) {
-            const found = current.find(f => f.id === p);
-            if (found && found.type === 'folder') current = found.children || [];
-            else return alert('Folder not found.');
-        }
-
-        const newItem = {
-            id: generateId(),
-            name: name,
-            type: type,
-            icon: selectedItemIcon || (type === 'link' ? '🔗' : '📄')
-        };
-
-        if (type === 'link') {
-            const url = document.getElementById('itemURL').value.trim();
-            if (!url) return alert('Enter a URL.');
-            newItem.url = url;
-            current.push(newItem);
-            saveData();
-            closeItemModal();
-            const container = document.getElementById('detailContent');
-            container.innerHTML = renderFolderSystem(folderType, subject, path);
-        } else {
-            const input = document.getElementById('itemFileInput');
-            const file = input.files[0];
-            if (!file) return alert('Select a file.');
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                newItem.data = e.target.result;
-                newItem.size = file.size;
-                current.push(newItem);
-                saveData();
-                closeItemModal();
-                const container = document.getElementById('detailContent');
-                container.innerHTML = renderFolderSystem(folderType, subject, path);
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    function uploadFolder(folderType, subject, pathStr) {
+    // Upload entire folder (webkitdirectory) and preserve structure
+    function uploadChapterFolder() {
         const input = document.createElement('input');
         input.type = 'file';
         input.webkitdirectory = true;
         input.multiple = true;
-        input.onchange = function(e) {
-            const files = e.target.files;
+        input.onchange = function(e){
+            const files = Array.from(e.target.files);
             if (!files || files.length === 0) return;
-            const folders = data[folderType]?.[subject] || [];
-            const path = pathStr ? pathStr.split(',') : [];
-            let current = folders;
-            for (const p of path) {
-                const found = current.find(f => f.id === p);
-                if (found && found.type === 'folder') current = found.children || [];
-                else return alert('Folder not found.');
-            }
+            const key = document.getElementById('chapterFilesList').dataset.key;
+            const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+            if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
+            const root = data.chapters[key][chIdx].files;
 
-            const folderMap = {};
-            for (const file of files) {
+            files.forEach(file => {
                 const parts = file.webkitRelativePath.split('/');
-                const folderName = parts[0];
-                const fileName = parts.slice(1).join('/');
-                if (!folderMap[folderName]) {
-                    const existing = current.find(f => f.name === folderName && f.type === 'folder');
-                    if (existing) {
-                        folderMap[folderName] = existing.children;
-                    } else {
-                        const newFolder = {
-                            id: generateId(),
-                            name: folderName,
-                            icon: '📁',
-                            type: 'folder',
-                            children: []
+                // navigate/create nested folder objects
+                let pointer = root;
+                for (let i = 0; i < parts.length; i++) {
+                    const name = parts[i];
+                    if (i === parts.length - 1) {
+                        // file
+                        const reader = new FileReader();
+                        reader.onload = function(ev) {
+                            const entry = { id: generateId(), name, type: 'file', data: ev.target.result, size: file.size };
+                            pointer.push(entry);
+                            saveData();
+                            renderChapterFiles();
+                            renderChapterList(key);
                         };
-                        current.push(newFolder);
-                        folderMap[folderName] = newFolder.children;
+                        reader.readAsDataURL(file);
+                    } else {
+                        // folder level
+                        let folder = pointer.find(it => it.type === 'folder' && it.name === name);
+                        if (!folder) {
+                            folder = { id: generateId(), name, type: 'folder', children: [] };
+                            pointer.push(folder);
+                        }
+                        pointer = folder.children;
                     }
                 }
-                const reader = new FileReader();
-                reader.onload = function(ev) {
-                    const entry = {
-                        id: generateId(),
-                        name: fileName,
-                        type: 'file',
-                        icon: '📄',
-                        data: ev.target.result,
-                        size: file.size
-                    };
-                    folderMap[folderName].push(entry);
-                    saveData();
-                };
-                reader.readAsDataURL(file);
-            }
-            setTimeout(() => {
-                const container = document.getElementById('detailContent');
-                container.innerHTML = renderFolderSystem(folderType, subject, path);
-            }, 500);
+            });
         };
         input.click();
     }
 
-    function openFile(dataUrl, fileName) {
-        fetch(dataUrl)
-            .then(response => response.blob())
-            .then(blob => {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.target = '_blank';
-                a.rel = 'noopener';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(url), 10000);
-            })
-            .catch(() => {
-                window.open(dataUrl, '_blank');
-            });
-    }
-
     // ============================================================
-    // 9. LINKS (main)
+    // Links (main)
     // ============================================================
     function renderLinks() {
         const container = document.getElementById('linksList');
         const links = data.links || [];
-        if (links.length === 0) {
-            container.innerHTML = '<div class="empty-state">No links saved.</div>';
-            return;
-        }
+        if (links.length === 0) { container.innerHTML = '<div class="empty-state">No links saved.</div>'; return; }
         container.innerHTML = links.map((link, idx) =>
-            `<div class="link-item" draggable="true" data-link-index="${idx}">
-                <div class="link-content">
-                    <span class="drag-handle">⋮⋮</span>
-                    <a href="${link.url}" target="_blank">${link.name}</a>
-                </div>
+            `<div class="link-item">
+                <div class="link-content"><a href="${escapeAttr(link.url)}" target="_blank">${link.name}</a></div>
                 <button class="del-link" onclick="deleteLink(${idx})">✕</button>
             </div>`
         ).join('');
-
-        document.querySelectorAll('.link-item').forEach(item => {
-            item.addEventListener('dragstart', handleLinkDragStart);
-            item.addEventListener('dragend', handleLinkDragEnd);
-            item.addEventListener('dragover', handleLinkDragOver);
-            item.addEventListener('dragenter', handleLinkDragEnter);
-            item.addEventListener('dragleave', handleLinkDragLeave);
-            item.addEventListener('drop', handleLinkDrop);
-        });
-    }
-
-    let dragLinkSrcIndex = null;
-
-    function handleLinkDragStart(e) {
-        this.classList.add('dragging');
-        dragLinkSrcIndex = parseInt(this.dataset.linkIndex);
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', String(dragLinkSrcIndex));
-    }
-
-    function handleLinkDragEnd(e) {
-        this.classList.remove('dragging');
-        document.querySelectorAll('.link-item.drag-over').forEach(el => el.classList.remove('drag-over'));
-    }
-
-    function handleLinkDragOver(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-    }
-
-    function handleLinkDragEnter(e) {
-        e.preventDefault();
-        if (this !== document.querySelector('.link-item.dragging')) {
-            this.classList.add('drag-over');
-        }
-    }
-
-    function handleLinkDragLeave(e) {
-        this.classList.remove('drag-over');
-    }
-
-    function handleLinkDrop(e) {
-        e.preventDefault();
-        this.classList.remove('drag-over');
-        const draggedIdx = parseInt(e.dataTransfer.getData('text/plain'));
-        const targetIdx = parseInt(this.dataset.linkIndex);
-        if (draggedIdx === targetIdx) return;
-        const links = data.links;
-        const [draggedItem] = links.splice(draggedIdx, 1);
-        links.splice(targetIdx, 0, draggedItem);
-        data.links = links;
-        saveData();
-        renderLinks();
     }
 
     function addLink() {
@@ -1733,44 +1162,36 @@
     }
 
     function deleteLink(idx) {
-        showDeleteConfirm(`Delete "${data.links[idx].name}"?`, () => {
-            data.links.splice(idx, 1);
-            saveData();
-            renderLinks();
-        });
+        if (!confirm('Delete this link?')) return;
+        data.links.splice(idx, 1);
+        saveData();
+        renderLinks();
     }
 
     // ============================================================
-    // 10. OBJECTIVES
+    // Objectives
     // ============================================================
     function renderObjectives() {
         const container = document.getElementById('objectiveGrid');
         if (!container) return;
-        const subjOrder = ['Chinese', 'English', 'Mathematics', 'CS', 'Economics', 'Bafs', 'Ict'];
+        const subjOrder = SUBJECTS;
         let html = '';
         subjOrder.forEach(subj => {
             const obj = data.objectives[subj] || { target: '5', current: '4' };
-            const gradeList = (subj === 'CS') ? CS_GRADE_LEVELS : GRADE_LEVELS;
-            if (!gradeList.includes(obj.target)) obj.target = gradeList[0];
-            if (!gradeList.includes(obj.current)) obj.current = gradeList[0];
             html += `
                 <div class="objective-row">
                     <span class="obj-name">${subj}</span>
                     <div class="obj-grade-group">
                         <div>
                             <div class="grade-label">Target</div>
-                            <div class="grade-selector">
-                                <button onclick="changeGrade('${subj}', 'target', -1)">‹</button>
-                                <span class="grade-display target">${obj.target}</span>
-                                <button onclick="changeGrade('${subj}', 'target', 1)">›</button>
+                            <div style="display:flex;align-items:center;gap:8px">
+                                <input style="width:60px" value="${escapeAttr(obj.target)}" onchange="changeObjective('${subj}','target',this.value)" />
                             </div>
                         </div>
                         <div>
                             <div class="grade-label">Current</div>
-                            <div class="grade-selector">
-                                <button onclick="changeGrade('${subj}', 'current', -1)">‹</button>
-                                <span class="grade-display current">${obj.current}</span>
-                                <button onclick="changeGrade('${subj}', 'current', 1)">›</button>
+                            <div style="display:flex;align-items:center;gap:8px">
+                                <input style="width:60px" value="${escapeAttr(obj.current)}" onchange="changeObjective('${subj}','current',this.value)" />
                             </div>
                         </div>
                     </div>
@@ -1780,60 +1201,59 @@
         container.innerHTML = html;
     }
 
-    function changeGrade(subject, type, delta) {
-        const obj = data.objectives[subject] || { target: '5', current: '4' };
-        const gradeList = (subject === 'CS') ? CS_GRADE_LEVELS : GRADE_LEVELS;
-        if (!gradeList.includes(obj[type])) obj[type] = gradeList[0];
-        const idx = gradeList.indexOf(obj[type]);
-        let newIdx = idx + delta;
-        if (newIdx < 0) newIdx = 0;
-        if (newIdx >= gradeList.length) newIdx = gradeList.length - 1;
-        obj[type] = gradeList[newIdx];
-        data.objectives[subject] = obj;
+    function changeObjective(subject, type, value) {
+        if (!data.objectives) data.objectives = {};
+        data.objectives[subject] = data.objectives[subject] || { target: '5', current: '4' };
+        data.objectives[subject][type] = value;
         saveData();
-        renderObjectives();
     }
 
     // ============================================================
-    // 11. HABITS
+    // Habits
     // ============================================================
-    function renderHabits() {
-        const container = document.getElementById('habitsContainer');
-        if (!container) return;
+    function getTodayLocal() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function resetHabitsIfNewDay() {
         const today = getTodayLocal();
         if (!data.habits[today]) {
             data.habits[today] = {};
             SUBJECTS.forEach(s => data.habits[today][s] = false);
             saveData();
+            renderHabits();
+        }
+    }
+
+    function renderHabits() {
+        const container = document.getElementById('habitsContainer');
+        if (!container) return;
+        const today = getTodayLocal();
+        if (!data.habits[today]) {
+            data.habits[today] = {}; SUBJECTS.forEach(s => data.habits[today][s] = false);
+            saveData();
         }
         const streaks = {};
         SUBJECTS.forEach(subj => {
-            let count = 0;
-            let date = new Date();
+            let count = 0; let date = new Date();
             while (true) {
-                const d = formatLocalDate(date.getFullYear(), date.getMonth(), date.getDate());
-                if (data.habits[d] && data.habits[d][subj] === true) {
-                    count++;
-                    date.setDate(date.getDate() - 1);
-                } else {
-                    break;
-                }
+                const d = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+                if (data.habits[d] && data.habits[d][subj] === true) { count++; date.setDate(date.getDate()-1); } else break;
             }
             streaks[subj] = count;
         });
 
-        const order = ['Chinese', 'English', 'Mathematics', 'CS', 'Economics', 'Bafs', 'Ict'];
         let html = '';
-        order.forEach(subj => {
+        SUBJECTS.forEach(subj => {
             const done = data.habits[today][subj] || false;
             const streak = streaks[subj] || 0;
-            const statusText = '';
             const fireText = streak > 0 ? '🔥' + streak : '';
             html += `
                 <div class="habit-row" data-subject="${subj}">
                     <div class="habit-box ${done ? 'done' : ''}" onclick="toggleHabit('${subj}')">
                         <span class="habit-name">${subj}</span>
-                        <span class="habit-status">${statusText}</span>
+                        <span class="habit-status"></span>
                         <span class="habit-fire">${fireText}</span>
                     </div>
                 </div>
@@ -1845,202 +1265,50 @@
     function toggleHabit(subject) {
         const today = getTodayLocal();
         if (!data.habits[today]) {
-            data.habits[today] = {};
-            SUBJECTS.forEach(s => data.habits[today][s] = false);
+            data.habits[today] = {}; SUBJECTS.forEach(s => data.habits[today][s] = false);
         }
         data.habits[today][subject] = !data.habits[today][subject];
         saveData();
         renderHabits();
-        const calendarPage = document.getElementById('page-calendar');
-        if (calendarPage.classList.contains('active')) {
-            const currentDate = document.getElementById('studyLogContent').dataset.date;
-            if (currentDate) showStudyLogForDate(currentDate);
-        }
-    }
-
-    function formatLocalDate(year, month, day) {
-        const m = String(month + 1).padStart(2, '0');
-        const d = String(day).padStart(2, '0');
-        return year + '-' + m + '-' + d;
     }
 
     setInterval(() => {
         const today = getTodayLocal();
         if (!data.habits[today]) {
-            data.habits[today] = {};
-            SUBJECTS.forEach(s => data.habits[today][s] = false);
-            saveData();
-            renderHabits();
+            data.habits[today] = {}; SUBJECTS.forEach(s => data.habits[today][s] = false); saveData(); renderHabits();
         }
     }, 60000);
 
     // ============================================================
-    // 12. CALENDAR
+    // Calendar & Events (kept simple)
     // ============================================================
     let calYear = new Date().getFullYear();
     let calMonth = new Date().getMonth();
 
     function renderCalendar() {
         const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        document.getElementById('calMonthYear').innerText = calYear + ' ' + monthNames[calMonth];
-        const grid = document.getElementById('calGrid');
-        const firstDay = new Date(calYear, calMonth, 1).getDay();
-        const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
-        const today = getTodayLocal();
-        let html = `<div class="day-name">Sun</div><div class="day-name">Mon</div><div class="day-name">Tue</div><div class="day-name">Wed</div><div class="day-name">Thu</div><div class="day-name">Fri</div><div class="day-name">Sat</div>`;
-        for (let i=0; i<firstDay; i++) html += `<div class="day-cell empty"></div>`;
-        for (let d=1; d<=daysInMonth; d++) {
-            const dateStr = formatLocalDate(calYear, calMonth, d);
-            const hasEvent = data.events.some(e => e.date === dateStr);
-            const cls = 'day-cell' + (hasEvent ? ' has-event' : '');
-            html += `<div class="${cls}" onclick="selectDate('${dateStr}')">${d}</div>`;
-        }
-        grid.innerHTML = html;
-        selectDate(today);
+        document.getElementById('calGrid').innerText = `${calYear} ${monthNames[calMonth]}`;
     }
-
-    function changeMonth(delta) {
-        calMonth += delta;
-        if (calMonth<0) { calMonth=11; calYear--; }
-        if (calMonth>11) { calMonth=0; calYear++; }
-        renderCalendar();
-    }
-
-    function selectDate(dateStr) {
-        renderEventList('all', dateStr);
-        showStudyLogForDate(dateStr);
-    }
-
-    function showStudyLogForDate(dateStr) {
-        const container = document.getElementById('studyLogContent');
-        container.dataset.date = dateStr;
-        const habitsForDate = data.habits[dateStr] || {};
-        const studiedSubjects = SUBJECTS.filter(s => habitsForDate[s] === true);
-        if (studiedSubjects.length === 0) {
-            container.innerHTML = '<span class="study-log-empty">No study records on this day.</span>';
-            return;
-        }
-        const colorMap = {
-            'Chinese': '#e74c3c',
-            'English': '#f1c40f',
-            'Mathematics': '#3498db',
-            'CS': '#2ecc71',
-            'Economics': '#9b59b6',
-            'Bafs': '#e67e22',
-            'Ict': '#1abc9c'
-        };
-        let html = '<div class="log-subjects">';
-        studiedSubjects.forEach(subj => {
-            const color = colorMap[subj] || '#8ab4f8';
-            html += `<span class="log-subject done" style="border-color:${color}; color:${color};">${subj}</span>`;
-        });
-        html += '</div>';
-        container.innerHTML = html;
-    }
-
-    function renderEventList(filter, specificDate = null) {
-        const container = document.getElementById('eventList');
-        let events = [...data.events];
-        const filterVal = filter || document.getElementById('eventFilter').value;
-        const today = getTodayLocal();
-
-        if (specificDate) {
-            events = events.filter(e => e.date === specificDate);
-        } else {
-            if (filterVal === 'all') {
-                events = events.filter(e => e.date >= today);
-            } else if (filterVal === 'countdown') {
-                events = events.filter(e => e.type === 'countdown' && e.date >= today);
-            } else if (filterVal === 'schedule') {
-                events = events.filter(e => e.type === 'schedule' && e.date >= today);
-            }
-        }
-        events.sort((a,b) => a.date.localeCompare(b.date));
-
-        if (events.length === 0) {
-            container.innerHTML = '<div class="empty-state">No events.</div>';
-            return;
-        }
-
-        container.innerHTML = events.map(ev => {
-            const diff = Math.ceil((new Date(ev.date + 'T00:00:00') - new Date(today + 'T00:00:00')) / (1000*60*60*24));
-            let countdownText = '';
-            if (ev.type === 'countdown') {
-                if (diff === 0) countdownText = 'Today!';
-                else if (diff < 0) countdownText = Math.abs(diff) + ' days ago';
-                else countdownText = diff + ' days left';
-            }
-            return `<div class="event-item" style="border-left-color:${ev.type==='countdown'?'#f1c40f':'#888'};">
-                <div><div class="ev-title">${ev.title}</div><div class="ev-date">📅 ${ev.date}</div></div>
-                ${countdownText ? `<div class="ev-countdown">${countdownText}</div>` : `<div style="color:#666;">Schedule</div>`}
-                <button class="del-ev" onclick="deleteEvent(${ev.id})">✕</button>
-            </div>`;
-        }).join('');
-        document.getElementById('eventFilter').value = filterVal;
-    }
-
-    function openAddEvent() {
-        document.getElementById('eventModal').classList.add('show');
-        document.getElementById('evTitle').value = '';
-        document.getElementById('evDate').value = getTodayLocal();
-        document.getElementById('evType').value = 'schedule';
-    }
-
-    function closeEventModal() {
-        document.getElementById('eventModal').classList.remove('show');
-    }
-
-    function saveEvent() {
-        const title = document.getElementById('evTitle').value.trim();
-        const date = document.getElementById('evDate').value;
-        const type = document.getElementById('evType').value;
-        if (!title || !date) return alert('Fill in title and date.');
-        data.events.push({ id: Date.now(), title, date, type });
-        saveData();
-        closeEventModal();
-        renderCalendar();
-    }
-
-    function deleteEvent(id) {
-        showDeleteConfirm(`Delete event?`, () => {
-            data.events = data.events.filter(e => e.id !== id);
-            saveData();
-            renderCalendar();
-        });
-    }
-
-    document.getElementById('eventFilter')?.addEventListener('change', function() {
-        renderEventList(this.value);
-    });
 
     // ============================================================
-    // 13. STATISTICS (半透明曲線圖)
+    // Statistics (full page)
     // ============================================================
     let statRange = 'week';
-
     function setStatRange(range) {
         statRange = range;
-        document.querySelectorAll('.stat-filter-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.range === range);
-        });
+        document.querySelectorAll('.stat-filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.range === range));
         renderStatistics();
     }
 
     function renderStatistics() {
         const canvas = document.getElementById('statChart');
         if (!canvas) return;
-
         const habitDates = Object.keys(data.habits).sort();
         if (habitDates.length === 0) {
             document.getElementById('statSummary').innerHTML = '<div class="stat-no-data">No study data yet. Start tracking your habits!</div>';
             return;
         }
-
-        const dailyCounts = habitDates.map(date => {
-            const dayHabits = data.habits[date] || {};
-            return Object.values(dayHabits).filter(v => v === true).length;
-        });
-
+        const dailyCounts = habitDates.map(date => Object.values(data.habits[date] || {}).filter(v => v === true).length);
         const today = new Date();
         let cutoffDate = new Date(today);
         switch (statRange) {
@@ -2049,518 +1317,226 @@
             case 'halfyear': cutoffDate.setMonth(today.getMonth() - 6); break;
             case 'year': cutoffDate.setFullYear(today.getFullYear() - 1); break;
         }
-        const cutoffStr = formatLocalDate(cutoffDate.getFullYear(), cutoffDate.getMonth(), cutoffDate.getDate());
-
-        const filteredIndices = habitDates.map((date, idx) => date >= cutoffStr ? idx : -1).filter(i => i >= 0);
-        const filteredDates = filteredIndices.map(i => habitDates[i]);
-        const filteredCounts = filteredIndices.map(i => dailyCounts[i]);
-
-        if (filteredDates.length === 0) {
-            document.getElementById('statSummary').innerHTML = '<div class="stat-no-data">No data in this period.</div>';
-            return;
-        }
-
+        const cutoffStr = `${cutoffDate.getFullYear()}-${String(cutoffDate.getMonth()+1).padStart(2,'0')}-${String(cutoffDate.getDate()).padStart(2,'0')}`;
+        const filtered = habitDates.map((d,i) => d >= cutoffStr ? { d, c: dailyCounts[i] } : null).filter(x => x);
+        if (filtered.length === 0) { document.getElementById('statSummary').innerHTML = '<div class="stat-no-data">No data in this period.</div>'; return; }
+        const filteredCounts = filtered.map(f => f.c);
         const totalDays = filteredCounts.filter(c => c > 0).length;
-        const avgSubjects = (filteredCounts.reduce((a, b) => a + b, 0) / filteredDates.length);
+        const avgSubjects = filteredCounts.reduce((a,b)=>a+b,0) / filteredCounts.length;
         const maxSubjects = Math.max(...filteredCounts);
-
         document.getElementById('statTotalDays').textContent = totalDays;
         document.getElementById('statAvgSubjects').textContent = avgSubjects.toFixed(1);
         document.getElementById('statMaxSubjects').textContent = maxSubjects;
 
+        // draw chart
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.parentElement.getBoundingClientRect();
-        const width = rect.width - 24;
-        const height = Math.min(280, width * 0.6);
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
-        canvas.style.width = width + 'px';
-        canvas.style.height = height + 'px';
+        const width = rect.width - 24; const height = Math.min(280, width * 0.6);
+        canvas.width = width * dpr; canvas.height = height * dpr;
+        canvas.style.width = width + 'px'; canvas.style.height = height + 'px';
         ctx.scale(dpr, dpr);
-
+        ctx.clearRect(0,0,width,height);
+        if (filteredCounts.length < 2) { ctx.fillStyle = '#666'; ctx.font = '14px -apple-system, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Need at least 2 days of data to show trend.', width/2, height/2); return; }
         const padding = { top: 24, bottom: 32, left: 32, right: 16 };
         const chartWidth = width - padding.left - padding.right;
         const chartHeight = height - padding.top - padding.bottom;
-
-        ctx.clearRect(0, 0, width, height);
-
-        if (filteredCounts.length < 2) {
-            ctx.fillStyle = '#666';
-            ctx.font = '14px -apple-system, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('Need at least 2 days of data to show trend.', width/2, height/2);
-            return;
-        }
-
         const maxVal = Math.max(1, Math.max(...filteredCounts));
         const yMax = Math.ceil(maxVal / 1) * 1;
-
-        const xLabels = filteredDates.map(d => {
-            const parts = d.split('-');
-            return parts[1] + '/' + parts[2];
-        });
-
-        ctx.strokeStyle = '#2a2a2a';
-        ctx.lineWidth = 0.5;
-        for (let i = 0; i <= yMax; i++) {
-            const y = padding.top + chartHeight - (i / yMax) * chartHeight;
-            ctx.beginPath();
-            ctx.moveTo(padding.left, y);
-            ctx.lineTo(width - padding.right, y);
-            ctx.stroke();
-            ctx.fillStyle = '#666';
-            ctx.font = '11px -apple-system, sans-serif';
-            ctx.textAlign = 'right';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(i.toString(), padding.left - 8, y);
-        }
-
         const points = filteredCounts.map((val, idx) => {
             const x = padding.left + (idx / (filteredCounts.length - 1)) * chartWidth;
             const y = padding.top + chartHeight - (val / yMax) * chartHeight;
             return { x, y, val };
         });
-
-        // 半透明填充（50% 透明度漸層）
         const gradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
         gradient.addColorStop(0, 'rgba(138, 180, 248, 0.5)');
         gradient.addColorStop(1, 'rgba(138, 180, 248, 0.0)');
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, padding.top + chartHeight);
-        points.forEach(p => ctx.lineTo(p.x, p.y));
-        ctx.lineTo(points[points.length-1].x, padding.top + chartHeight);
-        ctx.closePath();
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        // 折線
-        ctx.beginPath();
-        points.forEach((p, idx) => {
-            if (idx === 0) ctx.moveTo(p.x, p.y);
-            else ctx.lineTo(p.x, p.y);
-        });
-        ctx.strokeStyle = '#8ab4f8';
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
-
-        // 數據點
-        points.forEach(p => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = '#8ab4f8';
-            ctx.fill();
-            ctx.strokeStyle = '#0b0b0b';
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-        });
-
-        ctx.fillStyle = '#666';
-        ctx.font = '10px -apple-system, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
+        ctx.beginPath(); ctx.moveTo(points[0].x, padding.top + chartHeight); points.forEach(p => ctx.lineTo(p.x, p.y)); ctx.lineTo(points[points.length-1].x, padding.top + chartHeight); ctx.closePath(); ctx.fillStyle = gradient; ctx.fill();
+        ctx.beginPath(); points.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)); ctx.strokeStyle = '#8ab4f8'; ctx.lineWidth = 2.5; ctx.stroke();
+        points.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fillStyle = '#8ab4f8'; ctx.fill(); ctx.strokeStyle = '#0b0b0b'; ctx.lineWidth = 1.5; ctx.stroke(); });
+        ctx.fillStyle = '#666'; ctx.font = '10px -apple-system, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
         const step = Math.max(1, Math.floor(points.length / 8));
-        points.forEach((p, idx) => {
-            if (idx % step === 0 || idx === points.length - 1) {
-                ctx.fillText(xLabels[idx], p.x, padding.top + chartHeight + 6);
-            }
-        });
-
-        ctx.fillStyle = '#555';
-        ctx.font = '12px -apple-system, sans-serif';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.fillText('Subjects per day', padding.left, 4);
+        points.forEach((p, idx) => { if (idx % step === 0 || idx === points.length - 1) ctx.fillText(filtered[idx] ? filtered[idx].d.split('-').slice(1).join('/') : '', p.x, padding.top + chartHeight + 6); });
+        ctx.fillStyle = '#555'; ctx.font = '12px -apple-system, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText('Subjects per day', padding.left, 4);
     }
 
-    // ============================================================
-    // Stat preview for home card (小圖)
-    // ============================================================
+    // Stat preview small canvas on home
     function renderStatPreview() {
         const canvas = document.getElementById('statPreviewCanvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.getBoundingClientRect();
-        const width = rect.width || 160;
-        const height = rect.height || 60;
-        canvas.width = Math.max(1, Math.floor(width * dpr));
-        canvas.height = Math.max(1, Math.floor(height * dpr));
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // scale for DPR
-        ctx.clearRect(0, 0, width, height);
-
-        // 使用最近 N 天（例如 14 日）作為小預覽
-        const N = 14;
-        const today = new Date();
-        const dates = [];
-        for (let i = N - 1; i >= 0; i--) {
-            const d = new Date(today);
-            d.setDate(today.getDate() - i);
-            dates.push(formatLocalDate(d.getFullYear(), d.getMonth(), d.getDate()));
-        }
-        const counts = dates.map(d => {
-            const dayHabits = data.habits[d] || {};
-            return Object.values(dayHabits).filter(v => v === true).length;
-        });
-
-        if (counts.every(c => c === 0)) {
-            ctx.fillStyle = '#666';
-            ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('No data', width / 2, height / 2);
-            return;
-        }
-
-        const maxVal = Math.max(1, Math.max(...counts));
-        const pad = { left: 6, right: 6, top: 6, bottom: 12 };
-        const chartW = width - pad.left - pad.right;
-        const chartH = height - pad.top - pad.bottom;
-
-        const points = counts.map((val, idx) => {
-            const x = pad.left + (chartW * (idx / (counts.length - 1)));
-            const y = pad.top + (chartH * (1 - val / maxVal));
-            return { x, y, val };
-        });
-
-        // 填充漸層 (50% 到 0%)
-        const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH);
-        grad.addColorStop(0, 'rgba(138,180,248,0.5)');
-        grad.addColorStop(1, 'rgba(138,180,248,0)');
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, pad.top + chartH);
-        points.forEach(p => ctx.lineTo(p.x, p.y));
-        ctx.lineTo(points[points.length - 1].x, pad.top + chartH);
-        ctx.closePath();
-        ctx.fillStyle = grad;
-        ctx.fill();
-
-        // 折線
-        ctx.beginPath();
-        points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
-        ctx.strokeStyle = '#8ab4f8';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // 點
-        points.forEach(p => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-            ctx.fillStyle = '#8ab4f8';
-            ctx.fill();
-        });
+        const width = rect.width || 160; const height = rect.height || 60;
+        canvas.width = Math.max(1, Math.floor(width * dpr)); canvas.height = Math.max(1, Math.floor(height * dpr));
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0,0,width,height);
+        const N = 14; const today = new Date(); const dates = [];
+        for (let i = N - 1; i >= 0; i--) { const d = new Date(today); d.setDate(today.getDate() - i); dates.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`); }
+        const counts = dates.map(d => (data.habits[d] ? Object.values(data.habits[d]).filter(v => v === true).length : 0));
+        if (counts.every(c => c === 0)) { ctx.fillStyle = '#666'; ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('No data', width / 2, height / 2); return; }
+        const maxVal = Math.max(...counts, 1); const pad = { left: 6, right: 6, top: 6, bottom: 12 }; const chartW = width - pad.left - pad.right; const chartH = height - pad.top - pad.bottom;
+        const points = counts.map((val, idx) => ({ x: pad.left + (chartW * (idx / (counts.length - 1))), y: pad.top + (chartH * (1 - val / maxVal)) }));
+        const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH); grad.addColorStop(0, 'rgba(138,180,248,0.5)'); grad.addColorStop(1, 'rgba(138,180,248,0)');
+        ctx.beginPath(); ctx.moveTo(points[0].x, pad.top + chartH); points.forEach(p => ctx.lineTo(p.x, p.y)); ctx.lineTo(points[points.length - 1].x, pad.top + chartH); ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+        ctx.beginPath(); points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)); ctx.strokeStyle = '#8ab4f8'; ctx.lineWidth = 2; ctx.stroke();
+        points.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); ctx.fillStyle = '#8ab4f8'; ctx.fill(); });
     }
 
     // ============================================================
-    // 14. TIMER
+    // Tools: Calculator & Grade calculator
     // ============================================================
-    let timerMode = 'stopwatch';
-    let timerRunning = false;
-    let timerInterval = null;
-    let timerSeconds = 0;
-    let timerTotalSeconds = 0;
-    let timerStartTime = 0;
-    let timerElapsedBeforePause = 0;
+    function navigateToToolsDefault(){ navigateTo('tools'); showTool('calculator'); }
 
-    function initTimer() {
-        if (!timerRunning && timerSeconds === 0 && timerTotalSeconds === 0) {
-            document.getElementById('timerDisplay').textContent = '00:00:00';
-            updateTimerCircle(0);
+    function showTool(name) {
+        const container = document.getElementById('toolsContent');
+        if (name === 'calculator') {
+            container.innerHTML = `<div style="display:flex;gap:8px;align-items:center">
+                <input id="calcExpr" placeholder="Type expression, e.g. (2+3)*4" style="flex:1" />
+                <button class="btn-secondary" onclick="runCalc()">Calc</button>
+            </div><div style="margin-top:8px"><strong>Result: </strong><span id="calcResult"></span></div>`;
+        } else if (name === 'grade') {
+            data._gradeTmp = data._gradeTmp || [];
+            if (data._gradeTmp.length === 0) data._gradeTmp = [{name:'Test',weight:40,score:80},{name:'Exam',weight:60,score:75}];
+            container.innerHTML = `<div id="gradeRows"></div>
+                <div style="margin-top:8px;display:flex;gap:8px">
+                    <button class="btn-secondary" onclick="addGradeRow()">+ Add Item</button>
+                    <button class="btn-secondary" onclick="calcGrade()">Calculate</button>
+                </div>
+                <div style="margin-top:8px"><strong>Total: </strong><span id="gradeResult"></span></div>`;
+            renderGradeRows();
         }
     }
 
-    function setTimerMode(mode) {
-        if (timerRunning) timerStartPause();
-        timerMode = mode;
-        document.getElementById('timerModeStopwatch').classList.toggle('active', mode === 'stopwatch');
-        document.getElementById('timerModeCountdown').classList.toggle('active', mode === 'countdown');
-        document.getElementById('timerInputArea').style.display = mode === 'countdown' ? 'flex' : 'none';
-        timerReset();
-    }
-
-    function setCountdownTime() {
-        if (timerRunning) return;
-        const h = parseInt(document.getElementById('timerHours').value) || 0;
-        const m = parseInt(document.getElementById('timerMinutes').value) || 0;
-        const s = parseInt(document.getElementById('timerSeconds').value) || 0;
-        timerTotalSeconds = h * 3600 + m * 60 + s;
-        timerSeconds = timerTotalSeconds;
-        updateTimerDisplay(timerSeconds);
-        updateTimerCircle(timerTotalSeconds > 0 ? 1 : 0);
-    }
-
-    function timerStartPause() {
-        if (timerRunning) {
-            timerRunning = false;
-            clearInterval(timerInterval);
-            if (timerMode === 'stopwatch') {
-                timerElapsedBeforePause += (Date.now() - timerStartTime) / 1000;
-            }
-            document.getElementById('timerStartBtn').textContent = 'Resume';
-            return;
-        }
-        timerRunning = true;
-        document.getElementById('timerStartBtn').textContent = 'Pause';
-        if (timerMode === 'stopwatch') {
-            timerStartTime = Date.now();
-            timerElapsedBeforePause = timerElapsedBeforePause || 0;
-        } else {
-            if (timerSeconds <= 0) { timerReset(); return; }
-            timerStartTime = Date.now();
-            timerElapsedBeforePause = 0;
-        }
-        timerInterval = setInterval(timerTick, 100);
-    }
-
-    function timerTick() {
-        if (timerMode === 'stopwatch') {
-            const elapsed = timerElapsedBeforePause + (Date.now() - timerStartTime) / 1000;
-            timerSeconds = elapsed;
-            updateTimerDisplay(timerSeconds);
-            const progress = (timerSeconds % 60) / 60;
-            updateTimerCircle(progress);
-        } else {
-            const elapsed = (Date.now() - timerStartTime) / 1000;
-            const remaining = timerTotalSeconds - elapsed;
-            if (remaining <= 0) {
-                timerSeconds = 0;
-                updateTimerDisplay(0);
-                updateTimerCircle(0);
-                clearInterval(timerInterval);
-                timerRunning = false;
-                document.getElementById('timerStartBtn').textContent = 'Start';
-                return;
-            }
-            timerSeconds = remaining;
-            updateTimerDisplay(remaining);
-            updateTimerCircle(remaining / timerTotalSeconds);
+    function runCalc() {
+        const expr = document.getElementById('calcExpr').value.trim();
+        if (!expr) return;
+        try {
+            // use Function to evaluate safely in local context
+            const res = Function('"use strict"; return (' + expr + ')')();
+            document.getElementById('calcResult').textContent = String(res);
+        } catch(e) {
+            document.getElementById('calcResult').textContent = 'Error';
         }
     }
 
-    function updateTimerDisplay(seconds) {
-        const hrs = Math.floor(seconds / 3600);
-        const mins = Math.floor((seconds % 3600) / 60);
-        const secs = Math.floor(seconds % 60);
-        document.getElementById('timerDisplay').textContent =
-            String(hrs).padStart(2, '0') + ':' +
-            String(mins).padStart(2, '0') + ':' +
-            String(secs).padStart(2, '0');
+    // Grade calculator
+    function renderGradeRows() {
+        const container = document.getElementById('gradeRows');
+        const rows = data._gradeTmp || [];
+        container.innerHTML = rows.map((r,i) => `<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+            <input placeholder="Name" value="${escapeAttr(r.name)}" onchange="updateGradeRow(${i},'name',this.value)" />
+            <input placeholder="Weight (%)" style="width:80px" value="${r.weight}" onchange="updateGradeRow(${i},'weight',this.value)" />
+            <input placeholder="Score" style="width:80px" value="${r.score}" onchange="updateGradeRow(${i},'score',this.value)" />
+            <button class="btn-secondary" onclick="removeGradeRow(${i})">Remove</button>
+        </div>`).join('');
     }
-
-    function updateTimerCircle(progress) {
-        const circle = document.getElementById('timerCircle');
-        const circumference = 628.32;
-        const offset = circumference * (1 - progress);
-        circle.style.strokeDashoffset = offset;
-    }
-
-    function timerReset() {
-        clearInterval(timerInterval);
-        timerRunning = false;
-        timerElapsedBeforePause = 0;
-        document.getElementById('timerStartBtn').textContent = 'Start';
-        if (timerMode === 'stopwatch') {
-            timerSeconds = 0;
-            timerTotalSeconds = 0;
-            updateTimerDisplay(0);
-            updateTimerCircle(0);
-        } else {
-            const h = parseInt(document.getElementById('timerHours').value) || 0;
-            const m = parseInt(document.getElementById('timerMinutes').value) || 0;
-            const s = parseInt(document.getElementById('timerSeconds').value) || 0;
-            timerTotalSeconds = h * 3600 + m * 60 + s;
-            timerSeconds = timerTotalSeconds;
-            updateTimerDisplay(timerSeconds);
-            updateTimerCircle(timerTotalSeconds > 0 ? 1 : 0);
-        }
+    function addGradeRow(){ data._gradeTmp = data._gradeTmp || []; data._gradeTmp.push({name:'Item',weight:0,score:0}); renderGradeRows(); }
+    function updateGradeRow(i,k,v){ if(!data._gradeTmp) data._gradeTmp=[]; data._gradeTmp[i][k] = (k==='name'?v:parseFloat(v)||0); renderGradeRows(); }
+    function removeGradeRow(i){ data._gradeTmp.splice(i,1); renderGradeRows(); }
+    function calcGrade(){
+        const rows = data._gradeTmp || []; if (rows.length===0) return alert('Add items');
+        let totalW = 0; let sum = 0;
+        rows.forEach(r => { totalW += Number(r.weight)||0; sum += (Number(r.score)||0) * (Number(r.weight)||0); });
+        const result = totalW > 0 ? (sum/totalW) : 0;
+        document.getElementById('gradeResult').textContent = result.toFixed(2);
     }
 
     // ============================================================
-    // 15. BOTTOM BAR
+    // AI links management & bottom bar (text-only custom buttons)
     // ============================================================
+    function renderAiLinks() {
+        const container = document.getElementById('aiLinksList');
+        const arr = data.aiLinks || [];
+        if (arr.length === 0) { container.innerHTML = '<div class="empty-state">No AI links.</div>'; return; }
+        container.innerHTML = arr.map((a,i) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border:1px solid #2a2a2a;border-radius:8px;margin-bottom:6px">
+            <div><a href="${escapeAttr(a.url)}" target="_blank">${escapeAttr(a.name)}</a></div>
+            <div style="display:flex;gap:8px"><button class="btn-secondary" onclick="editAiLink(${i})">Edit</button><button class="btn-secondary" style="background:#e74c3c" onclick="deleteAiLink(${i})">Delete</button></div>
+        </div>`).join('');
+    }
+    function addAiLink(){
+        const name = document.getElementById('aiName').value.trim(); const url = document.getElementById('aiURL').value.trim();
+        if (!name || !url) return alert('Enter both');
+        data.aiLinks = data.aiLinks || []; data.aiLinks.push({ name, url }); saveData(); document.getElementById('aiName').value=''; document.getElementById('aiURL').value=''; renderAiLinks(); renderBottomBar();
+    }
+    function editAiLink(i){
+        const a = data.aiLinks[i]; const newName = prompt('Name:', a.name); if (newName === null) return; const newUrl = prompt('URL:', a.url); if (newUrl === null) return;
+        a.name = newName; a.url = newUrl; saveData(); renderAiLinks(); renderBottomBar();
+    }
+    function deleteAiLink(i){ if (!confirm('Delete?')) return; data.aiLinks.splice(i,1); saveData(); renderAiLinks(); renderBottomBar(); }
+
     function renderBottomBar() {
         const container = document.getElementById('customButtonsContainer');
         if (!container) return;
-        const buttons = data.customButtons || [];
-        container.innerHTML = buttons.map((btn, idx) =>
-            `<button id="custom_${btn.id}" oncontextmenu="event.preventDefault(); showDeleteConfirm('Delete "${btn.name}"?', () => deleteCustomButton('${btn.id}'))" onclick="window.open('${btn.url}', '_blank')" style="min-width:36px; padding:2px 4px;">
-                <span class="btn-icon" style="font-size:16px;">${btn.icon || '🔗'}</span>
-                <span class="btn-label">${btn.name}</span>
-            </button>`
-        ).join('');
-        // 長按觸發刪除 (mobile)
-        document.querySelectorAll('#customButtonsContainer button').forEach(btn => {
-            let pressTimer = null;
-            btn.addEventListener('touchstart', (e) => {
-                pressTimer = setTimeout(() => {
-                    const id = btn.id.replace('custom_', '');
-                    const item = data.customButtons.find(b => b.id === id);
-                    if (item) {
-                        showDeleteConfirm(`Delete "${item.name}"?`, () => deleteCustomButton(id));
-                    }
-                }, 600);
-            });
-            btn.addEventListener('touchend', () => { clearTimeout(pressTimer); });
-            btn.addEventListener('touchmove', () => { clearTimeout(pressTimer); });
+        const btns = data.customButtons || [];
+        container.innerHTML = btns.map(b => `<button onclick="window.open('${b.url}','_blank')">${escapeAttr(b.name)}</button>`).join('');
+    }
+    function openCustomBtnModal(){ document.getElementById('customBtnModal').classList.add('show'); document.getElementById('customBtnName').value=''; document.getElementById('customBtnURL').value=''; }
+    function closeCustomBtnModal(){ document.getElementById('customBtnModal').classList.remove('show'); }
+    function saveCustomButton(){ const name = document.getElementById('customBtnName').value.trim(); const url = document.getElementById('customBtnURL').value.trim(); if(!name||!url) return alert('Enter both'); data.customButtons = data.customButtons || []; data.customButtons.push({ id: generateId(), name, url }); saveData(); closeCustomBtnModal(); renderBottomBar(); }
+
+    // ============================================================
+    // Delete confirm utilities
+    // ============================================================
+    let deleteCallback = null;
+    function showDeleteConfirm(message, callback) { document.getElementById('deleteConfirmMessage').textContent = message; document.getElementById('deleteConfirmOverlay').classList.add('show'); deleteCallback = callback; }
+    function cancelDelete() { document.getElementById('deleteConfirmOverlay').classList.remove('show'); deleteCallback = null; }
+    function confirmDelete() { if (deleteCallback) deleteCallback(); deleteCallback = null; document.getElementById('deleteConfirmOverlay').classList.remove('show'); }
+
+    // ============================================================
+    // File open helper
+    // ============================================================
+    function openFile(dataUrl, fileName) {
+        fetch(dataUrl).then(response => response.blob()).then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.target = '_blank'; a.rel = 'noopener';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 10000);
+        }).catch(() => { window.open(dataUrl, '_blank'); });
+    }
+
+    // ============================================================
+    // Misc: Quiz page, etc.
+    // ============================================================
+    function openQuiz() {
+        currentCategory = 'Quiz';
+        document.getElementById('quizTitle').innerText = 'Quiz';
+        const container = document.getElementById('quizContent');
+        container.innerHTML = `<div class="subject-grid" id="quizSubjectGrid"></div>`;
+        const grid2 = document.getElementById('quizSubjectGrid');
+        grid2.innerHTML = '';
+        SUBJECTS.forEach(subj => {
+            const div = document.createElement('div');
+            div.className = 'subject-item';
+            div.innerHTML = `<div class="subj-name">${subj}</div>`;
+            div.onclick = () => openSubjectDetail('Quiz', subj);
+            grid2.appendChild(div);
         });
+        navigateTo('quiz');
     }
-
-    function deleteCustomButton(id) {
-        data.customButtons = (data.customButtons || []).filter(b => b.id !== id);
-        saveData();
-        renderBottomBar();
-        closeDeleteConfirm();
-    }
-
-    function openAI() {
-        window.open('https://chat.deepseek.com', '_blank');
-    }
-
-    function openCustomBtnModal() {
-        document.getElementById('customBtnModal').classList.add('show');
-        document.getElementById('customBtnName').value = '';
-        document.getElementById('customBtnURL').value = '';
-        document.querySelectorAll('#customIconSelector .icon-option').forEach(el => el.classList.remove('selected'));
-        document.querySelector('#customIconSelector .icon-option[data-icon="🔗"]').classList.add('selected');
-        selectedCustomIcon = '🔗';
-    }
-
-    function closeCustomBtnModal() {
-        document.getElementById('customBtnModal').classList.remove('show');
-    }
-
-    function selectCustomIcon(el) {
-        document.querySelectorAll('#customIconSelector .icon-option').forEach(e => e.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedCustomIcon = el.dataset.icon || '🔗';
-    }
-
-    function uploadCustomIcon(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const base64 = e.target.result;
-            const container = document.getElementById('customIconSelector');
-            const span = document.createElement('span');
-            span.className = 'icon-option selected';
-            span.style.background = '#1a2a3a';
-            span.style.border = '2px solid #8ab4f8';
-            span.style.borderRadius = '8px';
-            span.style.padding = '4px 8px';
-            span.style.display = 'inline-flex';
-            span.style.alignItems = 'center';
-            span.style.justifyContent = 'center';
-            span.style.width = '40px';
-            span.style.height = '40px';
-            const img = document.createElement('img');
-            img.src = base64;
-            img.style.width = '32px';
-            img.style.height = '32px';
-            img.style.objectFit = 'contain';
-            img.style.borderRadius = '4px';
-            span.appendChild(img);
-            span.onclick = function() {
-                document.querySelectorAll('#customIconSelector .icon-option').forEach(e => e.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedCustomIcon = this.querySelector('img') ? this.querySelector('img').src : '🔗';
-            };
-            container.appendChild(span);
-            selectedCustomIcon = base64;
-            input.value = '';
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function saveCustomButton() {
-        const name = document.getElementById('customBtnName').value.trim();
-        const url = document.getElementById('customBtnURL').value.trim();
-        if (!name || !url) return alert('Enter both name and URL.');
-        if (!data.customButtons) data.customButtons = [];
-        data.customButtons.push({
-            id: generateId(),
-            name: name,
-            url: url,
-            icon: selectedCustomIcon || '🔗'
-        });
-        saveData();
-        closeCustomBtnModal();
-        renderBottomBar();
-    }
+    function goBackFromQuiz(){ navigateTo('home'); }
 
     // ============================================================
-    // 16. DELETE CONFIRM
+    // Init app
     // ============================================================
-    function showDeleteConfirm(message, callback) {
-        document.getElementById('deleteConfirmMessage').textContent = message;
-        document.getElementById('deleteConfirmOverlay').classList.add('show');
-        deleteCallback = callback;
-    }
-
-    function cancelDelete() {
-        document.getElementById('deleteConfirmOverlay').classList.remove('show');
-        deleteCallback = null;
-    }
-
-    function confirmDelete() {
-        if (deleteCallback) deleteCallback();
-        deleteCallback = null;
-        document.getElementById('deleteConfirmOverlay').classList.remove('show');
-    }
-
-    function closeDeleteConfirm() {
-        document.getElementById('deleteConfirmOverlay').classList.remove('show');
-        deleteCallback = null;
-    }
-
-    // ============================================================
-    // 17. NOTIFICATIONS
-    // ============================================================
-    function openNotif() {
-        document.getElementById('notifModal').classList.add('show');
-    }
-    function closeNotif() {
-        document.getElementById('notifModal').classList.remove('show');
-    }
-
-    // ============================================================
-    // 18. MODAL CLOSE
-    // ============================================================
-    window.onclick = function(e) {
-        if (e.target === document.getElementById('notifModal')) closeNotif();
-        if (e.target === document.getElementById('eventModal')) closeEventModal();
-        if (e.target === document.getElementById('chapterModal')) closeChapterModal();
-        if (e.target === document.getElementById('folderModal')) closeFolderModal();
-        if (e.target === document.getElementById('itemModal')) closeItemModal();
-        if (e.target === document.getElementById('customBtnModal')) closeCustomBtnModal();
-        if (e.target === document.getElementById('deleteConfirmOverlay')) cancelDelete();
-    }
-
-    // ============================================================
-    // 19. INIT
-    // ============================================================
+    let data = {};
     function initApp() {
         data = loadData();
-
-        // ----- 新增：確保 homeOrder 包含預設卡 (包含 statistics) -----
-        const defaultOrder = ['information','quiz','dse','links','objectives','statistics','timer'];
-        if (!data.homeOrder) data.homeOrder = defaultOrder.slice();
-        defaultOrder.forEach(id => { if (!data.homeOrder.includes(id)) data.homeOrder.push(id); });
+        // ensure homeOrder contains defaults
+        if (!data.homeOrder) data.homeOrder = HOME_DEFAULT_ORDER.slice();
+        HOME_DEFAULT_ORDER.forEach(id => { if (!data.homeOrder.includes(id)) data.homeOrder.push(id); });
         saveData();
-        // ----------------------------------------------------------
 
         resetHabitsIfNewDay();
         updateHeaderClock();
         navigateTo('home');
         renderBottomBar();
         window.addEventListener('resize', () => {
-            if (document.getElementById('page-statistics').classList.contains('active')) {
-                renderStatistics();
-            }
-            // 重新繪製主頁的 statistics preview（如果主頁顯示）
-            if (document.getElementById('page-home').classList.contains('active')) {
-                renderStatPreview();
-            }
+            if (document.getElementById('page-statistics').classList.contains('active')) renderStatistics();
+            if (document.getElementById('page-home').classList.contains('active')) renderStatPreview();
         });
         console.log('Ching Study unlocked.');
     }
