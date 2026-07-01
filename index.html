@@ -14,6 +14,7 @@
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
+        /* Login */
         #loginContainer { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; }
         #loginContainer h1 { font-size: 32px; font-weight: 300; letter-spacing: 4px; margin-bottom: 8px; }
         #loginContainer p { color: #888; margin-bottom: 30px; }
@@ -23,6 +24,7 @@
         #loginContainer button:active { background: #666; transform: scale(0.96); }
         #loginError { color: #e74c3c; font-size: 14px; margin-top: 12px; min-height: 24px; }
         .login-footer { color: #444; font-size: 12px; margin-top: 40px; }
+        /* App */
         #appContainer { display: none; animation: fade 0.3s ease; }
         #appContainer.active { display: block; }
         @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -35,6 +37,7 @@
         .header .right .icon-btn:active { color: #fff; transform: scale(0.9); }
         .page { display: none; animation: fade 0.2s ease; }
         .page.active { display: block; }
+        /* 主頁卡片 */
         .card-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
         .main-card { background: #1a1a1a; border-left: 3px solid #555; border-radius: 12px; padding: 10px 16px; cursor: grab; transition: 0.15s; user-select: none; display: flex; justify-content: space-between; align-items: center; touch-action: manipulation; }
         .main-card:active { background: #2a2a2a; transform: scale(0.98); cursor: grabbing; }
@@ -43,6 +46,7 @@
         .main-card .title { font-size: 17px; font-weight: 300; color: #fff; }
         .main-card .desc { font-size: 12px; color: #999; margin-left: 8px; }
         .main-card .drag-hint { font-size: 11px; color: #555; margin-left: 4px; }
+        /* Subjects */
         .subject-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin: 16px 0; }
         .subject-item { background: #151515; text-align: center; padding: 14px 8px; border-radius: 12px; border: 1px solid #2a2a2a; cursor: pointer; transition: 0.1s; touch-action: manipulation; }
         .subject-item:active { background: #2a2a2a; transform: scale(0.95); }
@@ -79,7 +83,7 @@
         .logout-btn:active { background: #3a3a3a; color: #fff; }
         .footnote { color: #555; font-size: 12px; text-align: center; margin-top: 20px; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        /* Folder */
+        /* ===== FOLDER STRUCTURE ===== */
         .folder-item { background: #151515; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 14px; margin-bottom: 4px; cursor: pointer; transition: 0.1s; touch-action: manipulation; }
         .folder-item:active { background: #2a2a2a; }
         .folder-item .folder-header { display: flex; align-items: center; gap: 8px; }
@@ -95,7 +99,7 @@
         .file-item .file-actions { display: flex; gap: 4px; }
         .file-item .file-actions button { background: none; border: none; color: #888; font-size: 14px; cursor: pointer; padding: 0 4px; }
         .file-item .file-actions .del-btn { color: #e74c3c; }
-        /* Habits */
+        /* ===== HABITS ===== */
         .habits-container { margin-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         .habit-row { background: #141414; border: 1px solid #222; border-radius: 10px; padding: 6px 8px 6px 10px; cursor: default; display: flex; align-items: center; }
         .habit-row .habit-box { flex: 1; display: flex; align-items: center; justify-content: space-between; padding: 4px 4px 4px 0; border-radius: 6px; background: transparent; cursor: pointer; transition: 0.1s; min-height: 32px; position: relative; touch-action: manipulation; }
@@ -114,7 +118,7 @@
         .habit-row[data-subject="Economics"] { --habit-color: #9b59b6; }
         .habit-row[data-subject="Bafs"] { --habit-color: #e67e22; }
         .habit-row[data-subject="Ict"] { --habit-color: #1abc9c; }
-        /* Objectives */
+        /* ===== OBJECTIVES ===== */
         .objective-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
         .objective-row { background: #151515; border: 1px solid #2a2a2a; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
         .objective-row .obj-name { font-size: 15px; color: #ddd; min-width: 70px; }
@@ -126,7 +130,7 @@
         .objective-row .grade-selector .grade-display { font-size: 16px; font-weight: 500; min-width: 28px; text-align: center; }
         .objective-row .grade-selector .grade-display.target { color: #f1c40f; }
         .objective-row .grade-selector .grade-display.current { color: #3498db; }
-        /* Calendar */
+        /* ===== CALENDAR ===== */
         .cal-grid { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 12px 8px; display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
         .cal-grid .day-name { text-align:center; font-size:12px; color:#777; padding:6px 0; }
         .cal-grid .day-cell { text-align:center; padding:8px 0; font-size:15px; border-radius:30px; cursor:pointer; color:#ddd; touch-action: manipulation; }
@@ -144,7 +148,7 @@
         .study-log-container .log-subject { background: #222; padding: 4px 12px; border-radius: 20px; font-size: 13px; color: #ddd; border: 1px solid #444; }
         .study-log-container .log-subject.done { border-color: var(--habit-color, #8ab4f8); color: #fff; }
         .study-log-empty { color: #555; font-size: 13px; }
-        /* Statistics */
+        /* ===== STATISTICS ===== */
         .stat-container { padding: 8px 0; }
         .stat-filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
         .stat-filters .stat-filter-btn { background: #222; border: 1px solid #444; color: #888; padding: 6px 16px; border-radius: 30px; font-size: 14px; cursor: pointer; transition: 0.15s; }
@@ -156,7 +160,7 @@
         .stat-summary .stat-item .stat-number { font-size: 24px; font-weight: 300; color: #fff; }
         .stat-summary .stat-item .stat-label { font-size: 12px; color: #888; }
         .stat-no-data { text-align: center; padding: 40px 0; color: #666; }
-        /* Timer */
+        /* ===== TIMER ===== */
         .timer-container { display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
         .timer-clock { position: relative; width: 240px; height: 240px; border-radius: 50%; border: 2px solid #333; background: #0b0b0b; display: flex; align-items: center; justify-content: center; margin: 10px auto; }
         .timer-clock svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
@@ -175,7 +179,7 @@
         .timer-input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         .timer-input input[type=number] { -moz-appearance: textfield; }
         .timer-input span { color: #888; font-size: 18px; }
-        /* Links */
+        /* ===== LINKS ===== */
         .link-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 8px 12px 8px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; cursor: grab; transition: 0.15s; }
         .link-item:active { cursor: grabbing; }
         .link-item.dragging { opacity: 0.3; transform: scale(0.95); }
@@ -185,7 +189,7 @@
         .link-item .link-content a { color: #8ab4f8; text-decoration: none; font-size: 14px; flex: 1; }
         .link-item .link-content a:active { color: #fff; }
         .link-item .del-link { background: none; border: none; color: #e74c3c; font-size: 16px; cursor: pointer; padding: 4px; touch-action: manipulation; }
-        /* Chapter links & files */
+        /* ===== CHAPTER LINKS & FILES (Quiz) ===== */
         .chapter-link-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .chapter-link-item a { color: #8ab4f8; text-decoration: none; font-size: 14px; flex: 1; }
         .chapter-link-item a:active { color: #fff; }
@@ -198,7 +202,7 @@
         .chapter-file-item .actions button { background: none; border: none; color: #e74c3c; font-size: 16px; cursor: pointer; padding: 0 4px; touch-action: manipulation; }
         .chapter-file-item .actions .open-btn { color: #8ab4f8; font-size: 16px; text-decoration: none; cursor: pointer; background: none; border: none; padding: 0 4px; }
         .chapter-file-item .actions .download-btn { color: #8ab4f8; font-size: 16px; text-decoration: none; margin-right: 2px; }
-        /* Bottom bar */
+        /* ===== BOTTOM BAR ===== */
         .bottom-bar-wrapper {
             position: fixed;
             bottom: 0;
@@ -247,7 +251,7 @@
         .bottom-bar button .btn-label { font-size: 10px; color: #666; }
         .bottom-bar button.active .btn-label { color: #8ab4f8; }
         .bottom-bar .bb-spacer { flex: 1; min-width: 8px; }
-        /* Modal */
+        /* ===== MODAL ===== */
         .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); display:none; justify-content:center; align-items:center; z-index:999; }
         .modal-overlay.show { display:flex; }
         .modal-box { background:#1c1c1c; width:90%; max-width:400px; border-radius:24px; padding:24px; max-height:80vh; overflow-y:auto; border:1px solid #333; }
@@ -262,6 +266,7 @@
         .icon-selector .icon-option.selected { border-color: #8ab4f8; background: #1a2a3a; }
         .icon-selector .icon-upload { background: #222; border: 1px solid #444; border-radius: 8px; padding: 4px 10px; color: #aaa; font-size: 13px; cursor: pointer; }
         .icon-selector input[type="file"] { display: none; }
+        /* ===== DELETE CONFIRM ===== */
         .delete-confirm-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -286,7 +291,7 @@
         .delete-confirm-box .btn-group button { flex: 1; padding: 10px; border-radius: 30px; border: none; font-size: 15px; cursor: pointer; touch-action: manipulation; }
         .delete-confirm-box .btn-group .btn-cancel { background: #333; color: #aaa; }
         .delete-confirm-box .btn-group .btn-delete { background: #e74c3c; color: #fff; }
-        /* Responsive */
+        /* ===== Responsive ===== */
         @media (max-width: 480px) {
             .header .center { font-size: 11px; min-width: 100px; }
             .timer-clock { width: 180px; height: 180px; }
@@ -316,7 +321,7 @@
 </head>
 <body>
 
-<!-- Login -->
+<!-- ===== LOGIN ===== -->
 <div id="loginContainer">
     <h1>◇ Ching Study</h1>
     <p>Enter password to access</p>
@@ -326,11 +331,13 @@
     <div class="login-footer">All data stored locally in your browser</div>
 </div>
 
-<!-- App -->
+<!-- ===== APP ===== -->
 <div id="appContainer">
     <!-- Header -->
     <div class="header">
-        <div class="left"><h1>◇ Ching Study</h1></div>
+        <div class="left">
+            <h1>◇ Ching Study</h1>
+        </div>
         <div class="center" id="headerDateTime">--:--:--  ----/--/--</div>
         <div class="right">
             <button class="icon-btn" onclick="openNotif()">🔔</button>
@@ -344,6 +351,7 @@
             <div style="font-size: 14px; color: #888; margin-bottom: 4px;">Learning Habits</div>
             <div class="habits-container" id="habitsContainer"></div>
         </div>
+
         <div class="card-grid" id="homeCardGrid"></div>
         <button class="logout-btn" onclick="logout()">Logout</button>
         <div class="footnote">All data saved in this browser</div>
@@ -363,14 +371,14 @@
         <div id="detailContent"></div>
     </div>
 
-    <!-- PAGE: QUIZ -->
+    <!-- PAGE: QUIZ CHAPTERS -->
     <div id="page-quiz" class="page">
         <button class="back-btn" onclick="goBackFromQuiz()">← Back to subjects</button>
         <h2 id="quizTitle" style="font-weight:300; font-size:20px;">Subject</h2>
         <div id="quizContent"></div>
     </div>
 
-    <!-- PAGE: CHAPTER LINKS -->
+    <!-- PAGE: CHAPTER LINKS & FILES (Quiz) -->
     <div id="page-chapter-links" class="page">
         <button class="back-btn" onclick="goBackFromChapterLinks()">← Back to chapters</button>
         <h2 id="chapterLinksTitle" style="font-weight:300; font-size:20px;">Chapter</h2>
@@ -495,9 +503,21 @@
     <div class="modal-overlay" id="notifModal">
         <div class="modal-box">
             <h3>Notifications <button class="close-modal" onclick="closeNotif()">✕</button></h3>
-            <div class="notif-item"><span>✉</span><span>Contact tutor</span><a href="mailto:?subject=Study Question" style="color:#8ab4f8;">Email</a></div>
-            <div class="notif-item"><span>✆</span><span>Remind yourself</span><a href="sms:?body=Time to study!" style="color:#8ab4f8;">SMS</a></div>
-            <div class="notif-item"><span>📌</span><span>Daily reminder: review your notes</span><span style="color:#666;">Read</span></div>
+            <div class="notif-item" style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #2a2a2a;">
+                <span style="font-size:20px; color:#aaa;">✉</span>
+                <span style="flex:1; color:#eee;">Contact tutor</span>
+                <a href="mailto:?subject=Study Question" style="color:#8ab4f8; text-decoration:none; font-weight:500;">Email</a>
+            </div>
+            <div class="notif-item" style="display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #2a2a2a;">
+                <span style="font-size:20px; color:#aaa;">✆</span>
+                <span style="flex:1; color:#eee;">Remind yourself</span>
+                <a href="sms:?body=Time to study!" style="color:#8ab4f8; text-decoration:none; font-weight:500;">SMS</a>
+            </div>
+            <div class="notif-item" style="display:flex; align-items:center; gap:12px; padding:12px 0;">
+                <span style="font-size:20px; color:#aaa;">📌</span>
+                <span style="flex:1; color:#eee;">Daily reminder: review your notes</span>
+                <span style="color:#666; font-size:13px;">Read</span>
+            </div>
         </div>
     </div>
 
@@ -512,7 +532,7 @@
         </div>
     </div>
 
-    <!-- ADD CHAPTER MODAL -->
+    <!-- ADD CHAPTER MODAL (Quiz) -->
     <div class="modal-overlay" id="chapterModal">
         <div class="modal-box">
             <h3>New Chapter <button class="close-modal" onclick="closeChapterModal()">✕</button></h3>
@@ -521,7 +541,7 @@
         </div>
     </div>
 
-    <!-- ADD FOLDER MODAL -->
+    <!-- ADD FOLDER MODAL (Information / DSE) -->
     <div class="modal-overlay" id="folderModal">
         <div class="modal-box">
             <h3>New Folder <button class="close-modal" onclick="closeFolderModal()">✕</button></h3>
@@ -537,13 +557,16 @@
                 <span class="icon-option" data-icon="⭐" onclick="selectIcon(this)">⭐</span>
                 <span class="icon-option" data-icon="🎯" onclick="selectIcon(this)">🎯</span>
                 <span class="icon-option" data-icon="💡" onclick="selectIcon(this)">💡</span>
-                <label class="icon-upload">📤 Upload <input type="file" accept="image/*" onchange="uploadIcon(this)" /></label>
+                <label class="icon-upload" style="background:#222; border:1px solid #444; border-radius:8px; padding:4px 10px; color:#aaa; font-size:13px; cursor:pointer;">
+                    📤 Upload
+                    <input type="file" accept="image/*" onchange="uploadIcon(this)" />
+                </label>
             </div>
             <button onclick="saveFolder()">Create</button>
         </div>
     </div>
 
-    <!-- ADD ITEM MODAL -->
+    <!-- ADD ITEM MODAL (File / Link) -->
     <div class="modal-overlay" id="itemModal">
         <div class="modal-box">
             <h3>Add Item <button class="close-modal" onclick="closeItemModal()">✕</button></h3>
@@ -552,8 +575,12 @@
                 <option value="link">🔗 Link</option>
             </select>
             <input id="itemName" placeholder="Name" />
-            <div id="itemFileField" style="margin-bottom:10px;"><input type="file" id="itemFileInput" /></div>
-            <div id="itemLinkField" style="display:none; margin-bottom:10px;"><input id="itemURL" placeholder="URL (e.g. https://...)" /></div>
+            <div id="itemFileField" style="margin-bottom:10px;">
+                <input type="file" id="itemFileInput" />
+            </div>
+            <div id="itemLinkField" style="display:none; margin-bottom:10px;">
+                <input id="itemURL" placeholder="URL (e.g. https://...)" />
+            </div>
             <div class="icon-selector" id="itemIconSelector">
                 <span style="color:#888; font-size:13px; width:100%; margin-bottom:4px;">Choose icon (optional):</span>
                 <span class="icon-option selected" data-icon="" onclick="selectItemIcon(this)">None</span>
@@ -562,7 +589,10 @@
                 <span class="icon-option" data-icon="🔗" onclick="selectItemIcon(this)">🔗</span>
                 <span class="icon-option" data-icon="📊" onclick="selectItemIcon(this)">📊</span>
                 <span class="icon-option" data-icon="📈" onclick="selectItemIcon(this)">📈</span>
-                <label class="icon-upload">📤 Upload <input type="file" accept="image/*" onchange="uploadItemIcon(this)" /></label>
+                <label class="icon-upload" style="background:#222; border:1px solid #444; border-radius:8px; padding:4px 10px; color:#aaa; font-size:13px; cursor:pointer;">
+                    📤 Upload
+                    <input type="file" accept="image/*" onchange="uploadItemIcon(this)" />
+                </label>
             </div>
             <button onclick="saveItem()">Add</button>
         </div>
@@ -582,13 +612,16 @@
                 <span class="icon-option" data-icon="💻" onclick="selectCustomIcon(this)">💻</span>
                 <span class="icon-option" data-icon="⚡" onclick="selectCustomIcon(this)">⚡</span>
                 <span class="icon-option" data-icon="🎨" onclick="selectCustomIcon(this)">🎨</span>
-                <label class="icon-upload">📤 Upload <input type="file" accept="image/*" onchange="uploadCustomIcon(this)" /></label>
+                <label class="icon-upload" style="background:#222; border:1px solid #444; border-radius:8px; padding:4px 10px; color:#aaa; font-size:13px; cursor:pointer;">
+                    📤 Upload
+                    <input type="file" accept="image/*" onchange="uploadCustomIcon(this)" />
+                </label>
             </div>
             <button onclick="saveCustomButton()">Add</button>
         </div>
     </div>
 
-    <!-- DELETE CONFIRM -->
+    <!-- DELETE CONFIRM OVERLAY -->
     <div class="delete-confirm-overlay" id="deleteConfirmOverlay">
         <div class="delete-confirm-box">
             <p id="deleteConfirmMessage">Delete this item?</p>
@@ -600,7 +633,7 @@
     </div>
 </div>
 
-<!-- BOTTOM BAR -->
+<!-- ===== BOTTOM BAR ===== -->
 <div class="bottom-bar-wrapper">
     <div class="bottom-bar" id="bottomBar">
         <button onclick="navigateTo('home')" class="active" id="bbHome">
@@ -695,7 +728,7 @@
             chapters: chapters,
             events: [],
             links: [
-                { name: 'DeepSeek', url: 'https://chat.deepseek.com' },
+                { name: 'DeepSeek', url: 'https://deepseek.com' },
                 { name: 'Google', url: 'https://google.com' }
             ],
             habits: {},
@@ -718,6 +751,7 @@
             const raw = localStorage.getItem('ching_study_data');
             if (raw) {
                 const parsed = JSON.parse(raw);
+                // 確保 Quiz chapters 存在
                 CATEGORIES.forEach(c => SUBJECTS.forEach(s => {
                     const key = c + '_' + s;
                     if (c === 'Quiz') {
@@ -937,9 +971,7 @@
     function openQuiz() {
         currentCategory = 'Quiz';
         document.getElementById('quizTitle').innerText = 'Quiz';
-        const container = document.getElementById('quizContent');
-        container.innerHTML = `<div id="quizSubjectGrid" class="subject-grid"></div>`;
-        const grid = document.getElementById('quizSubjectGrid');
+        const grid = document.getElementById('subjectGrid');
         grid.innerHTML = '';
         SUBJECTS.forEach(subj => {
             const div = document.createElement('div');
@@ -947,6 +979,19 @@
             div.innerHTML = `<div class="subj-name">${subj}</div>`;
             div.onclick = () => openQuizSubject(subj);
             grid.appendChild(div);
+        });
+        // 用同一個 grid，但放喺 quiz page
+        document.getElementById('quizContent').innerHTML = '';
+        const container = document.getElementById('quizContent');
+        container.innerHTML = `<div id="quizSubjectGrid" class="subject-grid"></div>`;
+        const grid2 = document.getElementById('quizSubjectGrid');
+        grid2.innerHTML = '';
+        SUBJECTS.forEach(subj => {
+            const div = document.createElement('div');
+            div.className = 'subject-item';
+            div.innerHTML = `<div class="subj-name">${subj}</div>`;
+            div.onclick = () => openQuizSubject(subj);
+            grid2.appendChild(div);
         });
         navigateTo('quiz');
     }
@@ -1037,7 +1082,7 @@
         renderChapterList(key);
     }
 
-    // ----- Chapter Links & Files -----
+    // ----- Chapter Links & Files (Quiz) -----
     function openChapterLinks(key, chIdx) {
         currentSubject = key.replace(/^.*_/, '');
         currentChapterIndex = chIdx;
@@ -1052,6 +1097,7 @@
     }
 
     function goBackFromChapterLinks() {
+        // 返回 Quiz 嘅 subjects 頁面
         openQuiz();
     }
 
@@ -1164,7 +1210,7 @@
     }
 
     // ============================================================
-    // 8. FOLDER SYSTEM (Information & DSE)
+    // 8. FOLDER SYSTEM (Information & DSE - 完全獨立)
     // ============================================================
     function renderDetail() {
         const container = document.getElementById('detailContent');
@@ -1619,23 +1665,28 @@
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', String(dragLinkSrcIndex));
     }
+
     function handleLinkDragEnd(e) {
         this.classList.remove('dragging');
         document.querySelectorAll('.link-item.drag-over').forEach(el => el.classList.remove('drag-over'));
     }
+
     function handleLinkDragOver(e) {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
     }
+
     function handleLinkDragEnter(e) {
         e.preventDefault();
         if (this !== document.querySelector('.link-item.dragging')) {
             this.classList.add('drag-over');
         }
     }
+
     function handleLinkDragLeave(e) {
         this.classList.remove('drag-over');
     }
+
     function handleLinkDrop(e) {
         e.preventDefault();
         this.classList.remove('drag-over');
@@ -1791,7 +1842,7 @@
     function formatLocalDate(year, month, day) {
         const m = String(month + 1).padStart(2, '0');
         const d = String(day).padStart(2, '0');
-        return year + '-' + m + '-' + day;
+        return year + '-' + m + '-' + d;
     }
 
     setInterval(() => {
@@ -1944,7 +1995,7 @@
     });
 
     // ============================================================
-    // 13. STATISTICS (曲線圖)
+    // 13. STATISTICS (半透明曲線圖)
     // ============================================================
     let statRange = 'week';
 
@@ -2052,7 +2103,7 @@
             return { x, y, val };
         });
 
-        // 50% 透明漸層填充
+        // 半透明填充（50% 透明度漸層）
         const gradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
         gradient.addColorStop(0, 'rgba(138, 180, 248, 0.5)');
         gradient.addColorStop(1, 'rgba(138, 180, 248, 0.0)');
@@ -2120,13 +2171,112 @@
             updateTimerCircle(0);
         }
     }
-    function setTimerMode(mode) { /* 省略實現，同之前一樣 */ }
-    function timerStartPause() { /* 省略實現 */ }
-    function timerTick() { /* 省略實現 */ }
-    function updateTimerDisplay(seconds) { /* 省略實現 */ }
-    function updateTimerCircle(progress) { /* 省略實現 */ }
-    function timerReset() { /* 省略實現 */ }
-    // 為縮短篇幅，Timer 完整函數可參考之前的版本，此處不重複，但所有功能完整。
+
+    function setTimerMode(mode) {
+        if (timerRunning) timerStartPause();
+        timerMode = mode;
+        document.getElementById('timerModeStopwatch').classList.toggle('active', mode === 'stopwatch');
+        document.getElementById('timerModeCountdown').classList.toggle('active', mode === 'countdown');
+        document.getElementById('timerInputArea').style.display = mode === 'countdown' ? 'flex' : 'none';
+        timerReset();
+    }
+
+    function setCountdownTime() {
+        if (timerRunning) return;
+        const h = parseInt(document.getElementById('timerHours').value) || 0;
+        const m = parseInt(document.getElementById('timerMinutes').value) || 0;
+        const s = parseInt(document.getElementById('timerSeconds').value) || 0;
+        timerTotalSeconds = h * 3600 + m * 60 + s;
+        timerSeconds = timerTotalSeconds;
+        updateTimerDisplay(timerSeconds);
+        updateTimerCircle(timerTotalSeconds > 0 ? 1 : 0);
+    }
+
+    function timerStartPause() {
+        if (timerRunning) {
+            timerRunning = false;
+            clearInterval(timerInterval);
+            if (timerMode === 'stopwatch') {
+                timerElapsedBeforePause += (Date.now() - timerStartTime) / 1000;
+            }
+            document.getElementById('timerStartBtn').textContent = 'Resume';
+            return;
+        }
+        timerRunning = true;
+        document.getElementById('timerStartBtn').textContent = 'Pause';
+        if (timerMode === 'stopwatch') {
+            timerStartTime = Date.now();
+            timerElapsedBeforePause = timerElapsedBeforePause || 0;
+        } else {
+            if (timerSeconds <= 0) { timerReset(); return; }
+            timerStartTime = Date.now();
+            timerElapsedBeforePause = 0;
+        }
+        timerInterval = setInterval(timerTick, 100);
+    }
+
+    function timerTick() {
+        if (timerMode === 'stopwatch') {
+            const elapsed = timerElapsedBeforePause + (Date.now() - timerStartTime) / 1000;
+            timerSeconds = elapsed;
+            updateTimerDisplay(timerSeconds);
+            const progress = (timerSeconds % 60) / 60;
+            updateTimerCircle(progress);
+        } else {
+            const elapsed = (Date.now() - timerStartTime) / 1000;
+            const remaining = timerTotalSeconds - elapsed;
+            if (remaining <= 0) {
+                timerSeconds = 0;
+                updateTimerDisplay(0);
+                updateTimerCircle(0);
+                clearInterval(timerInterval);
+                timerRunning = false;
+                document.getElementById('timerStartBtn').textContent = 'Start';
+                return;
+            }
+            timerSeconds = remaining;
+            updateTimerDisplay(remaining);
+            updateTimerCircle(remaining / timerTotalSeconds);
+        }
+    }
+
+    function updateTimerDisplay(seconds) {
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        document.getElementById('timerDisplay').textContent =
+            String(hrs).padStart(2, '0') + ':' +
+            String(mins).padStart(2, '0') + ':' +
+            String(secs).padStart(2, '0');
+    }
+
+    function updateTimerCircle(progress) {
+        const circle = document.getElementById('timerCircle');
+        const circumference = 628.32;
+        const offset = circumference * (1 - progress);
+        circle.style.strokeDashoffset = offset;
+    }
+
+    function timerReset() {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        timerElapsedBeforePause = 0;
+        document.getElementById('timerStartBtn').textContent = 'Start';
+        if (timerMode === 'stopwatch') {
+            timerSeconds = 0;
+            timerTotalSeconds = 0;
+            updateTimerDisplay(0);
+            updateTimerCircle(0);
+        } else {
+            const h = parseInt(document.getElementById('timerHours').value) || 0;
+            const m = parseInt(document.getElementById('timerMinutes').value) || 0;
+            const s = parseInt(document.getElementById('timerSeconds').value) || 0;
+            timerTotalSeconds = h * 3600 + m * 60 + s;
+            timerSeconds = timerTotalSeconds;
+            updateTimerDisplay(timerSeconds);
+            updateTimerCircle(timerTotalSeconds > 0 ? 1 : 0);
+        }
+    }
 
     // ============================================================
     // 15. BOTTOM BAR
@@ -2177,9 +2327,54 @@
         document.querySelector('#customIconSelector .icon-option[data-icon="🔗"]').classList.add('selected');
         selectedCustomIcon = '🔗';
     }
-    function closeCustomBtnModal() { document.getElementById('customBtnModal').classList.remove('show'); }
-    function selectCustomIcon(el) { /* 同上 */ }
-    function uploadCustomIcon(input) { /* 同上 */ }
+
+    function closeCustomBtnModal() {
+        document.getElementById('customBtnModal').classList.remove('show');
+    }
+
+    function selectCustomIcon(el) {
+        document.querySelectorAll('#customIconSelector .icon-option').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedCustomIcon = el.dataset.icon || '🔗';
+    }
+
+    function uploadCustomIcon(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const base64 = e.target.result;
+            const container = document.getElementById('customIconSelector');
+            const span = document.createElement('span');
+            span.className = 'icon-option selected';
+            span.style.background = '#1a2a3a';
+            span.style.border = '2px solid #8ab4f8';
+            span.style.borderRadius = '8px';
+            span.style.padding = '4px 8px';
+            span.style.display = 'inline-flex';
+            span.style.alignItems = 'center';
+            span.style.justifyContent = 'center';
+            span.style.width = '40px';
+            span.style.height = '40px';
+            const img = document.createElement('img');
+            img.src = base64;
+            img.style.width = '32px';
+            img.style.height = '32px';
+            img.style.objectFit = 'contain';
+            img.style.borderRadius = '4px';
+            span.appendChild(img);
+            span.onclick = function() {
+                document.querySelectorAll('#customIconSelector .icon-option').forEach(e => e.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedCustomIcon = this.querySelector('img') ? this.querySelector('img').src : '🔗';
+            };
+            container.appendChild(span);
+            selectedCustomIcon = base64;
+            input.value = '';
+        };
+        reader.readAsDataURL(file);
+    }
+
     function saveCustomButton() {
         const name = document.getElementById('customBtnName').value.trim();
         const url = document.getElementById('customBtnURL').value.trim();
@@ -2204,15 +2399,18 @@
         document.getElementById('deleteConfirmOverlay').classList.add('show');
         deleteCallback = callback;
     }
+
     function cancelDelete() {
         document.getElementById('deleteConfirmOverlay').classList.remove('show');
         deleteCallback = null;
     }
+
     function confirmDelete() {
         if (deleteCallback) deleteCallback();
         deleteCallback = null;
         document.getElementById('deleteConfirmOverlay').classList.remove('show');
     }
+
     function closeDeleteConfirm() {
         document.getElementById('deleteConfirmOverlay').classList.remove('show');
         deleteCallback = null;
@@ -2221,8 +2419,12 @@
     // ============================================================
     // 17. NOTIFICATIONS
     // ============================================================
-    function openNotif() { document.getElementById('notifModal').classList.add('show'); }
-    function closeNotif() { document.getElementById('notifModal').classList.remove('show'); }
+    function openNotif() {
+        document.getElementById('notifModal').classList.add('show');
+    }
+    function closeNotif() {
+        document.getElementById('notifModal').classList.remove('show');
+    }
 
     // ============================================================
     // 18. MODAL CLOSE
