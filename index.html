@@ -2541,6 +2541,14 @@
     // ============================================================
     function initApp() {
         data = loadData();
+
+        // ----- 新增：確保 homeOrder 包含預設卡 (包含 statistics) -----
+        const defaultOrder = ['information','quiz','dse','links','objectives','statistics','timer'];
+        if (!data.homeOrder) data.homeOrder = defaultOrder.slice();
+        defaultOrder.forEach(id => { if (!data.homeOrder.includes(id)) data.homeOrder.push(id); });
+        saveData();
+        // ----------------------------------------------------------
+
         resetHabitsIfNewDay();
         updateHeaderClock();
         navigateTo('home');
