@@ -839,6 +839,7 @@
     // ============================================================
     // 5. HOME CARDS (DRAG & DROP)
     // ============================================================
+    // --------------- REPLACED renderHomeCards ---------------
     function renderHomeCards() {
         const container = document.getElementById('homeCardGrid');
         const order = data.homeOrder || ['information', 'quiz', 'dse', 'links', 'objectives', 'statistics', 'timer'];
@@ -854,15 +855,30 @@
         let html = '';
         order.forEach(id => {
             if (!cardMap[id]) return;
-            html += `
-                <div class="main-card" draggable="true" data-card-id="${id}" onclick="handleCardClick('${id}')">
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <span class="title">${cardMap[id].title}</span>
-                        <span class="desc">${cardMap[id].desc}</span>
+            // 為 statistics card 加入一個小畫布作為 preview
+            if (id === 'statistics') {
+                html += `
+                    <div class="main-card" draggable="true" data-card-id="${id}" onclick="handleCardClick('${id}')">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span class="title">${cardMap[id].title}</span>
+                            <span class="desc">${cardMap[id].desc}</span>
+                        </div>
+                        <div style="width:160px; height:60px; margin-left:10px;">
+                            <canvas id="statPreviewCanvas" style="width:100%; height:100%; display:block;"></canvas>
+                        </div>
                     </div>
-                    <div class="drag-hint">⋮⋮</div>
-                </div>
-            `;
+                `;
+            } else {
+                html += `
+                    <div class="main-card" draggable="true" data-card-id="${id}" onclick="handleCardClick('${id}')">
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span class="title">${cardMap[id].title}</span>
+                            <span class="desc">${cardMap[id].desc}</span>
+                        </div>
+                        <div class="drag-hint">⋮⋮</div>
+                    </div>
+                `;
+            }
         });
         container.innerHTML = html;
 
@@ -874,6 +890,9 @@
             card.addEventListener('dragleave', handleCardDragLeave);
             card.addEventListener('drop', handleCardDrop);
         });
+
+        // 畫 preview（如果有 data 的話）
+        setTimeout(renderStatPreview, 50);
     }
 
     function handleCardClick(id) {
@@ -2155,6 +2174,84 @@
     }
 
     // ============================================================
+    // Stat preview for home card (小圖)
+    // ============================================================
+    function renderStatPreview() {
+        const canvas = document.getElementById('statPreviewCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        const width = rect.width || 160;
+        const height = rect.height || 60;
+        canvas.width = Math.max(1, Math.floor(width * dpr));
+        canvas.height = Math.max(1, Math.floor(height * dpr));
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // scale for DPR
+        ctx.clearRect(0, 0, width, height);
+
+        // 使用最近 N 天（例如 14 日）作為小預覽
+        const N = 14;
+        const today = new Date();
+        const dates = [];
+        for (let i = N - 1; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            dates.push(formatLocalDate(d.getFullYear(), d.getMonth(), d.getDate()));
+        }
+        const counts = dates.map(d => {
+            const dayHabits = data.habits[d] || {};
+            return Object.values(dayHabits).filter(v => v === true).length;
+        });
+
+        if (counts.every(c => c === 0)) {
+            ctx.fillStyle = '#666';
+            ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('No data', width / 2, height / 2);
+            return;
+        }
+
+        const maxVal = Math.max(1, Math.max(...counts));
+        const pad = { left: 6, right: 6, top: 6, bottom: 12 };
+        const chartW = width - pad.left - pad.right;
+        const chartH = height - pad.top - pad.bottom;
+
+        const points = counts.map((val, idx) => {
+            const x = pad.left + (chartW * (idx / (counts.length - 1)));
+            const y = pad.top + (chartH * (1 - val / maxVal));
+            return { x, y, val };
+        });
+
+        // 填充漸層 (50% 到 0%)
+        const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH);
+        grad.addColorStop(0, 'rgba(138,180,248,0.5)');
+        grad.addColorStop(1, 'rgba(138,180,248,0)');
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, pad.top + chartH);
+        points.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.lineTo(points[points.length - 1].x, pad.top + chartH);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // 折線
+        ctx.beginPath();
+        points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.strokeStyle = '#8ab4f8';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 點
+        points.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#8ab4f8';
+            ctx.fill();
+        });
+    }
+
+    // ============================================================
     // 14. TIMER
     // ============================================================
     let timerMode = 'stopwatch';
@@ -2451,6 +2548,10 @@
         window.addEventListener('resize', () => {
             if (document.getElementById('page-statistics').classList.contains('active')) {
                 renderStatistics();
+            }
+            // 重新繪製主頁的 statistics preview（如果主頁顯示）
+            if (document.getElementById('page-home').classList.contains('active')) {
+                renderStatPreview();
             }
         });
         console.log('Ching Study unlocked.');
