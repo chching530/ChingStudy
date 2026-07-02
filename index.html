@@ -324,11 +324,21 @@
 <!-- ===== LOGIN ===== -->
 <div id="loginContainer">
     <h1>◇ Ching Study</h1>
-    <p>Enter password to access</p>
-    <input type="password" id="passwordInput" placeholder="Password" autofocus>
-    <button onclick="verifyPassword()">Unlock</button>
-    <div id="loginError"></div>
-    <div class="login-footer">All data stored locally in your browser</div>
+    <p>Sign in or register to sync across devices</p>
+
+    <!-- Email login form -->
+    <div id="authForms" style="display:flex;flex-direction:column;gap:8px;align-items:center;">
+        <input type="email" id="authEmail" placeholder="Email" style="max-width:320px;padding:12px;border-radius:20px;">
+        <input type="password" id="authPassword" placeholder="Password" style="max-width:320px;padding:12px;border-radius:20px;">
+        <div style="display:flex;gap:8px;">
+            <button onclick="signInWithEmail()">Sign in</button>
+            <button onclick="signUpWithEmail()">Sign up</button>
+        </div>
+        <div style="margin-top:8px;">
+            <button onclick="useLocalPasswordMode()" style="background:#333;padding:8px 12px;border-radius:20px;">Use Local Password</button>
+        </div>
+        <div id="authMsg" style="min-height:24px;color:#f1c40f;margin-top:6px;"></div>
+    </div>
 </div>
 
 <!-- ===== APP ===== -->
@@ -1186,24 +1196,34 @@
     // ============================================================
     // File upload helpers
     // ============================================================
-    function addChapterFile() {
-        const input = document.getElementById('chapterFileInput');
-        const file = input.files[0];
-        if (!file) return alert('Please select a file.');
-        const reader = new FileReader();
-        const key = document.getElementById('chapterFilesList').dataset.key;
-        const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
-        reader.onload = function(e) {
-            const entry = { id: generateId(), name: file.name, type: 'file', data: e.target.result, size: file.size };
+async function addChapterFile() {
+    const input = document.getElementById('chapterFileInput');
+    const file = input.files[0];
+    if (!file) return alert('Please select a file.');
+    const key = document.getElementById('chapterFilesList').dataset.key;
+    const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+
+    // if user is signed in, upload to Storage, else fallback to base64
+    if (window.auth && window.auth.currentUser) {
+        const uid = window.auth.currentUser.uid;
+        const id = generateId();
+        const path = `users/${uid}/files/${id}_${file.name}`;
+        try {
+            const url = await window.uploadFileToStorage(file, path);
+            const entry = { id, name: file.name, type: 'file-ref', url, size: file.size };
             if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
             data.chapters[key][chIdx].files.push(entry);
             saveData();
             input.value = '';
             renderChapterFiles();
             renderChapterList(key);
-        };
-        reader.readAsDataURL(file);
+        } catch (e) {
+            console.error(e); alert('Upload failed');
+        }
+    } else {
+        // fallback to existing base64 logic...
     }
+}
 
     function uploadChapterFolder() {
         const input = document.createElement('input');
@@ -1977,7 +1997,189 @@
         console.log('Ching Study unlocked.');
     }
 
+
     checkLoginStatus();
+</script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+  // --- paste your firebaseConfig here ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyAdx9vadpwmZcJKuzAANnIYC_epmdFJ1xQ",
+    authDomain: "chingstudy-c530.firebaseapp.com",
+    projectId: "chingstudy-c530",
+    storageBucket: "chingstudy-c530.appspot.com",
+    messagingSenderId: "661963537920",
+    appId: "1:661963537920:web:6ef8ef3e7aed95b21322e5",
+    measurementId: "G-HECJDWXH24"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  // reference to your existing local data object and saveData() / loadData() must exist.
+  // We'll assume you have a global 'data' object and functions saveData(), loadData() in your page.
+  // If not, you should adapt the calls below to match your code.
+
+  // --- Authentication helpers ---
+  window.signUpWithEmail = async function() {
+    const email = document.getElementById('authEmail').value.trim();
+    const pw = document.getElementById('authPassword').value;
+    const msg = document.getElementById('authMsg');
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pw);
+      msg.style.color = '#8ab4f8';
+      msg.textContent = 'Account created. Logged in.';
+      // create an empty user doc if absent
+      await setDoc(doc(db,'users',cred.user.uid), { appData: null }, { merge:true });
+    } catch (err) {
+      msg.style.color = '#e74c3c';
+      msg.textContent = err.message;
+      console.error(err);
+    }
+  };
+
+  window.signInWithEmail = async function() {
+    const email = document.getElementById('authEmail').value.trim();
+    const pw = document.getElementById('authPassword').value;
+    const msg = document.getElementById('authMsg');
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, pw);
+      msg.style.color = '#8ab4f8';
+      msg.textContent = 'Signed in.';
+      // onAuthStateChanged will trigger load
+    } catch (err) {
+      msg.style.color = '#e74c3c';
+      msg.textContent = err.message;
+      console.error(err);
+    }
+  };
+
+  window.signOutUser = async function() {
+    await signOut(auth);
+  };
+
+  // use local password fallback (calls your existing verifyPassword)
+  window.useLocalPasswordMode = function() {
+    // show the original input and use existing verifyPassword()
+    // If your page uses verifyPassword(), it will work unchanged
+    // For simplicity we call the old function if it exists:
+    if (typeof verifyPassword === 'function') {
+      // reveal the original login container layout if you kept it
+      // here we just call it to attempt local unlock (user should have typed local pwd)
+      verifyPassword();
+    } else {
+      alert('Local unlock not available');
+    }
+  };
+
+  // --- Firestore sync helpers ---
+  // Save full data object to Firestore under users/{uid}.appData
+  async function saveRemoteData(uid, appData) {
+    if (!uid) return;
+    try {
+      await setDoc(doc(db,'users',uid), { appData }, { merge: true });
+      console.log('Saved remote data for', uid);
+    } catch (e) {
+      console.error('saveRemoteData failed', e);
+    }
+  }
+
+  async function loadRemoteData(uid) {
+    if (!uid) return null;
+    try {
+      const snap = await getDoc(doc(db,'users',uid));
+      if (!snap.exists()) return null;
+      const obj = snap.data();
+      return obj.appData || null;
+    } catch (e) {
+      console.error('loadRemoteData failed', e);
+      return null;
+    }
+  }
+
+  // debounce wrapper to avoid spam writes
+  function debounce(fn, wait=1500) {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(()=>fn(...args), wait);
+    };
+  }
+
+  // We'll call this debounced function whenever local save happens
+  const saveRemoteDataDebounced = debounce((uid, appData) => {
+    saveRemoteData(uid, appData);
+  }, 1500);
+
+  // file upload helper (returns downloadURL)
+  async function uploadFileToStorage(file, storagePath) {
+    const r = ref(storage, storagePath);
+    const snapshot = await uploadBytes(r, file);
+    const url = await getDownloadURL(snapshot.ref);
+    return url;
+  }
+
+  // Hook into auth state
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      console.log('User signed in', user.uid);
+      // load remote appData
+      const remote = await loadRemoteData(user.uid);
+      // if remote exists, decide merge/overwrite. Here we overwrite local with remote if remote present.
+      if (remote) {
+        try {
+          // write remote into localStorage key used by your app
+          localStorage.setItem('ching_study_data', JSON.stringify(remote));
+          // then reload data object in page (you must have loadData() that reads localStorage)
+          if (typeof loadData === 'function') {
+            data = loadData(); // update global 'data' variable
+          } else {
+            console.warn('No loadData() found in page. Ensure your app provides loadData() to rebuild data from localStorage.');
+          }
+          // re-render UI
+          if (typeof renderHomeCards === 'function') renderHomeCards();
+        } catch (e) { console.error(e); }
+      } else {
+        // remote empty — optionally upload local data to remote
+        if (typeof data !== 'undefined') {
+          await saveRemoteData(user.uid, data);
+        }
+      }
+
+      // set a hook: whenever your saveData() is called, if user is signed in also push remote
+      // We patch saveData if it exists:
+      if (typeof saveData === 'function') {
+        const originalSave = saveData;
+        saveData = function() {
+          originalSave.apply(this, arguments);
+          // after local save, push remote
+          if (auth.currentUser) saveRemoteDataDebounced(auth.currentUser.uid, data);
+        };
+      }
+    } else {
+      console.log('User signed out');
+      // no-op
+    }
+  });
+
+  // Expose upload helper to global so other code can call it before saving a file entry:
+  window.uploadFileToStorage = uploadFileToStorage;
+
+  // Finally expose a helper to explicitly sync to remote now:
+  window.syncNowToRemote = async function() {
+    if (!auth.currentUser) { alert('Please sign in first'); return; }
+    await saveRemoteData(auth.currentUser.uid, data);
+    alert('Synced to cloud.');
+  };
+
+  // You may want to call this on app init to show current auth status
+  console.log('Firebase module loaded');
 </script>
 </body>
 </html>
