@@ -318,12 +318,14 @@
         ::-webkit-scrollbar-track { background: #0b0b0b; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
     </style>
-    <!-- Firebase JS (compat) -->
+    <!-- Firebase Compat SDK (全部使用同步方式) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
     </script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js">
     </script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js">
     </script>
 </head>
 <body>
@@ -338,11 +340,11 @@
             <input type="email" id="authEmail" placeholder="Email" style="max-width:320px;padding:12px;border-radius:20px;">
             <input type="password" id="authPassword" placeholder="Password" style="max-width:320px;padding:12px;border-radius:20px;">
             <div style="display:flex;gap:8px;">
-                <button onclick="window.signInWithEmail()">Sign in</button>
-                <button onclick="window.signUpWithEmail()">Sign up</button>
+                <button onclick="signInWithEmail()">Sign in</button>
+                <button onclick="signUpWithEmail()">Sign up</button>
             </div>
             <div style="margin-top:8px;">
-                <button onclick="window.useLocalPasswordMode()" style="background:#333;padding:8px 12px;border-radius:20px;">Use Local Password</button>
+                <button onclick="useLocalPasswordMode()" style="background:#333;padding:8px 12px;border-radius:20px;">Use Local Password</button>
             </div>
             <div id="authMsg" style="min-height:24px;color:#f1c40f;margin-top:6px;"></div>
         </div>
@@ -369,9 +371,9 @@
                 <div class="habits-container" id="habitsContainer"></div>
             </div>
 
-            <!-- 同步按鈕 (新增) -->
+            <!-- 同步按鈕 -->
             <button id="syncNowBtn" onclick="syncNow()" style="background:#444;border:none;color:#fff;padding:10px;border-radius:30px;cursor:pointer;margin-bottom:12px;width:100%;">
-                sync now
+                🔄 立即同步（從雲端拉取最新資料）
             </button>
 
             <div class="card-grid" id="homeCardGrid"></div>
@@ -630,7 +632,31 @@
 
     <script>
         // ============================================================
-        // Data model & helpers (保持與你 Version5 一致)
+        // 初始化 Firebase (使用 compat 全域物件)
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdx9vadpwmZcJKuzAANnIYC_epmdFJ1xQ",
+            authDomain: "chingstudy-c530.firebaseapp.com",
+            projectId: "chingstudy-c530",
+            storageBucket: "chingstudy-c530.appspot.com",
+            messagingSenderId: "661963537920",
+            appId: "1:661963537920:web:6ef8ef3e7aed95b21322e5",
+            measurementId: "G-HECJDWXH24"
+        };
+
+        // 初始化 Firebase (compat)
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // 讓全體函數可存取
+        window.auth = auth;
+        window.db = db;
+        window.storage = storage;
+
+        // ============================================================
+        // Data model & helpers
         // ============================================================
         const CATEGORIES = ['Information', 'Quiz', 'DSE'];
         const SUBJECTS = ['Chinese', 'English', 'Mathematics', 'CS', 'Economics', 'Bafs', 'Ict'];
@@ -675,7 +701,6 @@
                 if (!parsed.homeOrder) parsed.homeOrder = HOME_DEFAULT_ORDER.slice();
                 if (!parsed.aiLinks) parsed.aiLinks = [];
 
-                // Migrate old infoFolders/dseFolders
                 if (parsed.infoFolders) {
                     SUBJECTS.forEach(s => {
                         const arr = parsed.infoFolders[s] || [];
@@ -724,7 +749,6 @@
             }
         }
 
-        // Use 'var' so it attaches to window (accessible from module)
         var data = loadData();
 
         function saveData() {
@@ -732,28 +756,42 @@
         }
 
         // ============================================================
-        // Login & init
+        // Login / Auth 函數 (直接使用 compat)
         // ============================================================
         const CORRECT_PASSWORD = 'ching';
 
-        function checkLoginStatus() {
-            if (localStorage.getItem('loggedIn') === 'true') showApp();
-        }
-
-        // Legacy verifyPassword - kept for compatibility
-        function verifyPassword() {
-            const v = document.getElementById('passwordInput');
-            if (v) {
-                const val = v.value.trim();
-                if (val === CORRECT_PASSWORD) { localStorage.setItem('loggedIn', 'true');
-                    showApp(); } else { document.getElementById('loginError').textContent = 'Wrong password, try again'; }
-            } else {
-                const pw = prompt('Enter local password:');
-                if (pw === CORRECT_PASSWORD) { localStorage.setItem('loggedIn', 'true');
-                    showApp(); } else { document.getElementById('authMsg').textContent = 'Wrong password';
-                    document.getElementById('authMsg').style.color = '#e74c3c'; }
+        window.signUpWithEmail = async function() {
+            const email = document.getElementById('authEmail').value.trim();
+            const pw = document.getElementById('authPassword').value;
+            const msg = document.getElementById('authMsg');
+            try {
+                const cred = await auth.createUserWithEmailAndPassword(email, pw);
+                msg.style.color = '#8ab4f8';
+                msg.textContent = 'Account created. Logged in.';
+                // 建立使用者文件
+                await db.collection('users').doc(cred.user.uid).set({ appData: null }, { merge: true });
+            } catch (err) {
+                msg.style.color = '#e74c3c';
+                msg.textContent = err.message;
+                console.error(err);
             }
-        }
+        };
+
+        window.signInWithEmail = async function() {
+            const email = document.getElementById('authEmail').value.trim();
+            const pw = document.getElementById('authPassword').value;
+            const msg = document.getElementById('authMsg');
+            try {
+                const cred = await auth.signInWithEmailAndPassword(email, pw);
+                msg.style.color = '#8ab4f8';
+                msg.textContent = 'Signed in.';
+                // onAuthStateChanged 會處理後續
+            } catch (err) {
+                msg.style.color = '#e74c3c';
+                msg.textContent = err.message;
+                console.error(err);
+            }
+        };
 
         window.useLocalPasswordMode = function() {
             const pw = prompt('Enter local password:');
@@ -768,6 +806,10 @@
             }
         };
 
+        function checkLoginStatus() {
+            if (localStorage.getItem('loggedIn') === 'true') showApp();
+        }
+
         function showApp() {
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
@@ -775,14 +817,15 @@
             initApp();
         }
 
-        // ===== 修正後的 logout 函數 =====
+        // ============================================================
+        // Logout (修正)
+        // ============================================================
         function logout() {
             if (!confirm('確定要登出嗎？')) return;
             localStorage.removeItem('loggedIn');
-            if (typeof window.auth !== 'undefined' && window.auth.currentUser) {
-                window.auth.signOut().catch(() => {});
+            if (auth.currentUser) {
+                auth.signOut().catch(() => {});
             }
-            // 強制重新載入，清除快取
             window.location.href = window.location.href.split('?')[0] + '?t=' + Date.now();
         }
 
@@ -1277,12 +1320,14 @@
             const key = document.getElementById('chapterFilesList').dataset.key;
             const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
 
-            if (typeof window.auth !== 'undefined' && window.auth.currentUser) {
+            if (auth.currentUser) {
                 try {
-                    const uid = window.auth.currentUser.uid;
+                    const uid = auth.currentUser.uid;
                     const id = generateId();
                     const path = `users/${uid}/files/${id}_${file.name}`;
-                    const url = await window.uploadFileToStorage(file, path);
+                    const ref = storage.ref(path);
+                    const snapshot = await ref.put(file);
+                    const url = await snapshot.ref.getDownloadURL();
                     const entry = { id, name: file.name, type: 'file-ref', url, size: file.size };
                     if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
                     data.chapters[key][chIdx].files.push(entry);
@@ -1325,7 +1370,7 @@
                 if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
                 const root = data.chapters[key][chIdx].files;
 
-                const useFirebase = (typeof window.auth !== 'undefined' && window.auth.currentUser);
+                const useFirebase = !!auth.currentUser;
 
                 files.forEach(async (file) => {
                     const parts = file.webkitRelativePath.split('/');
@@ -1335,10 +1380,12 @@
                         if (i === parts.length - 1) {
                             if (useFirebase) {
                                 try {
-                                    const uid = window.auth.currentUser.uid;
+                                    const uid = auth.currentUser.uid;
                                     const id = generateId();
                                     const path = `users/${uid}/files/${id}_${file.name}`;
-                                    const url = await window.uploadFileToStorage(file, path);
+                                    const ref = storage.ref(path);
+                                    const snapshot = await ref.put(file);
+                                    const url = await snapshot.ref.getDownloadURL();
                                     const entry = { id, name, type: 'file-ref', url, size: file
                                         .size };
                                     pointer.push(entry);
@@ -1536,7 +1583,7 @@
         }, 60000);
 
         // ============================================================
-        // Calendar & Events (從之前版本完整還原)
+        // Calendar & Events
         // ============================================================
         let calYear = new Date().getFullYear();
         let calMonth = new Date().getMonth();
@@ -1688,7 +1735,7 @@
         });
 
         // ============================================================
-        // Statistics (page + preview) — 保持你先前的設計與漸層
+        // Statistics (page + preview)
         // ============================================================
         let statRange = 'week';
 
@@ -1739,7 +1786,6 @@
             document.getElementById('statAvgSubjects').textContent = avgSubjects.toFixed(1);
             document.getElementById('statMaxSubjects').textContent = maxSubjects;
 
-            // draw chart
             const ctx = canvas.getContext('2d');
             const dpr = window.devicePixelRatio || 1;
             const rect = canvas.parentElement.getBoundingClientRect();
@@ -1856,7 +1902,7 @@
         }
 
         // ============================================================
-        // Tools: Calculator & Grade calculator (完整按鈕介面)
+        // Tools: Calculator & Grade calculator
         // ============================================================
         function navigateToToolsDefault() { navigateTo('tools');
             showTool('calculator'); }
@@ -1914,7 +1960,6 @@
                 e.preventDefault(); } else if (e.key === 'Backspace') { calcBack();
                 e.preventDefault(); } } }
 
-        // Grade functions
         function renderGradeRows() {
             const container = document.getElementById('gradeRows');
             const rows = data._gradeTmp || [];
@@ -2084,7 +2129,7 @@
         function goBackFromQuiz() { navigateTo('home'); }
 
         // ============================================================
-        // Timer (Stopwatch + Countdown) implementation
+        // Timer (Stopwatch + Countdown)
         // ============================================================
         let timerMode = 'stopwatch';
         let timerRunning = false;
@@ -2224,32 +2269,38 @@
         }
 
         // ============================================================
-        // 新增：同步函數 syncNow
+        // 同步函數 syncNow (使用 compat)
         // ============================================================
         window.syncNow = async function() {
-            if (!window.auth || !window.auth.currentUser) {
+            if (!auth.currentUser) {
                 alert('請先登入（使用 Email 帳號）才能同步');
                 return;
             }
-            const uid = window.auth.currentUser.uid;
+            const uid = auth.currentUser.uid;
             try {
-                // 這些函數由 Firebase 模組暴露
-                const remote = await window.loadRemoteData(uid);
-                if (remote) {
-                    localStorage.setItem('ching_study_data', JSON.stringify(remote));
-                    window.data = loadData();
-                    // 刷新所有頁面
-                    renderHomeCards();
-                    renderHabits();
-                    renderObjectives();
-                    renderBottomBar();
-                    renderStatPreview();
-                    if (document.getElementById('page-statistics').classList.contains('active')) renderStatistics();
-                    if (document.getElementById('page-calendar').classList.contains('active')) renderCalendar();
-                    alert('同步完成！');
+                const docRef = db.collection('users').doc(uid);
+                const snap = await docRef.get();
+                if (snap.exists) {
+                    const remote = snap.data().appData;
+                    if (remote) {
+                        localStorage.setItem('ching_study_data', JSON.stringify(remote));
+                        window.data = loadData();
+                        renderHomeCards();
+                        renderHabits();
+                        renderObjectives();
+                        renderBottomBar();
+                        renderStatPreview();
+                        if (document.getElementById('page-statistics').classList.contains('active')) renderStatistics();
+                        if (document.getElementById('page-calendar').classList.contains('active')) renderCalendar();
+                        alert('同步完成！');
+                    } else {
+                        alert('雲端無資料，將上傳目前本地資料');
+                        await docRef.set({ appData: window.data }, { merge: true });
+                        alert('已上傳');
+                    }
                 } else {
-                    alert('雲端無資料，將上傳目前本地資料');
-                    await window.saveRemoteData(uid, window.data);
+                    // 建立文件
+                    await docRef.set({ appData: window.data });
                     alert('已上傳');
                 }
             } catch (e) {
@@ -2257,6 +2308,66 @@
                 console.error(e);
             }
         };
+
+        // 當資料變更時自動推送（debounce）
+        let syncTimeout = null;
+
+        function debouncedSync() {
+            if (!auth.currentUser) return;
+            const uid = auth.currentUser.uid;
+            if (syncTimeout) clearTimeout(syncTimeout);
+            syncTimeout = setTimeout(async () => {
+                try {
+                    await db.collection('users').doc(uid).set({ appData: window.data }, { merge: true });
+                    console.log('Auto-synced to cloud');
+                } catch (e) { console.error('Auto-sync failed', e); }
+            }, 1500);
+        }
+
+        // 覆寫 saveData 以觸發自動同步
+        const originalSaveData = saveData;
+        saveData = function() {
+            originalSaveData.apply(this, arguments);
+            debouncedSync();
+        };
+        // 也讓 window.saveData 指向新的
+        window.saveData = saveData;
+
+        // ============================================================
+        // Auth state listener (compat)
+        // ============================================================
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                console.log('User signed in', user.uid);
+                // 從雲端拉取
+                try {
+                    const docRef = db.collection('users').doc(user.uid);
+                    const snap = await docRef.get();
+                    if (snap.exists) {
+                        const remote = snap.data().appData;
+                        if (remote) {
+                            localStorage.setItem('ching_study_data', JSON.stringify(remote));
+                            window.data = loadData();
+                            renderHomeCards();
+                            renderHabits();
+                            renderObjectives();
+                            renderBottomBar();
+                            renderStatPreview();
+                            if (document.getElementById('page-statistics').classList.contains('active'))
+                            renderStatistics();
+                            if (document.getElementById('page-calendar').classList.contains('active'))
+                            renderCalendar();
+                        }
+                    }
+                } catch (e) { console.error('Load remote on login failed', e); }
+
+                localStorage.setItem('loggedIn', 'true');
+                showApp();
+            } else {
+                console.log('User signed out');
+                // 不自動清除 local 登入
+            }
+        });
 
         // ============================================================
         // Init
@@ -2272,9 +2383,8 @@
             navigateTo('home');
             renderBottomBar();
 
-            // 頁面可見時自動同步（若已登入）
             document.addEventListener('visibilitychange', function() {
-                if (!document.hidden && window.auth && window.auth.currentUser) {
+                if (!document.hidden && auth.currentUser) {
                     setTimeout(() => { window.syncNow(); }, 300);
                 }
             });
@@ -2297,190 +2407,8 @@
             console.log('Ching Study unlocked.');
         }
 
-        // Check login status
+        // Start
         checkLoginStatus();
-
-        // 暴露必要函數給 window，供 Firebase 模組調用
-        window.data = data;
-        window.loadData = loadData;
-        window.saveData = saveData;
-        window.showApp = showApp;
-        window.renderHomeCards = renderHomeCards;
-        window.renderHabits = renderHabits;
-        window.renderObjectives = renderObjectives;
-        window.renderBottomBar = renderBottomBar;
-        window.renderStatPreview = renderStatPreview;
-        window.verifyPassword = verifyPassword;
-        window.CORRECT_PASSWORD = CORRECT_PASSWORD;
-        window.navigateTo = navigateTo;
-        window.logout = logout;
-        window.auth = null; // 會由 module 設置
-    </script>
-
-    <!-- ===== FIREBASE MODULE (ES Module) ===== -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
-            onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAdx9vadpwmZcJKuzAANnIYC_epmdFJ1xQ",
-            authDomain: "chingstudy-c530.firebaseapp.com",
-            projectId: "chingstudy-c530",
-            storageBucket: "chingstudy-c530.appspot.com",
-            messagingSenderId: "661963537920",
-            appId: "1:661963537920:web:6ef8ef3e7aed95b21322e5",
-            measurementId: "G-HECJDWXH24"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
-
-        window.auth = auth;
-
-        // --- Auth helpers ---
-        window.signUpWithEmail = async function() {
-            const email = document.getElementById('authEmail').value.trim();
-            const pw = document.getElementById('authPassword').value;
-            const msg = document.getElementById('authMsg');
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, email, pw);
-                msg.style.color = '#8ab4f8';
-                msg.textContent = 'Account created. Logged in.';
-                await setDoc(doc(db, 'users', cred.user.uid), { appData: null }, { merge: true });
-            } catch (err) {
-                msg.style.color = '#e74c3c';
-                msg.textContent = err.message;
-                console.error(err);
-            }
-        };
-
-        window.signInWithEmail = async function() {
-            const email = document.getElementById('authEmail').value.trim();
-            const pw = document.getElementById('authPassword').value;
-            const msg = document.getElementById('authMsg');
-            try {
-                const cred = await signInWithEmailAndPassword(auth, email, pw);
-                msg.style.color = '#8ab4f8';
-                msg.textContent = 'Signed in.';
-            } catch (err) {
-                msg.style.color = '#e74c3c';
-                msg.textContent = err.message;
-                console.error(err);
-            }
-        };
-
-        window.signOutUser = async function() {
-            await signOut(auth);
-        };
-
-        // --- Firestore sync ---
-        async function saveRemoteData(uid, appData) {
-            if (!uid) return;
-            try {
-                await setDoc(doc(db, 'users', uid), { appData }, { merge: true });
-                console.log('Saved remote data for', uid);
-            } catch (e) {
-                console.error('saveRemoteData failed', e);
-            }
-        }
-
-        async function loadRemoteData(uid) {
-            if (!uid) return null;
-            try {
-                const snap = await getDoc(doc(db, 'users', uid));
-                if (!snap.exists()) return null;
-                const obj = snap.data();
-                return obj.appData || null;
-            } catch (e) {
-                console.error('loadRemoteData failed', e);
-                return null;
-            }
-        }
-
-        // 暴露給全域
-        window.saveRemoteData = saveRemoteData;
-        window.loadRemoteData = loadRemoteData;
-
-        function debounce(fn, wait = 1500) {
-            let t;
-            return (...args) => {
-                clearTimeout(t);
-                t = setTimeout(() => fn(...args), wait);
-            };
-        }
-
-        const saveRemoteDataDebounced = debounce((uid, appData) => {
-            saveRemoteData(uid, appData);
-        }, 1500);
-
-        window.uploadFileToStorage = async function(file, storagePath) {
-            const r = ref(storage, storagePath);
-            const snapshot = await uploadBytes(r, file);
-            const url = await getDownloadURL(snapshot.ref);
-            return url;
-        };
-
-        // --- Auth state listener ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                console.log('User signed in', user.uid);
-                // Load remote data
-                const remote = await loadRemoteData(user.uid);
-                if (remote) {
-                    try {
-                        localStorage.setItem('ching_study_data', JSON.stringify(remote));
-                        if (typeof window.loadData === 'function') {
-                            window.data = window.loadData();
-                        }
-                        if (typeof window.renderHomeCards === 'function') window.renderHomeCards();
-                        if (typeof window.renderHabits === 'function') window.renderHabits();
-                        if (typeof window.renderObjectives === 'function') window.renderObjectives();
-                        if (typeof window.renderBottomBar === 'function') window.renderBottomBar();
-                        if (typeof window.renderStatPreview === 'function') setTimeout(window.renderStatPreview,
-                        80);
-                    } catch (e) { console.error(e); }
-                } else {
-                    if (typeof window.data !== 'undefined' && window.data) {
-                        await saveRemoteData(user.uid, window.data);
-                    }
-                }
-
-                // Wrap saveData to push to Firestore
-                const originalSave = window.saveData;
-                if (typeof originalSave === 'function') {
-                    window.saveData = function() {
-                        originalSave.apply(window, arguments);
-                        if (auth.currentUser && typeof window.data !== 'undefined') {
-                            saveRemoteDataDebounced(auth.currentUser.uid, window.data);
-                        }
-                    };
-                }
-
-                localStorage.setItem('loggedIn', 'true');
-                if (typeof window.showApp === 'function') {
-                    window.showApp();
-                } else {
-                    document.getElementById('loginContainer').style.display = 'none';
-                    document.getElementById('appContainer').classList.add('active');
-                }
-
-                if (typeof window.loadData === 'function') {
-                    window.data = window.loadData();
-                    if (typeof window.initApp === 'function') window.initApp();
-                }
-
-            } else {
-                console.log('User signed out');
-                // 不自動清除 local 登入狀態，保留給本地模式使用
-            }
-        });
-
-        console.log('Firebase module loaded');
     </script>
 </body>
 </html>
