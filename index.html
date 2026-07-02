@@ -1152,9 +1152,9 @@ async function addChapterFile() {
     const key = document.getElementById('chapterFilesList').dataset.key;
     const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
 
-    const MAX_SIZE = 500 * 1024;
+    const MAX_SIZE = 50 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-        alert('File too large! Please upload files smaller than 500 KB.');
+        alert('File too large! Please upload files smaller than 50 MB.');
         input.value = '';
         return;
     }
