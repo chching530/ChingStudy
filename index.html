@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
@@ -8,7 +8,7 @@
     <meta name="format-detection" content="telephone=no">
     <title>◇ Ching Study</title>
     <style>
-        /* ===== 完整樣式保持不變 ===== */
+        /* ===== Full Styles (unchanged) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background: #0b0b0b; color: #f0f0f0; padding: 16px; padding-bottom: 110px; max-width: 1000px; margin: 0 auto; min-height: 100vh; }
         button, .main-card, .subject-item, .chapter-card, .habit-box, .link-item, .item-card .actions button, .chapter-file-item .actions button, .stat-filter-btn, .folder-item, .file-item, .bottom-bar button {
@@ -198,7 +198,7 @@
         .chapter-file-item .actions button { background: none; border: none; color: #e74c3c; font-size: 16px; cursor: pointer; padding: 0 4px; touch-action: manipulation; }
         .chapter-file-item .actions .open-btn { color: #8ab4f8; font-size: 16px; text-decoration: none; cursor: pointer; background: none; border: none; padding: 0 4px; }
         .chapter-file-item .actions .download-btn { color: #8ab4f8; font-size: 16px; text-decoration: none; margin-right: 2px; }
-        /* BOTTOM BAR */
+        /* BOTTOM BAR - no emoji, no delete buttons, text only */
         .bottom-bar-wrapper {
             position: fixed;
             bottom: 0;
@@ -242,46 +242,21 @@
             flex-shrink: 0;
             border-radius: 8px;
             position: relative;
+            font-weight: 400;
         }
         .bottom-bar button:active { transform: scale(0.92); color: #fff; background: #2a2a2a; }
-        .bottom-bar button .btn-icon { font-size: 20px; line-height: 1; }
-        .bottom-bar button .btn-label { font-size: 10px; color: #666; }
+        .bottom-bar button .btn-icon { display: none; } /* Hide all emoji icons */
+        .bottom-bar button .btn-label { font-size: 11px; color: #888; }
         .bottom-bar button.active .btn-label { color: #8ab4f8; }
         .bottom-bar .bb-spacer { flex: 1; min-width: 8px; }
-        /* 自訂按鈕的刪除掣 */
+        /* Custom buttons in bottom bar - text only, no delete button */
         .bottom-bar .custom-btn-wrapper {
             display: inline-flex;
             align-items: center;
-            position: relative;
         }
-        .bottom-bar .custom-btn-wrapper .del-custom-btn {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: #e74c3c;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            font-size: 10px;
-            line-height: 16px;
-            text-align: center;
-            padding: 0;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.2s;
-            z-index: 2;
-            touch-action: manipulation;
-        }
-        .bottom-bar .custom-btn-wrapper:hover .del-custom-btn,
-        .bottom-bar .custom-btn-wrapper .del-custom-btn:active {
-            opacity: 1;
-        }
-        @media (max-width: 480px) {
-            .bottom-bar .custom-btn-wrapper .del-custom-btn {
-                opacity: 0.5; /* 手機上預設顯示半透明，方便刪除 */
-            }
+        .bottom-bar .custom-btn-wrapper button {
+            min-width: 44px;
+            flex-shrink: 0;
         }
         /* MODALS */
         .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); display:none; justify-content:center; align-items:center; z-index:999; }
@@ -335,8 +310,7 @@
             .main-card .desc { font-size: 11px; }
             .stat-summary { flex-wrap: wrap; gap: 8px; }
             .bottom-bar button { font-size: 10px; min-width: 36px; padding: 2px 6px; }
-            .bottom-bar button .btn-icon { font-size: 16px; }
-            .bottom-bar .custom-btn-wrapper .del-custom-btn { opacity: 0.5; }
+            .bottom-bar button .btn-label { font-size: 10px; }
         }
         @media (min-width: 800px) {
             body { max-width: 1000px; padding: 24px; padding-bottom: 120px; }
@@ -396,7 +370,7 @@
             <div class="habits-container" id="habitsContainer"></div>
         </div>
         <button id="syncNowBtn" onclick="syncNow()" style="background:#444;border:none;color:#fff;padding:10px;border-radius:30px;cursor:pointer;margin-bottom:12px;width:100%;">
-            🔄 立即同步（從雲端拉取最新資料）
+            🔄 Sync Now (pull latest from cloud)
         </button>
         <div class="card-grid" id="homeCardGrid"></div>
         <button class="logout-btn" onclick="logout()">Logout</button>
@@ -498,17 +472,17 @@
         <div id="toolsContent" style="margin-top:12px;"></div>
     </div>
 
-    <!-- PAGE: AI (管理底部 Bar 按鈕) -->
+    <!-- PAGE: AI (Manage bottom bar buttons) -->
     <div id="page-ai" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
-        <h2 style="font-weight:300; font-size:22px;">管理底部 Bar 按鈕</h2>
+        <h2 style="font-weight:300; font-size:22px;">Manage Bottom Bar</h2>
         <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
-            <input id="aiName" placeholder="按鈕名稱" style="flex:1; background:#222; border:1px solid #444; border-radius:30px; padding:10px 16px; color:#fff;" />
+            <input id="aiName" placeholder="Button name" style="flex:1; background:#222; border:1px solid #444; border-radius:30px; padding:10px 16px; color:#fff;" />
             <input id="aiURL" placeholder="URL (https://...)" style="flex:2; background:#222; border:1px solid #444; border-radius:30px; padding:10px 16px; color:#fff;" />
-            <button class="btn-secondary" onclick="addCustomButton()">新增</button>
+            <button class="btn-secondary" onclick="addCustomButton()">Add</button>
         </div>
         <div id="aiLinksList" style="margin-top:12px;"></div>
-        <p style="color:#666; font-size:13px; margin-top:10px;">💡 呢度新增嘅按鈕會出現喺底部 Bar，撳一下會打開對應 URL。</p>
+        <p style="color:#666; font-size:13px; margin-top:10px;">💡 Buttons added here will appear in the bottom bar. Tap to open the URL.</p>
     </div>
 
     <!-- PAGE: CALENDAR -->
@@ -585,7 +559,7 @@
         </div>
     </div>
 
-    <!-- CUSTOM BUTTON MODAL (用於底部嘅 Add 掣) -->
+    <!-- CUSTOM BUTTON MODAL (for the bottom Add button) -->
     <div class="modal-overlay" id="customBtnModal">
         <div class="modal-box">
             <h3>Add Custom Button <button class="close-modal" onclick="closeCustomBtnModal()">✕</button></h3>
@@ -636,7 +610,7 @@
 <div class="bottom-bar-wrapper">
     <div class="bottom-bar" id="bottomBar">
         <button onclick="navigateTo('home')" class="active" id="bbHome">Home</button>
-        <button id="bbAI" onclick="navigateTo('ai')">AI</button>
+        <button id="bbAI" onclick="navigateTo('ai')">Manage</button>
         <div id="customButtonsContainer" style="display:inline-flex; gap:4px; align-items:center;"></div>
         <button onclick="openCustomBtnModal()" id="bbAdd">Add</button>
         <div class="bb-spacer"></div>
@@ -645,7 +619,7 @@
 
 <script>
 // ============================================================
-// 初始化 Firebase (compat)
+// Firebase init (compat)
 // ============================================================
 const firebaseConfig = {
     apiKey: "AIzaSyAdx9vadpwmZcJKuzAANnIYC_epmdFJ1xQ",
@@ -684,9 +658,8 @@ function defaultData() {
         links: [{ name: 'DeepSeek', url: 'https://deepseek.com' }, { name: 'Google', url: 'https://google.com' }],
         habits: {},
         objectives: {},
-        customButtons: [],   // 而家只有 customButtons，AI 同底部共用
+        customButtons: [],
         homeOrder: HOME_DEFAULT_ORDER.slice()
-        // 刪除 aiLinks
     };
 }
 
@@ -707,13 +680,13 @@ function loadData() {
         if (!parsed.customButtons) parsed.customButtons = [];
         if (!parsed.homeOrder) parsed.homeOrder = HOME_DEFAULT_ORDER.slice();
 
-        // 將舊嘅 aiLinks 搬遷過嚟 customButtons (如果存在)
+        // Migrate old aiLinks to customButtons
         if (parsed.aiLinks && parsed.aiLinks.length > 0) {
             parsed.customButtons = parsed.customButtons.concat(parsed.aiLinks);
             delete parsed.aiLinks;
         }
 
-        // 其他 migration
+        // Migrate old infoFolders / dseFolders
         if (parsed.infoFolders) {
             SUBJECTS.forEach(s => {
                 const arr = parsed.infoFolders[s] || [];
@@ -825,7 +798,7 @@ function showApp() {
 }
 
 function logout() {
-    if (!confirm('確定要登出嗎？')) return;
+    if (!confirm('Logout?')) return;
     localStorage.removeItem('loggedIn');
     if (auth.currentUser) {
         auth.signOut().catch(() => {});
@@ -883,7 +856,7 @@ function navigateTo(page) {
     if (page === 'objectives') renderObjectives();
     if (page === 'statistics') renderStatistics();
     if (page === 'tools') { navigateToToolsDefault(); }
-    if (page === 'ai') renderCustomButtonsList();  // AI 頁面改為顯示 customButtons
+    if (page === 'ai') renderCustomButtonsList();
     if (page === 'calendar') renderCalendar();
     if (page === 'timer') initTimer();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -998,7 +971,7 @@ function handleCardClick(id) {
 }
 
 // ============================================================
-// Categories, subjects, chapters (保持不變)
+// Categories, subjects, chapters
 // ============================================================
 let currentCategory = null;
 let currentSubject = null;
@@ -1169,29 +1142,29 @@ function deleteChapterLink(idx) {
     renderChapterList(key);
 }
 
-// 檔案相關（簡化，全部用 base64，因為你無 Storage）
+// ============================================================
+// File handling (base64 only, no Storage)
+// ============================================================
 async function addChapterFile() {
     const input = document.getElementById('chapterFileInput');
     const file = input.files[0];
-    if (!file) return alert('請選擇檔案。');
+    if (!file) return alert('Please select a file.');
     const key = document.getElementById('chapterFilesList').dataset.key;
     const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
 
-    // 限制大小 500KB
     const MAX_SIZE = 500 * 1024;
     if (file.size > MAX_SIZE) {
-        alert('檔案太大！請上傳小於 500 KB 嘅檔案。');
+        alert('File too large! Please upload files smaller than 500 KB.');
         input.value = '';
         return;
     }
 
-    // 檢查 Firestore 文件大小 (預估)
     const existingFiles = data.chapters[key]?.[chIdx]?.files || [];
     let totalBase64Size = 0;
     existingFiles.forEach(f => { if (f.data) totalBase64Size += f.data.length; });
     const newBase64Size = file.size * 1.37;
     if (totalBase64Size + newBase64Size > 900 * 1024) {
-        alert('Firestore 文件就快超標（1MB），請刪除部分舊檔案再上傳。');
+        alert('Firestore document size limit (1MB) approaching. Please delete some old files first.');
         input.value = '';
         return;
     }
@@ -1227,7 +1200,6 @@ function uploadChapterFolder() {
             for (let i = 0; i < parts.length; i++) {
                 const name = parts[i];
                 if (i === parts.length - 1) {
-                    // 全部用 base64
                     const reader = new FileReader();
                     reader.onload = function(ev) {
                         const entry = { id: generateId(), name, type: 'file', data: ev.target.result, size: file.size };
@@ -1842,47 +1814,44 @@ function calcGrade(){
 }
 
 // ============================================================
-// AI 頁面管理 customButtons (改名，但保留原有函數名方便)
+// AI Page - Manage Bottom Bar Buttons
 // ============================================================
-// 重新命名：renderAiLinks -> renderCustomButtonsList
 function renderCustomButtonsList() {
     const container = document.getElementById('aiLinksList');
     const arr = data.customButtons || [];
     if (arr.length === 0) {
-        container.innerHTML = '<div class="empty-state">未有自訂按鈕，新增一個吧！</div>';
+        container.innerHTML = '<div class="empty-state">No custom buttons yet. Add one!</div>';
         return;
     }
     container.innerHTML = arr.map((a, i) => `
         <div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border:1px solid #2a2a2a;border-radius:8px;margin-bottom:6px;">
             <div><a href="${escapeAttr(a.url)}" target="_blank">${escapeAttr(a.name)}</a></div>
             <div style="display:flex;gap:8px;">
-                <button class="btn-secondary" onclick="editCustomButton(${i})">編輯</button>
-                <button class="btn-secondary" style="background:#e74c3c;" onclick="deleteCustomButton(${i})">刪除</button>
+                <button class="btn-secondary" onclick="editCustomButton(${i})">Edit</button>
+                <button class="btn-secondary" style="background:#e74c3c;" onclick="deleteCustomButton(${i})">Delete</button>
             </div>
         </div>
     `).join('');
 }
 
-// 新增（用於 AI 頁面）
 function addCustomButton() {
     const name = document.getElementById('aiName').value.trim();
     const url = document.getElementById('aiURL').value.trim();
-    if (!name || !url) return alert('請輸入名稱同 URL');
+    if (!name || !url) return alert('Please enter both name and URL.');
     data.customButtons = data.customButtons || [];
     data.customButtons.push({ name, url });
     saveData();
     document.getElementById('aiName').value = '';
     document.getElementById('aiURL').value = '';
     renderCustomButtonsList();
-    renderBottomBar();  // 同時更新底部
+    renderBottomBar();
 }
 
-// 編輯
 function editCustomButton(i) {
     const a = data.customButtons[i];
-    const newName = prompt('名稱：', a.name);
+    const newName = prompt('Name:', a.name);
     if (newName === null) return;
-    const newUrl = prompt('URL：', a.url);
+    const newUrl = prompt('URL:', a.url);
     if (newUrl === null) return;
     a.name = newName;
     a.url = newUrl;
@@ -1891,72 +1860,54 @@ function editCustomButton(i) {
     renderBottomBar();
 }
 
-// 刪除
 function deleteCustomButton(i) {
-    if (!confirm('確定刪除這個按鈕？')) return;
+    if (!confirm('Delete this button?')) return;
     data.customButtons.splice(i, 1);
     saveData();
     renderCustomButtonsList();
     renderBottomBar();
 }
 
-// 底部 Bar 的 Add 掣用嘅 modal 儲存（仍然用同一份 data.customButtons）
 function openCustomBtnModal() {
     document.getElementById('customBtnModal').classList.add('show');
     document.getElementById('customBtnName').value = '';
     document.getElementById('customBtnURL').value = '';
 }
 function closeCustomBtnModal() { document.getElementById('customBtnModal').classList.remove('show'); }
+
 function saveCustomButton() {
     const name = document.getElementById('customBtnName').value.trim();
     const url = document.getElementById('customBtnURL').value.trim();
-    if (!name || !url) return alert('輸入名稱同 URL');
+    if (!name || !url) return alert('Enter name and URL.');
     data.customButtons = data.customButtons || [];
     data.customButtons.push({ id: generateId(), name, url });
     saveData();
     closeCustomBtnModal();
     renderBottomBar();
-    // 如果 AI 頁面開咗，都更新埋
     if (document.getElementById('page-ai').classList.contains('active')) renderCustomButtonsList();
 }
 
 // ============================================================
-// 底部 Bar 渲染 (加上刪除掣)
+// Bottom Bar Render (text only, no emoji, no delete button)
 // ============================================================
 function renderBottomBar() {
     const container = document.getElementById('customButtonsContainer');
     if (!container) return;
     const btns = data.customButtons || [];
-    container.innerHTML = btns.map((b, idx) => {
+    container.innerHTML = btns.map((b) => {
         return `
-            <span class="custom-btn-wrapper" style="position:relative; display:inline-block;">
-                <button onclick="window.open('${escapeAttr(b.url)}','_blank')" style="background:none; border:none; color:#888; font-size:12px; padding:6px 10px; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; min-width:44px; flex-shrink:0; border-radius:8px; position:relative;">
-                    <span class="btn-icon" style="font-size:20px; line-height:1;">🔗</span>
-                    <span class="btn-label" style="font-size:10px; color:#666;">${escapeAttr(b.name)}</span>
+            <span class="custom-btn-wrapper">
+                <button onclick="window.open('${escapeAttr(b.url)}','_blank')">
+                    <span class="btn-label">${escapeAttr(b.name)}</span>
                 </button>
-                <button class="del-custom-btn" onclick="event.stopPropagation(); deleteCustomButtonFromBar(${idx})" title="刪除按鈕">✕</button>
             </span>
         `;
     }).join('');
 }
 
-// 底部 Bar 直接刪除
-function deleteCustomButtonFromBar(idx) {
-    if (!confirm(`確定刪除「${data.customButtons[idx].name}」按鈕？`)) return;
-    data.customButtons.splice(idx, 1);
-    saveData();
-    renderBottomBar();
-    // 如果 AI 頁面開咗，都更新
-    if (document.getElementById('page-ai').classList.contains('active')) renderCustomButtonsList();
-}
-
-// 為咗兼容，保留舊嘅 renderAiLinks 指向新函數
-function renderAiLinks() { renderCustomButtonsList(); }
-
-// ============================================================
-// 其他原有功能 (Timer, Quiz, etc.)
 // ============================================================
 // Quiz
+// ============================================================
 function openQuiz() {
     currentCategory = 'Quiz';
     document.getElementById('quizTitle').innerText = 'Quiz';
@@ -1975,7 +1926,9 @@ function openQuiz() {
 }
 function goBackFromQuiz() { navigateTo('home'); }
 
+// ============================================================
 // Timer
+// ============================================================
 let timerMode = 'stopwatch';
 let timerRunning = false;
 let timerStartAt = 0;
@@ -2112,11 +2065,11 @@ function updateCircleProgress() {
 }
 
 // ============================================================
-// 同步函數
+// Sync
 // ============================================================
 window.syncNow = async function() {
     if (!auth.currentUser) {
-        alert('請先登入（使用 Email 帳號）才能同步');
+        alert('Please sign in (with Email) to sync.');
         return;
     }
     const uid = auth.currentUser.uid;
@@ -2136,23 +2089,22 @@ window.syncNow = async function() {
                 if (document.getElementById('page-statistics').classList.contains('active')) renderStatistics();
                 if (document.getElementById('page-calendar').classList.contains('active')) renderCalendar();
                 if (document.getElementById('page-ai').classList.contains('active')) renderCustomButtonsList();
-                alert('同步完成！');
+                alert('Sync complete!');
             } else {
-                alert('雲端無資料，將上傳目前本地資料');
+                alert('No data in cloud. Uploading current local data...');
                 await docRef.set({ appData: window.data }, { merge: true });
-                alert('已上傳');
+                alert('Uploaded.');
             }
         } else {
             await docRef.set({ appData: window.data });
-            alert('已上傳');
+            alert('Uploaded.');
         }
     } catch (e) {
-        alert('同步失敗：' + e.message);
+        alert('Sync failed: ' + e.message);
         console.error(e);
     }
 };
 
-// 自動推送
 let syncTimeout = null;
 function debouncedSync() {
     if (!auth.currentUser) return;
@@ -2206,7 +2158,7 @@ auth.onAuthStateChanged(async (user) => {
 });
 
 // ============================================================
-// Delete confirm 等輔助功能
+// Delete confirm & helpers
 // ============================================================
 let deleteCallback = null;
 function showDeleteConfirm(message, callback) {
