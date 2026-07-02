@@ -369,6 +369,10 @@
                 <div class="habits-container" id="habitsContainer"></div>
             </div>
 
+            <button id="syncNowBtn" onclick="syncNow()" style="background:#444;border:none;color:#fff;padding:10px 20px;border-radius:30px;cursor:pointer;margin-bottom:12px;width:100%;">
+                立即同步
+            </button>
+
             <div class="card-grid" id="homeCardGrid"></div>
             <button class="logout-btn" onclick="logout()">Logout</button>
             <div class="footnote">All data saved in this browser</div>
@@ -2232,7 +2236,6 @@
         // We'll re-assign it if loadData returns something different
 
         function initApp() {
-            // Reload data from localStorage in case it changed
             data = loadData();
             if (!data.homeOrder) data.homeOrder = HOME_DEFAULT_ORDER.slice();
             HOME_DEFAULT_ORDER.forEach(id => { if (!data.homeOrder.includes(id)) data.homeOrder.push(id); });
@@ -2242,6 +2245,23 @@
             updateHeaderClock();
             navigateTo('home');
             renderBottomBar();
+
+            // 新增同步按鈕（動態插入）
+            const homePage = document.getElementById('page-home');
+            const syncBtn = document.createElement('button');
+            syncBtn.id = 'syncNowBtn';
+            syncBtn.textContent = '🔄 立即同步（從雲端拉取最新資料）';
+            syncBtn.style.cssText = 'background:#444;border:none;color:#fff;padding:10px 20px;border-radius:30px;cursor:pointer;margin-bottom:12px;width:100%;';
+            syncBtn.onclick = syncNow;
+            const grid = document.getElementById('homeCardGrid');
+            homePage.insertBefore(syncBtn, grid);
+
+            // 頁面可見時自動同步
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden && window.auth && window.auth.currentUser) {
+                    setTimeout(() => { syncNow(); }, 300);
+                }
+            });
 
             window.addEventListener('resize', () => {
                 if (document.getElementById('page-statistics').classList.contains('active')) renderStatistics();
@@ -2260,6 +2280,39 @@
             initTimer();
             console.log('Ching Study unlocked.');
         }
+
+        window.syncNow = async function() {
+            if (!window.auth || !window.auth.currentUser) {
+                alert('請先登入才能同步');
+                return;
+            }
+            const uid = window.auth.currentUser.uid;
+            try {
+                const remote = await loadRemoteData(uid);
+                if (remote) {
+                    // 覆蓋本地資料
+                    localStorage.setItem('ching_study_data', JSON.stringify(remote));
+                    // 重新載入 data 並刷新所有畫面
+                    window.data = loadData();
+                    renderHomeCards();
+                    renderHabits();
+                    renderObjectives();
+                    renderBottomBar();
+                    renderStatPreview();
+                    // 也刷新當前頁面（若在統計、日曆等）
+                    if (document.getElementById('page-statistics').classList.contains('active')) renderStatistics();
+                    if (document.getElementById('page-calendar').classList.contains('active')) renderCalendar();
+                    alert('同步完成！');
+                } else {
+                    alert('雲端無資料，將上傳目前本地資料');
+                    await saveRemoteData(uid, window.data);
+                    alert('已上傳');
+                }
+            } catch (e) {
+                alert('同步失敗：' + e.message);
+            }
+        };
+
 
         // Check if user is already logged in (localStorage flag)
         checkLoginStatus();
