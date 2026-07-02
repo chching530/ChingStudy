@@ -8,7 +8,7 @@
     <meta name="format-detection" content="telephone=no">
     <title>◇ Ching Study</title>
     <style>
-        /* 完整 CSS 跟之前相同（為簡潔略過註解） */
+        /* Full CSS (kept from your design) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background: #0b0b0b; color: #f0f0f0; padding: 16px; padding-bottom: 120px; max-width: 1000px; margin: 0 auto; min-height: 100vh; }
         button, .main-card, .subject-item, .chapter-card, .habit-box, .link-item, .item-card .actions button, .chapter-file-item .actions button, .stat-filter-btn, .folder-item, .file-item, .bottom-bar button {
@@ -267,36 +267,32 @@
     <div class="login-footer">All data stored locally in your browser</div>
 </div>
 
-<!-- Fallback login handler
-     => 保證即使主 script parse error 未定義 verifyPassword，仍可用此 handler unlock
--->
+<!-- Fallback login handler (runs before main script) -->
 <script>
 (function(){
+    // Provide a minimal-safe fallback verifyPassword in case main script fails to parse/execute
     try {
         const PASSWORD = 'ching';
         const input = document.getElementById('passwordInput');
         const btn = document.getElementById('unlockBtn');
 
         function fallbackVerify() {
-            const v = input.value ? input.value.trim() : '';
+            const v = input && input.value ? input.value.trim() : '';
             if (v === PASSWORD) {
                 localStorage.setItem('loggedIn', 'true');
-                // reload so main script (if fixed) will run initApp
                 location.reload();
             } else {
                 const err = document.getElementById('loginError');
                 if (err) err.textContent = 'Wrong password, try again';
-                input.value = '';
-                input.focus();
+                if (input) { input.value = ''; input.focus(); }
             }
         }
 
-        if (btn && input) {
-            btn.addEventListener('click', fallbackVerify);
-            input.addEventListener('keydown', function(e){ if (e.key === 'Enter') fallbackVerify(); });
-        }
+        // Only attach fallback handlers if real verifyPassword is not defined (or reattach to be safe)
+        btn && btn.addEventListener('click', fallbackVerify);
+        input && input.addEventListener('keydown', function(e){ if (e.key === 'Enter') fallbackVerify(); });
 
-        // If already logged in, show app immediately (useful if main script failed later)
+        // If already logged in, show app area (main script may still initialize)
         if (localStorage.getItem('loggedIn') === 'true') {
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
@@ -319,41 +315,42 @@
         </div>
     </div>
 
-    <!-- HOME -->
+    <!-- PAGE: HOME -->
     <div id="page-home" class="page active">
         <div style="margin-bottom: 16px;">
             <div style="font-size: 14px; color: #888; margin-bottom: 4px;">Learning Habits</div>
             <div class="habits-container" id="habitsContainer"></div>
         </div>
+
         <div class="card-grid" id="homeCardGrid"></div>
         <button class="logout-btn" onclick="logout()">Logout</button>
         <div class="footnote">All data saved in this browser</div>
     </div>
 
-    <!-- SUBJECTS -->
+    <!-- PAGE: SUBJECTS -->
     <div id="page-subjects" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
         <h2 id="categoryTitle" style="font-weight:300; font-size:22px;">Category</h2>
         <div class="subject-grid" id="subjectGrid"></div>
     </div>
 
-    <!-- DETAIL -->
+    <!-- PAGE: DETAIL (Information / DSE) -->
     <div id="page-detail" class="page">
         <button class="back-btn" onclick="goBackFromDetail()">← Back to subjects</button>
         <h2 id="detailTitle" style="font-weight:300; font-size:20px;">Subject</h2>
         <div id="detailContent"></div>
     </div>
 
-    <!-- QUIZ -->
+    <!-- PAGE: QUIZ CHAPTERS -->
     <div id="page-quiz" class="page">
-        <button class="back-btn" onclick="goBackFromQuiz()">← Back</button>
-        <h2 id="quizTitle" style="font-weight:300; font-size:20px;">Quiz</h2>
+        <button class="back-btn" onclick="goBackFromQuiz()">← Back to subjects</button>
+        <h2 id="quizTitle" style="font-weight:300; font-size:20px;">Subject</h2>
         <div id="quizContent"></div>
     </div>
 
-    <!-- CHAPTER LINKS & FILES -->
+    <!-- PAGE: CHAPTER LINKS & FILES (Quiz) -->
     <div id="page-chapter-links" class="page">
-        <button class="back-btn" onclick="goBackFromChapterLinks()">← Back</button>
+        <button class="back-btn" onclick="goBackFromChapterLinks()">← Back to chapters</button>
         <h2 id="chapterLinksTitle" style="font-weight:300; font-size:20px;">Chapter</h2>
         <div style="margin-top: 8px;">
             <div class="section-title" style="font-size:15px;">Links</div>
@@ -375,7 +372,7 @@
         </div>
     </div>
 
-    <!-- LINKS -->
+    <!-- PAGE: LINKS -->
     <div id="page-links" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
         <h2 style="font-weight:300; font-size:22px;">Links</h2>
@@ -387,14 +384,14 @@
         <div id="linksList"></div>
     </div>
 
-    <!-- OBJECTIVES -->
+    <!-- PAGE: OBJECTIVES -->
     <div id="page-objectives" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
         <h2 style="font-weight:300; font-size:22px;">Objectives</h2>
         <div class="objective-grid" id="objectiveGrid"></div>
     </div>
 
-    <!-- STATISTICS -->
+    <!-- PAGE: STATISTICS -->
     <div id="page-statistics" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
         <h2 style="font-weight:300; font-size:22px;">Statistics</h2>
@@ -405,7 +402,9 @@
                 <button class="stat-filter-btn" data-range="halfyear" onclick="setStatRange('halfyear')">Half Year</button>
                 <button class="stat-filter-btn" data-range="year" onclick="setStatRange('year')">Year</button>
             </div>
-            <div class="stat-chart-container"><canvas id="statChart"></canvas></div>
+            <div class="stat-chart-container">
+                <canvas id="statChart"></canvas>
+            </div>
             <div class="stat-summary" id="statSummary">
                 <div class="stat-item"><div class="stat-number" id="statTotalDays">0</div><div class="stat-label">Days Studied</div></div>
                 <div class="stat-item"><div class="stat-number" id="statAvgSubjects">0</div><div class="stat-label">Avg Subjects/Day</div></div>
@@ -414,7 +413,7 @@
         </div>
     </div>
 
-    <!-- TOOLS -->
+    <!-- PAGE: TOOLS -->
     <div id="page-tools" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
         <h2 style="font-weight:300; font-size:22px;">Tools</h2>
@@ -425,7 +424,7 @@
         <div id="toolsContent" style="margin-top:12px;"></div>
     </div>
 
-    <!-- AI manage -->
+    <!-- PAGE: AI manage -->
     <div id="page-ai" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
         <h2 style="font-weight:300; font-size:22px;">Manage AI (bottom bar)</h2>
@@ -438,112 +437,727 @@
         <div style="margin-top:8px; font-size:13px; color:#888;">Drag to reorder AI links (bottom bar will reflect order)</div>
     </div>
 
-    <!-- CALENDAR -->
-    <div id="page-calendar" class="page">
-        <button class="back-btn" onclick="navigateTo('home')">← Back</button>
-        <h2 style="font-weight:300; font-size:22px;">Calendar</h2>
-        <div class="cal-header" style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 12px;">
-            <button onclick="changeMonth(-1)" style="background:#222; border:1px solid #444; padding:6px 16px; border-radius:30px; font-size:18px; color:#ddd; cursor:pointer;">◀</button>
-            <span class="month-year" id="calMonthYear" style="font-size:18px; font-weight:300; color:#fff;">2026-06</span>
-            <button onclick="changeMonth(1)" style="background:#222; border:1px solid #444; padding:6px 16px; border-radius:30px; font-size:18px; color:#ddd; cursor:pointer;">▶</button>
-        </div>
-        <div class="cal-grid" id="calGrid"></div>
-        <div style="display:flex; gap:10px; margin:16px 0 12px; flex-wrap:wrap;">
-            <select id="eventFilter" style="flex:1; background:#222; border:1px solid #444; border-radius:30px; padding:10px 16px; color:#ddd;">
-                <option value="all">All (Future)</option>
-                <option value="countdown">Countdown</option>
-                <option value="schedule">Schedule</option>
-            </select>
-            <button onclick="openAddEvent()" style="background:#444; border:none; color:#fff; padding:10px 20px; border-radius:30px; cursor:pointer;">+ Add</button>
-        </div>
-        <div class="event-list" id="eventList"></div>
-        <div class="study-log-container" id="studyLogContainer">
-            <div class="log-title">📖 Study Log</div>
-            <div id="studyLogContent" class="study-log-empty">Select a date to see study records.</div>
-        </div>
-    </div>
-
-    <!-- Event modal -->
-    <div class="modal-overlay" id="eventModal">
-        <div class="modal-box">
-            <h3>Add Event <button class="close-modal" onclick="closeEventModal()">✕</button></h3>
-            <input id="evTitle" placeholder="Title" />
-            <input id="evDate" type="date" />
-            <select id="evType"><option value="schedule">Schedule</option><option value="countdown">Countdown</option></select>
-            <button onclick="saveEvent()">Save</button>
-        </div>
-    </div>
-
-    <!-- Chapter modal -->
-    <div class="modal-overlay" id="chapterModal">
-        <div class="modal-box">
-            <h3>New Chapter <button class="close-modal" onclick="closeChapterModal()">✕</button></h3>
-            <input id="chapterName" placeholder="Chapter name (e.g. Ch.1)" />
-            <button onclick="saveChapter()">Create Chapter</button>
-        </div>
-    </div>
-
-    <!-- Custom btn modal -->
-    <div class="modal-overlay" id="customBtnModal">
-        <div class="modal-box">
-            <h3>Add Button <button class="close-modal" onclick="closeCustomBtnModal()">✕</button></h3>
-            <input id="customBtnName" placeholder="Button name" />
-            <input id="customBtnURL" placeholder="URL (https://...)" />
-            <button onclick="saveCustomButton()">Add</button>
-        </div>
-    </div>
-
-    <!-- Delete confirm -->
-    <div class="delete-confirm-overlay" id="deleteConfirmOverlay">
-        <div class="delete-confirm-box">
-            <p id="deleteConfirmMessage">Delete this item?</p>
-            <div class="btn-group">
-                <button class="btn-cancel" onclick="cancelDelete()">Cancel</button>
-                <button class="btn-delete" onclick="confirmDelete()">Delete</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- additional modals -->
+    <div class="modal-overlay" id="eventModal"><div class="modal-box"><h3>Add Event <button class="close-modal" onclick="closeEventModal()">✕</button></h3><input id="evTitle" placeholder="Title" /><input id="evDate" type="date" /><select id="evType"><option value="schedule">Schedule</option><option value="countdown">Countdown</option></select><button onclick="saveEvent()">Save</button></div></div>
+    <div class="modal-overlay" id="chapterModal"><div class="modal-box"><h3>New Chapter <button class="close-modal" onclick="closeChapterModal()">✕</button></h3><input id="chapterName" placeholder="Chapter name (e.g. Ch.1)" /><button onclick="saveChapter()">Create Chapter</button></div></div>
+    <div class="modal-overlay" id="customBtnModal"><div class="modal-box"><h3>Add Button <button class="close-modal" onclick="closeCustomBtnModal()">✕</button></h3><input id="customBtnName" placeholder="Button name" /><input id="customBtnURL" placeholder="URL (https://...)" /><button onclick="saveCustomButton()">Add</button></div></div>
+    <div class="delete-confirm-overlay" id="deleteConfirmOverlay"><div class="delete-confirm-box"><p id="deleteConfirmMessage">Delete this item?</p><div class="btn-group"><button class="btn-cancel" onclick="cancelDelete()">Cancel</button><button class="btn-delete" onclick="confirmDelete()">Delete</button></div></div></div>
 </div>
 
 <!-- BOTTOM BAR -->
 <div class="bottom-bar-wrapper">
     <div class="bottom-bar" id="bottomBar">
-        <button onclick="navigateTo('home')" class="active" id="bbHome">Home</button>
-        <button id="bbAI" onclick="navigateTo('ai')">AI</button>
-        <div id="customButtonsContainer" style="display:inline-flex; gap:4px;"></div>
-        <button onclick="openCustomBtnModal()" id="bbAdd">+ Add</button>
+        <button onclick="navigateTo('home')" class="active" id="bbHome">
+            <span class="btn-icon">🏠</span>
+            <span class="btn-label">Home</span>
+        </button>
+        <button onclick="navigateTo('ai')" id="bbAI">
+            <span class="btn-icon" style="font-size:12px; font-weight:400;">DeepSeek</span>
+            <span class="btn-label" style="font-size:10px;">AI</span>
+        </button>
+        <div id="customButtonsContainer" style="display:inline-flex; gap:2px;"></div>
+        <button onclick="openCustomBtnModal()" id="bbAdd">
+            <span class="btn-icon">➕</span>
+            <span class="btn-label">Add</span>
+        </button>
         <div class="bb-spacer"></div>
     </div>
 </div>
 
 <script>
-/* =========================
-   IndexedDB helpers (ChingStudyFiles.files)
-   ========================= */
-/* ... (rest of your original large script unchanged) ... */
-/* NOTE: For brevity in this message I kept the large script identical to your provided version.
-   The only purposeful addition in this file was the fallback login handler above.
-   All original functions (openDb, saveFileToDB, loadData, initApp, etc.) are preserved.
-*/
+/* ---------------------------
+   Full main script (kept robust)
+   - IndexedDB helpers
+   - Data model
+   - UI rendering
+   - All functions preserved and guarded
+   --------------------------- */
 
-/* Start: keep original script's final checkLoginStatus() call */
-try {
-    // If your main script defines checkLoginStatus (it should), call it now.
-    // This is the same as your original file's final line.
-    if (typeof checkLoginStatus === 'function') {
-        checkLoginStatus();
-    } else {
-        // If main script didn't fully parse and checkLoginStatus is undefined,
-        // fallback will handle login (already set up).
-        console.warn('checkLoginStatus() not available yet.');
+/* IndexedDB helpers */
+function openDb(){
+    return new Promise((resolve,reject)=>{
+        const req = indexedDB.open('ChingStudyFiles', 1);
+        req.onupgradeneeded = e => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('files')) db.createObjectStore('files', { keyPath: 'id' });
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function saveFileToDB(name, blob){
+    const db = await openDb();
+    return new Promise((resolve,reject)=>{
+        const tx = db.transaction('files','readwrite');
+        const store = tx.objectStore('files');
+        const id = generateId();
+        store.add({ id, name, blob, size: blob.size });
+        tx.oncomplete = () => resolve(id);
+        tx.onerror = () => reject(tx.error);
+    });
+}
+
+async function getFileRecord(fileId){
+    const db = await openDb();
+    return new Promise((resolve,reject)=>{
+        const tx = db.transaction('files','readonly'); const store = tx.objectStore('files');
+        const req = store.get(fileId);
+        req.onsuccess = ()=> resolve(req.result);
+        req.onerror = ()=> reject(req.error);
+    });
+}
+
+async function getFileUrlFromDB(fileId){
+    const rec = await getFileRecord(fileId);
+    if(!rec) return null;
+    const url = URL.createObjectURL(rec.blob);
+    return { url, name: rec.name, size: rec.size };
+}
+
+async function deleteFileFromDB(fileId){
+    const db = await openDb();
+    return new Promise((resolve,reject)=>{
+        const tx = db.transaction('files','readwrite'); tx.objectStore('files').delete(fileId);
+        tx.oncomplete = ()=> resolve();
+        tx.onerror = ()=> reject(tx.error);
+    });
+}
+
+/* Data model & helpers */
+const CATEGORIES = ['Information','Quiz','DSE'];
+const SUBJECTS = ['Chinese','English','Mathematics','CS','Economics','Bafs','Ict'];
+const GRADE_LEVELS = ['1','2','3','4','5','5*','5**'];
+const CS_GRADE_LEVELS = ['U','A'];
+const HOME_DEFAULT_ORDER = ['information','quiz','dse','links','objectives','statistics','tools','ai','timer'];
+
+function keyFor(category,subject){ return `${category}_${subject}`; }
+function generateId(){ return Date.now() + '_' + Math.random().toString(36).substr(2,6); }
+function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
+
+function defaultData(){
+    const chapters = {};
+    CATEGORIES.forEach(c=>SUBJECTS.forEach(s=> chapters[keyFor(c,s)] = []));
+    return {
+        chapters,
+        events: [],
+        links: [{ name:'Google', url:'https://google.com' }],
+        habits: {},
+        objectives: {},
+        customButtons: [],
+        homeOrder: HOME_DEFAULT_ORDER.slice(),
+        aiLinks: []
+    };
+}
+
+function loadData(){
+    try {
+        const raw = localStorage.getItem('ching_study_data');
+        if(!raw) return defaultData();
+        const parsed = JSON.parse(raw);
+
+        if(!parsed.chapters) parsed.chapters = {};
+        CATEGORIES.forEach(c=>SUBJECTS.forEach(s=>{
+            const k = keyFor(c,s); if(!parsed.chapters[k]) parsed.chapters[k] = [];
+        }));
+
+        if(!parsed.links) parsed.links = [];
+        if(!parsed.habits) parsed.habits = {};
+        if(!parsed.objectives) parsed.objectives = {};
+        if(!parsed.customButtons) parsed.customButtons = [];
+        if(!parsed.homeOrder) parsed.homeOrder = HOME_DEFAULT_ORDER.slice();
+        if(!parsed.aiLinks) parsed.aiLinks = [];
+
+        // migrate old infoFolders/dseFolders to chapters if present
+        if(parsed.infoFolders){
+            SUBJECTS.forEach(s=>{
+                const arr = parsed.infoFolders[s] || []; const k = keyFor('Information', s);
+                arr.forEach(item=>{
+                    if(item.type==='folder') parsed.chapters[k].push({ name: item.name||'Folder', links: [], files: item.children || [] });
+                    else { let ch = parsed.chapters[k].find(c=>c.name==='Files'); if(!ch){ ch={name:'Files',links:[],files:[]}; parsed.chapters[k].push(ch);} ch.files.push(item); }
+                });
+            }); delete parsed.infoFolders;
+        }
+        if(parsed.dseFolders){
+            SUBJECTS.forEach(s=>{
+                const arr = parsed.dseFolders[s] || []; const k = keyFor('DSE', s);
+                arr.forEach(item=>{
+                    if(item.type==='folder') parsed.chapters[k].push({ name: item.name||'Folder', links: [], files: item.children || [] });
+                    else { let ch = parsed.chapters[k].find(c=>c.name==='Files'); if(!ch){ ch={name:'Files',links:[],files:[]}; parsed.chapters[k].push(ch);} ch.files.push(item); }
+                });
+            }); delete parsed.dseFolders;
+        }
+
+        SUBJECTS.forEach(s=>{ if(!parsed.objectives[s]) parsed.objectives[s] = { target:'5', current:'4' }; });
+
+        return parsed;
+    } catch(e){
+        console.error(e);
+        return defaultData();
     }
+}
+
+function saveData(){ localStorage.setItem('ching_study_data', JSON.stringify(data)); }
+
+/* Migration: base64 file entries -> IndexedDB (file-ref) */
+async function migrateBase64FilesIfAny(){
+    const promises = [];
+    for(const k of Object.keys(data.chapters || {})){
+        const chArr = data.chapters[k];
+        chArr.forEach(ch=>{
+            if(!ch.files) return;
+            function recurse(arr){
+                for(let i=0;i<arr.length;i++){
+                    const it = arr[i];
+                    if(it && it.type === 'file' && it.data){
+                        const p = (async ()=>{
+                            try{
+                                const resp = await fetch(it.data);
+                                const blob = await resp.blob();
+                                const fileId = await saveFileToDB(it.name || 'file', blob);
+                                arr[i] = { id: it.id || generateId(), name: it.name, type: 'file-ref', fileId, size: it.size || blob.size };
+                                saveData();
+                            }catch(err){
+                                console.error('migrate file failed', err);
+                            }
+                        })();
+                        promises.push(p);
+                    } else if(it && it.type === 'folder' && it.children){
+                        recurse(it.children);
+                    }
+                }
+            }
+            recurse(ch.files);
+        });
+    }
+    await Promise.all(promises);
+}
+
+/* Login & init */
+const CORRECT_PASSWORD = 'ching';
+function checkLoginStatus(){ if (localStorage.getItem('loggedIn') === 'true') showApp(); }
+function verifyPassword(){ // main verify (fallback already attached)
+    try {
+        const v = document.getElementById('passwordInput').value.trim();
+        if (v === CORRECT_PASSWORD) {
+            localStorage.setItem('loggedIn', 'true');
+            showApp();
+        } else {
+            document.getElementById('loginError').textContent = 'Wrong password, try again';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordInput').focus();
+        }
+    } catch (e) {
+        console.error('verifyPassword error', e);
+    }
+}
+document.addEventListener('keydown', function(e){
+    if(e.target && e.target.id === 'passwordInput' && e.key === 'Enter') {
+        try { verifyPassword(); } catch(_) {}
+    }
+});
+function showApp(){
+    document.getElementById('loginContainer').style.display = 'none';
+    document.getElementById('appContainer').classList.add('active');
+    try { initApp(); } catch(e){ console.error('initApp error', e); document.getElementById('loginError').textContent = 'App error: ' + (e && e.message ? e.message : String(e)); }
+}
+function logout(){ if (confirm('Logout?')){ localStorage.removeItem('loggedIn'); location.reload(); } }
+
+/* Header clock */
+function updateHeaderClock(){ const now=new Date(); const hh=String(now.getHours()).padStart(2,'0'), mm=String(now.getMinutes()).padStart(2,'0'), ss=String(now.getSeconds()).padStart(2,'0'); const y=now.getFullYear(), mo=String(now.getMonth()+1).padStart(2,'0'), d=String(now.getDate()).padStart(2,'0'); document.getElementById('headerDateTime').textContent = `${hh}:${mm}:${ss}  ${y}-${mo}-${d}`; }
+setInterval(updateHeaderClock,1000);
+
+/* Navigation */
+const pageMap = { home:'page-home', subjects:'page-subjects', detail:'page-detail', quiz:'page-quiz', chapterLinks:'page-chapter-links', links:'page-links', objectives:'page-objectives', statistics:'page-statistics', tools:'page-tools', ai:'page-ai', calendar:'page-calendar', timer:'page-timer' };
+function navigateTo(page){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); const el=document.getElementById(pageMap[page]); if(el) el.classList.add('active'); if(page==='home'){ renderHomeCards(); renderHabits(); renderObjectives(); renderBottomBar(); } if(page==='detail') renderDetail(); if(page==='quiz') openQuiz(); if(page==='chapterLinks'){ renderChapterLinks(); renderChapterFiles(); } if(page==='links') renderLinks(); if(page==='objectives') renderObjectives(); if(page==='statistics') renderStatistics(); if(page==='tools') navigateToToolsDefault(); if(page==='ai') renderAiLinks(); if(page==='calendar') renderCalendar(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+/* Home Cards — drag via right handle only */
+function renderHomeCards(){
+    const container = document.getElementById('homeCardGrid'); const order = data.homeOrder || HOME_DEFAULT_ORDER.slice();
+    const cardMap = {
+        information: { title: 'Information', desc: 'Folders & Files' },
+        quiz: { title: 'Quiz', desc: 'Chapters & Files' },
+        dse: { title: 'DSE', desc: 'Folders & Files' },
+        links: { title: 'Links', desc: 'Bookmarks & app shortcuts' },
+        objectives: { title: 'Objectives', desc: 'Target & Current Grades' },
+        statistics: { title: 'Statistics', desc: 'Study habit trends' },
+        tools: { title: 'Tools', desc: 'Calculator & Grade' },
+        ai: { title: 'AI', desc: 'Manage AI links' },
+        timer: { title: 'Timer', desc: 'Stopwatch & Countdown' }
+    };
+    let html = '';
+    order.forEach(id=>{
+        if(!cardMap[id]) return;
+        if(id === 'statistics'){
+            html += `<div class="main-card" data-card-id="${id}" onclick="handleCardClick('${id}')">
+                        <div style="display:flex;align-items:center;gap:8px"><span class="title">${cardMap[id].title}</span><span class="desc">${cardMap[id].desc}</span></div>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <canvas id="statPreviewCanvas" style="width:140px;height:60px;display:block"></canvas>
+                            <span class="drag-hint" draggable="true">⋮⋮</span>
+                        </div>
+                     </div>`;
+        } else {
+            html += `<div class="main-card" data-card-id="${id}" onclick="handleCardClick('${id}')">
+                        <div style="display:flex;align-items:center;gap:8px"><span class="title">${cardMap[id].title}</span><span class="desc">${cardMap[id].desc}</span></div>
+                        <div><span class="drag-hint" draggable="true">⋮⋮</span></div>
+                     </div>`;
+        }
+    });
+    container.innerHTML = html;
+
+    // add drag listeners — only on drag-hint
+    let dragSrcId = null;
+    container.querySelectorAll('.drag-hint').forEach(h=>{
+        h.addEventListener('dragstart', function(e){
+            const card = this.closest('.main-card');
+            dragSrcId = card.dataset.cardId;
+            card.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', dragSrcId);
+        });
+        h.addEventListener('dragend', function(e){
+            const card = this.closest('.main-card');
+            card.classList.remove('dragging');
+            dragSrcId = null;
+            container.querySelectorAll('.main-card.drag-over').forEach(el=>el.classList.remove('drag-over'));
+        });
+    });
+
+    container.querySelectorAll('.main-card').forEach(card=>{
+        card.addEventListener('dragover', e=>{ e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+        card.addEventListener('dragenter', function(e){ e.preventDefault(); if(!this.classList.contains('dragging')) this.classList.add('drag-over'); });
+        card.addEventListener('dragleave', function(e){ this.classList.remove('drag-over'); });
+        card.addEventListener('drop', function(e){
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            const draggedId = e.dataTransfer.getData('text/plain');
+            const targetId = this.dataset.cardId;
+            if(draggedId === targetId) return;
+            const order = data.homeOrder || [];
+            const srcIdx = order.indexOf(draggedId);
+            const tgtIdx = order.indexOf(targetId);
+            if(srcIdx > -1 && tgtIdx > -1){
+                order.splice(srcIdx,1);
+                order.splice(tgtIdx,0,draggedId);
+                data.homeOrder = order; saveData(); renderHomeCards();
+            }
+        });
+    });
+
+    // stat preview
+    setTimeout(renderStatPreview,100);
+}
+
+function handleCardClick(id){
+    if(id === 'information' || id === 'dse') openCategory(id.charAt(0).toUpperCase() + id.slice(1));
+    else if(id === 'quiz') openQuiz();
+    else if(id === 'links') navigateTo('links');
+    else if(id === 'objectives') navigateTo('objectives');
+    else if(id === 'statistics') navigateTo('statistics');
+    else if(id === 'tools') navigateTo('tools');
+    else if(id === 'ai') navigateTo('ai');
+    else if(id === 'timer') navigateTo('timer');
+}
+
+/* Categories/Subjects */
+let currentCategory = null;
+let currentSubject = null;
+let currentChapterKey = null;
+let currentChapterIndex = null;
+
+function openCategory(category){ currentCategory = category; document.getElementById('categoryTitle').innerText = category; const grid = document.getElementById('subjectGrid'); grid.innerHTML=''; SUBJECTS.forEach(subj=>{ const div=document.createElement('div'); div.className='subject-item'; div.innerHTML = `<div class="subj-name">${subj}</div>`; div.onclick = ()=> openSubjectDetail(category, subj); grid.appendChild(div); }); navigateTo('subjects'); }
+function openSubjectDetail(category, subject){ currentCategory = category; currentSubject = subject; document.getElementById('detailTitle').innerText = `${subject} (${category})`; renderDetail(); navigateTo('detail'); }
+function goBackFromDetail(){ if(currentCategory) openCategory(currentCategory); else navigateTo('home'); }
+
+/* Chapters */
+function renderDetail(){
+    const cont = document.getElementById('detailContent');
+    if(!currentCategory || !currentSubject){ cont.innerHTML = '<div class="empty-state">Select a subject.</div>'; return; }
+    const key = keyFor(currentCategory, currentSubject);
+    cont.innerHTML = `<div class="flex-between" style="margin-bottom:12px;align-items:center;"><div style="font-size:16px;font-weight:300;">${currentSubject} — ${currentCategory}</div><div style="display:flex;gap:8px;"><button class="btn-secondary" onclick="openChapterModal('${key}')">+ New Chapter</button></div></div><div id="chapterList_${key}"></div>`;
+    renderChapterList(key);
+}
+function renderChapterList(key){
+    const container = document.getElementById('chapterList_' + key); if(!container) return;
+    const chapters = data.chapters[key] || []; if(chapters.length===0){ container.innerHTML = '<div class="empty-state">No chapters yet. Create one!</div>'; return; }
+    container.innerHTML = chapters.map((ch,idx)=>`<div class="chapter-card" onclick="openChapterLinks('${key}',${idx})"><div class="flex-between"><div style="font-weight:400">${ch.name}</div><div class="small">${(ch.links||[]).length} links · ${(ch.files||[]).length} files</div></div><div style="margin-top:8px;display:flex;gap:8px"><button class="btn-secondary" onclick="event.stopPropagation(); openChapterModal('${key}',${idx})">Rename</button><button class="btn-secondary" style="background:#e74c3c" onclick="event.stopPropagation(); deleteChapter('${key}',${idx})">Delete</button></div></div>`).join('');
+}
+
+function openChapterModal(key, editIdx=null){ const modal=document.getElementById('chapterModal'); modal.dataset.key=key; modal.dataset.editIdx = editIdx!==null?editIdx:''; document.getElementById('chapterName').value = editIdx!==null?data.chapters[key][editIdx].name:''; modal.classList.add('show'); }
+function closeChapterModal(){ document.getElementById('chapterModal').classList.remove('show'); }
+function saveChapter(){ const modal=document.getElementById('chapterModal'); const key=modal.dataset.key; const editIdx=modal.dataset.editIdx; const name=document.getElementById('chapterName').value.trim(); if(!name) return alert('Enter a chapter name.'); if(!data.chapters[key]) data.chapters[key]=[]; if(editIdx!=='') data.chapters[key][parseInt(editIdx)].name = name; else data.chapters[key].push({ name, links: [], files: [] }); saveData(); closeChapterModal(); renderChapterList(key); }
+function deleteChapter(key, idx){ if(!confirm('Delete this chapter?')) return; data.chapters[key].splice(idx,1); saveData(); renderChapterList(key); }
+
+/* Chapter Links & Files */
+function openChapterLinks(key, chIdx){ currentChapterKey = key; currentChapterIndex = chIdx; const ch = data.chapters[key][chIdx]; document.getElementById('chapterLinksTitle').textContent = ch.name; document.getElementById('chapterLinksList').dataset.key = key; document.getElementById('chapterLinksList').dataset.chIdx = chIdx; document.getElementById('chapterFilesList').dataset.key = key; document.getElementById('chapterFilesList').dataset.chIdx = chIdx; renderChapterLinks(); renderChapterFiles(); navigateTo('chapterLinks'); }
+function goBackFromChapterLinks(){ renderDetail(); navigateTo('detail'); }
+
+function renderChapterLinks(){ const container=document.getElementById('chapterLinksList'); const key=container.dataset.key; const chIdx=parseInt(container.dataset.chIdx); const chapters=data.chapters[key]||[]; if(chIdx>=chapters.length) return; const links=chapters[chIdx].links||[]; if(links.length===0){ container.innerHTML='<div class="empty-state">No links in this chapter.</div>'; return; } container.innerHTML = links.map((l,idx)=>`<div class="chapter-link-item"><a href="${escapeAttr(l.url)}" target="_blank">${l.name}</a><button class="del-link" onclick="deleteChapterLink(${idx})">✕</button></div>`).join(''); }
+function addChapterLink(){ const key=document.getElementById('chapterLinksList').dataset.key; const chIdx=parseInt(document.getElementById('chapterLinksList').dataset.chIdx); const name=document.getElementById('chapterLinkName').value.trim(); const url=document.getElementById('chapterLinkURL').value.trim(); if(!name||!url) return alert('Enter both name and URL'); if(!data.chapters[key][chIdx].links) data.chapters[key][chIdx].links = []; data.chapters[key][chIdx].links.push({ name, url }); saveData(); document.getElementById('chapterLinkName').value=''; document.getElementById('chapterLinkURL').value=''; renderChapterLinks(); renderChapterList(key); }
+function deleteChapterLink(idx){ if(!confirm('Delete this link?')) return; const key=document.getElementById('chapterLinksList').dataset.key; const chIdx=parseInt(document.getElementById('chapterLinksList').dataset.chIdx); data.chapters[key][chIdx].links.splice(idx,1); saveData(); renderChapterLinks(); renderChapterList(key); }
+
+/* Files tree rendering */
+function renderChapterFiles(){
+    const container=document.getElementById('chapterFilesList'); const key=container.dataset.key; const chIdx=parseInt(container.dataset.chIdx); const chapters=data.chapters[key]||[]; if(chIdx>=chapters.length) return; const files=chapters[chIdx].files||[]; if(files.length===0){ container.innerHTML='<div class="empty-state">No files in this chapter.</div>'; return; } container.innerHTML = renderFileTreeHtml(files);
+}
+function renderFileTreeHtml(list){ return list.map(item=>{ if(item && item.type==='folder'){ if(!item.id) item.id = generateId(); return `<div class="folder-item" data-folder-id="${item.id}"><div class="folder-header"><button class="btn-secondary" style="padding:6px 8px;font-size:13px;" onclick="toggleFolderById('${item.id}'); event.stopPropagation();">▾</button><div class="folder-name" style="flex:1;padding-left:6px;" onclick="toggleFolderById('${item.id}')">${item.name}</div><div class="folder-actions"><button onclick="event.stopPropagation(); renameFolderById('${item.id}')">✎</button><button onclick="event.stopPropagation(); deleteFolderById('${item.id}')">✕</button></div></div><div id="folder_children_${item.id}" class="folder-children">${renderFileTreeHtml(item.children || [])}</div></div>`; } else if(item && item.type==='file-ref'){ return `<div class="chapter-file-item"><div class="info"><span class="title">${item.name}</span><div class="sub">${item.size ? (Math.round(item.size/1024)+' KB') : ''}</div></div><div class="actions">${item.fileId?`<button class="open-btn" onclick="openFileRef('${item.fileId}')">📂</button><a class="download-btn" href="#" onclick="downloadFileRef(event,'${item.fileId}','${escapeAttr(item.name)}')">⬇</a>`:''}<button onclick="deleteFileById('${item.id||''}')">✕</button></div></div>`; } else { return `<div class="chapter-file-item"><div class="info"><span class="title">${item && item.name ? item.name : ''}</span></div><div class="actions">${item && item.data?`<button class="open-btn" onclick="openFile('${item.data}','${escapeAttr(item.name)}')">📂</button><a class="download-btn" href="${item.data}" download="${escapeAttr(item.name)}">⬇</a>`:''}<button onclick="deleteFileById('${item && item.id?item.id:''}')">✕</button></div></div>`; } }).join(''); }
+
+function toggleFolderById(id){ const el=document.getElementById('folder_children_'+id); if(!el) return; el.classList.toggle('collapsed'); }
+function deleteFileById(id){
+    if(!confirm('Delete this file?')) return;
+    const container = document.getElementById('chapterFilesList');
+    const key = container.dataset.key; const chIdx = parseInt(container.dataset.chIdx);
+    const chapter = data.chapters[key][chIdx]; if(!chapter) return;
+    function recurse(arr){
+        for(let i=0;i<arr.length;i++){
+            const it = arr[i];
+            if(it && it.id === id){
+                if(it.type === 'file-ref' && it.fileId) { deleteFileFromDB(it.fileId).catch(()=>{}); }
+                arr.splice(i,1); return true;
+            }
+            if(it && it.type==='folder' && it.children){ if(recurse(it.children)) return true; }
+        }
+        return false;
+    }
+    if(recurse(chapter.files || [])){ saveData(); renderChapterFiles(); renderChapterList(key); }
+}
+function deleteFolderById(id){
+    if(!confirm('Delete folder and its contents?')) return;
+    const container = document.getElementById('chapterFilesList');
+    const key=document.getElementById('chapterFilesList').dataset.key; const chIdx=parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+    const chapter = data.chapters[key][chIdx]; if(!chapter) return;
+    function recurse(arr){
+        for(let i=0;i<arr.length;i++){
+            const it = arr[i];
+            if(it && it.type==='folder' && it.id === id){
+                function removeRefs(node){
+                    if(node && node.type === 'file-ref' && node.fileId) deleteFileFromDB(node.fileId).catch(()=>{});
+                    if(node && node.type === 'folder' && node.children) node.children.forEach(c=>removeRefs(c));
+                }
+                removeRefs(it);
+                arr.splice(i,1); return true;
+            }
+            if(it && it.type==='folder' && it.children){ if(recurse(it.children)) return true; }
+        }
+        return false;
+    }
+    if(recurse(chapter.files || [])){ saveData(); renderChapterFiles(); renderChapterList(key); }
+}
+function renameFolderById(id){
+    const key=document.getElementById('chapterFilesList').dataset.key; const chIdx=parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+    const chapter = data.chapters[key][chIdx]; if(!chapter) return;
+    function recurse(arr){
+        for(let i=0;i<arr.length;i++){
+            const it = arr[i];
+            if(it && it.type==='folder' && it.id === id){
+                const newName = prompt('Rename folder:', it.name); if(newName && newName.trim()!==''){ it.name = newName.trim(); saveData(); renderChapterFiles(); renderChapterList(key); } return true;
+            }
+            if(it && it.type==='folder' && it.children){ if(recurse(it.children)) return true; }
+        }
+        return false;
+    }
+    recurse(chapter.files || []);
+}
+
+/* Upload single file -> store in IndexedDB as blob and save file-ref in chapter */
+async function addChapterFile(){
+    const input = document.getElementById('chapterFileInput'); const file = input.files[0]; if(!file) return alert('Please select a file.');
+    const container = document.getElementById('chapterFilesList'); const key = container.dataset.key; const chIdx = parseInt(container.dataset.chIdx);
+    try{
+        const fileId = await saveFileToDB(file.name, file);
+        const entry = { id: generateId(), name: file.name, type: 'file-ref', fileId, size: file.size };
+        if(!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
+        data.chapters[key][chIdx].files.push(entry); saveData(); input.value=''; renderChapterFiles(); renderChapterList(key);
+    } catch(e){ console.error(e); alert('Save file failed'); }
+}
+
+/* Upload entire folder (webkitdirectory) */
+function uploadChapterFolder(){
+    const input = document.createElement('input'); input.type='file'; input.webkitdirectory = true; input.multiple = true;
+    input.onchange = async function(e){
+        const files = Array.from(e.target.files); if(files.length===0) return;
+        const container = document.getElementById('chapterFilesList'); const key = container.dataset.key; const chIdx = parseInt(container.dataset.chIdx);
+        if(!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
+        const root = data.chapters[key][chIdx].files;
+        for(const file of files){
+            const parts = file.webkitRelativePath.split('/');
+            let pointer = root;
+            for(let i=0;i<parts.length;i++){
+                const name = parts[i];
+                if(i === parts.length - 1){
+                    try{
+                        const fileId = await saveFileToDB(name, file);
+                        pointer.push({ id: generateId(), name, type:'file-ref', fileId, size: file.size });
+                        saveData();
+                    } catch(err){ console.error('save folder file failed', err); }
+                } else {
+                    let folder = pointer.find(it => it.type === 'folder' && it.name === name);
+                    if(!folder){ folder = { id: generateId(), name, type:'folder', children: [] }; pointer.push(folder); }
+                    pointer = folder.children;
+                }
+            }
+        }
+        renderChapterFiles(); renderChapterList(key);
+    };
+    input.click();
+}
+
+/* Open / download file-ref from IndexedDB */
+async function openFileRef(fileId){
+    try{
+        const rec = await getFileUrlFromDB(fileId);
+        if(!rec) return alert('File not found');
+        window.open(rec.url, '_blank');
+        setTimeout(()=>URL.revokeObjectURL(rec.url), 10000);
+    } catch(e){ console.error(e); alert('Open failed'); }
+}
+async function downloadFileRef(e, fileId, name){
+    e.preventDefault();
+    try{
+        const rec = await getFileUrlFromDB(fileId);
+        if(!rec) return alert('File not found');
+        const a = document.createElement('a'); a.href = rec.url; a.download = name || rec.name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(()=>URL.revokeObjectURL(rec.url), 10000);
+    } catch(e){ console.error(e); alert('Download failed'); }
+}
+
+/* Links main */
+function renderLinks(){ const c=document.getElementById('linksList'); const links=data.links||[]; if(links.length===0){ c.innerHTML='<div class="empty-state">No links saved.</div>'; return;} c.innerHTML=links.map((l,i)=>`<div class="link-item"><div class="link-content"><a href="${escapeAttr(l.url)}" target="_blank">${l.name}</a></div><button class="del-link" onclick="deleteLink(${i})">✕</button></div>`).join(''); }
+function addLink(){ const name=document.getElementById('linkName').value.trim(); const url=document.getElementById('linkURL').value.trim(); if(!name||!url) return alert('Enter both'); data.links = data.links || []; data.links.push({ name, url }); saveData(); renderLinks(); document.getElementById('linkName').value=''; document.getElementById('linkURL').value=''; }
+function deleteLink(i){ if(!confirm('Delete?')) return; data.links.splice(i,1); saveData(); renderLinks(); }
+
+/* Objectives */
+function renderObjectives(){
+    const container = document.getElementById('objectiveGrid'); if(!container) return;
+    let html = '';
+    SUBJECTS.forEach(subj=>{
+        const obj = data.objectives[subj] || { target:'5', current:'4' };
+        const gradeList = (subj === 'CS') ? CS_GRADE_LEVELS : GRADE_LEVELS;
+        if(!gradeList.includes(obj.target)) obj.target = gradeList[0];
+        if(!gradeList.includes(obj.current)) obj.current = gradeList[0];
+        html += `
+            <div class="objective-row">
+                <div class="obj-left"><div class="obj-name">${subj}</div></div>
+                <div style="display:flex;gap:16px;align-items:center">
+                    <div>
+                        <div class="grade-label" style="color:#888;font-size:12px;">Target</div>
+                        <div class="grade-selector">
+                            <button onclick="changeGrade('${subj}','target',-1)">‹</button>
+                            <div class="grade-display target">${escapeAttr(obj.target)}</div>
+                            <button onclick="changeGrade('${subj}','target',1)">›</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="grade-label" style="color:#888;font-size:12px;">Current</div>
+                        <div class="grade-selector">
+                            <button onclick="changeGrade('${subj}','current',-1)">‹</button>
+                            <div class="grade-display current">${escapeAttr(obj.current)}</div>
+                            <button onclick="changeGrade('${subj}','current',1)">›</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    container.innerHTML = html;
+}
+function changeGrade(subject,type,delta){
+    const gradeList = (subject === 'CS') ? CS_GRADE_LEVELS : GRADE_LEVELS;
+    if(!data.objectives) data.objectives = {};
+    const obj = data.objectives[subject] || { target: gradeList[0], current: gradeList[0] };
+    if(!gradeList.includes(obj[type])) obj[type] = gradeList[0];
+    const idx = gradeList.indexOf(obj[type]); let newIdx = idx + delta;
+    if(newIdx < 0) newIdx = 0; if(newIdx >= gradeList.length) newIdx = gradeList.length - 1;
+    obj[type] = gradeList[newIdx]; data.objectives[subject] = obj; saveData(); renderObjectives();
+}
+
+/* Habits & study log */
+function getTodayLocal(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function resetHabitsIfNewDay(){ const today=getTodayLocal(); if(!data.habits[today]){ data.habits[today]={}; SUBJECTS.forEach(s=>data.habits[today][s]=false); saveData(); renderHabits(); } }
+function renderHabits(){ const c=document.getElementById('habitsContainer'); if(!c) return; const today=getTodayLocal(); if(!data.habits[today]) resetHabitsIfNewDay(); const streaks={}; SUBJECTS.forEach(subj=>{ let count=0; let date=new Date(); while(true){ const k=`${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; if(data.habits[k] && data.habits[k][subj]){ count++; date.setDate(date.getDate()-1); } else break; } streaks[subj]=count; }); let html=''; SUBJECTS.forEach(subj=>{ const done = data.habits[today][subj] || false; const streak = streaks[subj]||0; html += `<div class="habit-row" data-subject="${subj}"><div class="habit-box ${done?'done':''}" onclick="toggleHabit('${subj}')"><span class="habit-name">${subj}</span><span class="habit-status"></span><span class="habit-fire">${streak>0?('🔥'+streak):''}</span></div></div>`;}); c.innerHTML = html; }
+function toggleHabit(subject){ const today=getTodayLocal(); if(!data.habits[today]) data.habits[today] = {}; data.habits[today][subject] = !data.habits[today][subject]; saveData(); renderHabits(); }
+
+/* Calendar & events */
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+function renderCalendar(){
+    const monthNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('calMonthYear').innerText = calYear + ' ' + monthNames[calMonth];
+    const grid = document.getElementById('calGrid');
+    const firstDay = new Date(calYear, calMonth, 1).getDay(); const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+    const today = getTodayLocal(); let html = `<div class="day-name">Sun</div><div class="day-name">Mon</div><div class="day-name">Tue</div><div class="day-name">Wed</div><div class="day-name">Thu</div><div class="day-name">Fri</div><div class="day-name">Sat</div>`;
+    for(let i=0;i<firstDay;i++) html += `<div class="day-cell empty"></div>`;
+    for(let d=1; d<=daysInMonth; d++){
+        const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const hasEvent = data.events.some(e => e.date === dateStr);
+        const isToday = dateStr === getTodayLocal();
+        const classes = 'day-cell' + (hasEvent ? ' has-event' : '') + (isToday ? ' today' : '');
+        html += `<div class="${classes}" onclick="selectDate('${dateStr}')">${d}</div>`;
+    }
+    grid.innerHTML = html;
+    selectDate(getTodayLocal());
+}
+function changeMonth(delta){ calMonth += delta; if(calMonth<0){ calMonth=11; calYear--; } if(calMonth>11){ calMonth=0; calYear++; } renderCalendar(); }
+function selectDate(dateStr){ renderEventList('all', dateStr); showStudyLogForDate(dateStr); }
+function showStudyLogForDate(dateStr){ const container=document.getElementById('studyLogContent'); container.dataset.date = dateStr; const habitsForDate = data.habits[dateStr] || {}; const studiedSubjects = SUBJECTS.filter(s=>habitsForDate[s]===true); if(studiedSubjects.length===0){ container.innerHTML = '<span class="study-log-empty">No study records on this day.</span>'; return; } const colorMap = {'Chinese':'#e74c3c','English':'#f1c40f','Mathematics':'#3498db','CS':'#2ecc71','Economics':'#9b59b6','Bafs':'#e67e22','Ict':'#1abc9c'}; let html = '<div class="log-subjects">'; studiedSubjects.forEach(subj=>{ const color=colorMap[subj]||'#8ab4f8'; html += `<span class="log-subject done" style="border-color:${color}; color:${color};" onclick="toggleHabitForDate('${dateStr}','${subj}')">${subj}</span>`; }); html += '</div>'; container.innerHTML = html; }
+function toggleHabitForDate(dateStr, subj){ if(!data.habits[dateStr]) data.habits[dateStr] = {}; data.habits[dateStr][subj] = !data.habits[dateStr][subj]; saveData(); showStudyLogForDate(dateStr); renderHabits(); }
+function renderEventList(filter, specificDate=null){
+    const container=document.getElementById('eventList'); let events=[...(data.events||[])]; const filterVal = filter || document.getElementById('eventFilter').value; const today = getTodayLocal();
+    if(specificDate) events = events.filter(e=>e.date===specificDate); else {
+        if(filterVal==='all') events = events.filter(e=>e.date >= today);
+        else if(filterVal==='countdown') events = events.filter(e=>e.type==='countdown' && e.date>=today);
+        else if(filterVal==='schedule') events = events.filter(e=>e.type==='schedule' && e.date>=today);
+    }
+    events.sort((a,b)=>a.date.localeCompare(b.date));
+    if(events.length===0){ container.innerHTML = '<div class="empty-state">No events.</div>'; return; }
+    container.innerHTML = events.map(ev=>{
+        const diff = Math.ceil((new Date(ev.date + 'T00:00:00') - new Date(today + 'T00:00:00')) / (1000*60*60*24));
+        let countdownText = '';
+        if(ev.type==='countdown'){ if(diff===0) countdownText='Today!'; else if(diff<0) countdownText = Math.abs(diff)+' days ago'; else countdownText = diff + ' days left'; }
+        return `<div class="event-item" style="border-left-color:${ev.type==='countdown'?'#f1c40f':'#888'};"><div><div class="ev-title">${ev.title}</div><div class="ev-date">📅 ${ev.date}</div></div>${countdownText?`<div class="ev-countdown">${countdownText}</div>`:`<div style="color:#666;">Schedule</div>`}<button class="del-ev" onclick="deleteEvent(${ev.id})">✕</button></div>`;
+    }).join('');
+    document.getElementById('eventFilter').value = filterVal;
+}
+function openAddEvent(){ document.getElementById('eventModal').classList.add('show'); document.getElementById('evTitle').value=''; document.getElementById('evDate').value=getTodayLocal(); document.getElementById('evType').value='schedule'; }
+function closeEventModal(){ document.getElementById('eventModal').classList.remove('show'); }
+function saveEvent(){ const title=document.getElementById('evTitle').value.trim(); const date=document.getElementById('evDate').value; const type=document.getElementById('evType').value; if(!title||!date) return alert('Fill in title and date.'); data.events.push({ id: Date.now(), title, date, type }); saveData(); closeEventModal(); renderCalendar(); }
+function deleteEvent(id){ if(!confirm('Delete event?')) return; data.events = data.events.filter(e=>e.id!==id); saveData(); renderCalendar(); }
+
+/* Statistics */
+let statRange = 'week';
+function setStatRange(r){ statRange=r; document.querySelectorAll('.stat-filter-btn').forEach(b=>b.classList.toggle('active', b.dataset.range===r)); renderStatistics(); }
+function renderStatistics(){
+    const canvas = document.getElementById('statChart'); if(!canvas) return;
+    const habitDates = Object.keys(data.habits).sort(); if(habitDates.length===0){ document.getElementById('statSummary').innerHTML = '<div class="stat-no-data">No study data yet. Start tracking your habits!</div>'; return; }
+    const dailyCounts = habitDates.map(d=>Object.values(data.habits[d]||{}).filter(v=>v===true).length);
+    const today = new Date(); let cutoff=new Date(today);
+    switch(statRange){ case 'week': cutoff.setDate(today.getDate()-7); break; case 'month': cutoff.setMonth(today.getMonth()-1); break; case 'halfyear': cutoff.setMonth(today.getMonth()-6); break; case 'year': cutoff.setFullYear(today.getFullYear()-1); break; }
+    const cutoffStr = `${cutoff.getFullYear()}-${String(cutoff.getMonth()+1).padStart(2,'0')}-${String(cutoff.getDate()).padStart(2,'0')}`;
+    const filtered = habitDates.map((d,i)=> d>=cutoffStr ? {d,c:dailyCounts[i]}:null).filter(x=>x); if(filtered.length===0){ document.getElementById('statSummary').innerHTML = '<div class="stat-no-data">No data in this period.</div>'; return; }
+    const counts = filtered.map(f=>f.c); const totalDays = counts.filter(c=>c>0).length; const avg = counts.reduce((a,b)=>a+b,0)/counts.length; const max = Math.max(...counts); document.getElementById('statTotalDays').textContent = totalDays; document.getElementById('statAvgSubjects').textContent = avg.toFixed(1); document.getElementById('statMaxSubjects').textContent = max;
+    const ctx = canvas.getContext('2d'); const dpr = window.devicePixelRatio||1; const rect = canvas.parentElement.getBoundingClientRect(); const width = Math.max(300, rect.width - 24); const height = Math.min(280, width*0.6); canvas.width = width*dpr; canvas.height = height*dpr; canvas.style.width = width+'px'; canvas.style.height = height+'px'; ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,width,height);
+    if(counts.length<2){ ctx.fillStyle='#666'; ctx.font='14px sans-serif'; ctx.textAlign='center'; ctx.fillText('Need at least 2 days of data to show trend.', width/2, height/2); return; }
+    const padding = {top:24,bottom:32,left:32,right:16}; const chartW = width - padding.left - padding.right; const chartH = height - padding.top - padding.bottom; const yMax = Math.max(1,Math.max(...counts));
+    const points = counts.map((val,idx)=>({ x: padding.left + (idx/(counts.length-1))*chartW, y: padding.top + chartH - (val/yMax)*chartH, val }));
+    const grad = ctx.createLinearGradient(0,padding.top,0,padding.top+chartH); grad.addColorStop(0,'rgba(138,180,248,0.5)'); grad.addColorStop(1,'rgba(138,180,248,0)');
+    ctx.beginPath(); ctx.moveTo(points[0].x, padding.top+chartH); points.forEach(p=>ctx.lineTo(p.x,p.y)); ctx.lineTo(points[points.length-1].x, padding.top+chartH); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+    ctx.beginPath(); points.forEach((p,i)=> i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y)); ctx.strokeStyle='#8ab4f8'; ctx.lineWidth=2.5; ctx.stroke();
+    points.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fillStyle='#8ab4f8'; ctx.fill(); ctx.strokeStyle='#0b0b0b'; ctx.lineWidth=1.5; ctx.stroke(); });
+}
+
+/* small preview on home */
+function renderStatPreview(){
+    const canvas = document.getElementById('statPreviewCanvas'); if(!canvas) return;
+    const ctx = canvas.getContext('2d'); const dpr = window.devicePixelRatio||1; const rect = canvas.getBoundingClientRect(); const width = rect.width||160; const height = rect.height||60;
+    canvas.width = Math.max(1,Math.floor(width*dpr)); canvas.height = Math.max(1,Math.floor(height*dpr)); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,width,height);
+    const N = 14; const today = new Date(); const dates=[]; for(let i=N-1;i>=0;i--){ const d=new Date(today); d.setDate(today.getDate()-i); dates.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`); }
+    const counts = dates.map(d=> (data.habits[d]?Object.values(data.habits[d]).filter(v=>v===true).length:0) );
+    if(counts.every(c=>c===0)){ ctx.fillStyle='#666'; ctx.font='12px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('No data', width/2, height/2); return; }
+    const max = Math.max(1,...counts); const pad={left:6,right:6,top:6,bottom:12}; const cw = width-pad.left-pad.right; const ch = height-pad.top-pad.bottom;
+    const points = counts.map((v,i)=>({ x: pad.left + (i/(counts.length-1))*cw, y: pad.top + ch - (v/max)*ch }));
+    const grad = ctx.createLinearGradient(0,pad.top,0,pad.top+ch); grad.addColorStop(0,'rgba(138,180,248,0.5)'); grad.addColorStop(1,'rgba(138,180,248,0)');
+    ctx.beginPath(); ctx.moveTo(points[0].x, pad.top+ch); points.forEach(p=>ctx.lineTo(p.x,p.y)); ctx.lineTo(points[points.length-1].x, pad.top+ch); ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+    ctx.beginPath(); points.forEach((p,i)=> i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y)); ctx.strokeStyle='#8ab4f8'; ctx.lineWidth=2; ctx.stroke();
+    points.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2); ctx.fillStyle='#8ab4f8'; ctx.fill(); });
+}
+
+/* Tools: Calculator & grade */
+function navigateToToolsDefault(){ navigateTo('tools'); showTool('calculator'); }
+function showTool(name){
+    const container = document.getElementById('toolsContent');
+    if(name==='calculator'){
+        container.innerHTML = `<div class="calc-container"><div id="calcDisplay" class="calc-display">0</div><div class="calc-buttons">
+            <button onclick="calcInput('7')">7</button><button onclick="calcInput('8')">8</button><button onclick="calcInput('9')">9</button><button class="op" onclick="calcInput('/')">÷</button>
+            <button onclick="calcInput('4')">4</button><button onclick="calcInput('5')">5</button><button onclick="calcInput('6')">6</button><button class="op" onclick="calcInput('*')">×</button>
+            <button onclick="calcInput('1')">1</button><button onclick="calcInput('2')">2</button><button onclick="calcInput('3')">3</button><button class="op" onclick="calcInput('-')">−</button>
+            <button onclick="calcInput('0')">0</button><button onclick="calcInput('.')">.</button><button class="equal" onclick="calcEvaluate()">=</button><button class="op" onclick="calcInput('+')">+</button>
+            <button onclick="calcClear()">C</button><button onclick="calcBack()">⌫</button><button onclick="calcInput('(')">(</button><button onclick="calcInput(')')">)</button>
+        </div></div>`;
+        document.addEventListener('keydown', calcKeyHandler);
+    } else if(name==='grade'){
+        if(!data._gradeTmp || data._gradeTmp.length===0) data._gradeTmp = [{name:'Test',weight:40,score:80},{name:'Exam',weight:60,score:75}];
+        container.innerHTML = `<div id="gradeRows"></div><div style="margin-top:8px;display:flex;gap:8px"><button class="btn-secondary" onclick="addGradeRow()">+ Add Item</button><button class="btn-secondary" onclick="calcGrade()">Calculate</button></div><div style="margin-top:8px"><strong>Total: </strong><span id="gradeResult"></span></div>`;
+        renderGradeRows();
+    }
+}
+let calcExpr = '';
+function calcInput(ch){ calcExpr += ch; updateCalc(); }
+function calcClear(){ calcExpr=''; updateCalc(); }
+function calcBack(){ calcExpr = calcExpr.slice(0,-1); updateCalc(); }
+function updateCalc(){ document.getElementById('calcDisplay').textContent = calcExpr === '' ? '0' : calcExpr; }
+function calcEvaluate(){ try{ const res = Function('"use strict"; return ('+calcExpr+')')(); calcExpr = String(res); updateCalc(); }catch(e){ document.getElementById('calcDisplay').textContent = 'Error'; } }
+function calcKeyHandler(e){ if(document.getElementById('page-tools').classList.contains('active')){ if(/[\d\+\-\*\/\.\(\)]/.test(e.key)){ calcExpr += e.key; updateCalc(); e.preventDefault(); } else if(e.key==='Enter'){ calcEvaluate(); e.preventDefault(); } else if(e.key==='Backspace'){ calcBack(); e.preventDefault(); } } }
+
+/* grade calculator */
+function renderGradeRows(){ const container=document.getElementById('gradeRows'); const rows=data._gradeTmp||[]; container.innerHTML = rows.map((r,i)=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><input placeholder="Name" value="${escapeAttr(r.name)}" onchange="updateGradeRow(${i},'name',this.value)" /><input placeholder="Weight (%)" style="width:100px" value="${r.weight}" onchange="updateGradeRow(${i},'weight',this.value)" /><input placeholder="Score" style="width:100px" value="${r.score}" onchange="updateGradeRow(${i},'score',this.value)" /><button class="btn-secondary" onclick="removeGradeRow(${i})">Remove</button></div>`).join(''); }
+function addGradeRow(){ data._gradeTmp = data._gradeTmp || []; data._gradeTmp.push({name:'Item',weight:0,score:0}); renderGradeRows(); }
+function updateGradeRow(i,k,v){ if(!data._gradeTmp) data._gradeTmp=[]; data._gradeTmp[i][k] = (k==='name'?v:parseFloat(v)||0); renderGradeRows(); }
+function removeGradeRow(i){ data._gradeTmp.splice(i,1); renderGradeRows(); }
+function calcGrade(){ const rows=data._gradeTmp||[]; if(rows.length===0) return alert('Add items'); let total=0,sum=0; rows.forEach(r=>{ total += Number(r.weight)||0; sum += (Number(r.score)||0) * (Number(r.weight)||0); }); const res = total>0 ? sum/total : 0; document.getElementById('gradeResult').textContent = res.toFixed(2); }
+
+/* AI manage & bottom bar */
+function renderAiLinks(){ const c=document.getElementById('aiLinksList'); const arr=data.aiLinks||[]; if(arr.length===0){ c.innerHTML='<div class="empty-state">No AI links. Add one above.</div>'; return; } c.innerHTML = arr.map((a,i)=>`<div draggable="true" class="item-card" data-ai-index="${i}"><div class="info"><div class="title">${escapeAttr(a.name)}</div><div class="sub">${escapeAttr(a.url)}</div></div><div class="actions"><button onclick="editAiLink(${i})">✎</button><button onclick="deleteAiLink(${i})">✕</button></div></div>`).join('');
+    c.querySelectorAll('.item-card').forEach(card=>{ card.addEventListener('dragstart', aiDragStart); card.addEventListener('dragover', aiDragOver); card.addEventListener('drop', aiDrop); card.addEventListener('dragend', aiDragEnd); });
+}
+let aiDragSrcIndex = null;
+function aiDragStart(e){ aiDragSrcIndex = parseInt(this.dataset.aiIndex); this.style.opacity='0.4'; e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain', String(aiDragSrcIndex)); }
+function aiDragOver(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; }
+function aiDrop(e){ e.preventDefault(); const targetIdx = parseInt(this.dataset.aiIndex); const srcIdx = parseInt(e.dataTransfer.getData('text/plain')); if(srcIdx===targetIdx) return; const arr = data.aiLinks; const [m] = arr.splice(srcIdx,1); arr.splice(targetIdx,0,m); saveData(); renderAiLinks(); renderBottomBar(); }
+function aiDragEnd(e){ this.style.opacity=''; }
+
+function addAiLink(){ const name=document.getElementById('aiName').value.trim(); const url=document.getElementById('aiURL').value.trim(); if(!name||!url) return alert('Enter both'); data.aiLinks = data.aiLinks||[]; data.aiLinks.push({ name, url}); saveData(); document.getElementById('aiName').value=''; document.getElementById('aiURL').value=''; renderAiLinks(); renderBottomBar(); }
+function editAiLink(i){ const a=data.aiLinks[i]; const newName=prompt('Name:', a.name); if(newName===null) return; const newUrl=prompt('URL:', a.url); if(newUrl===null) return; a.name=newName; a.url=newUrl; saveData(); renderAiLinks(); renderBottomBar(); }
+function deleteAiLink(i){ if(!confirm('Delete?')) return; data.aiLinks.splice(i,1); saveData(); renderAiLinks(); renderBottomBar(); }
+
+/* bottom bar render */
+function renderBottomBar(){ const container=document.getElementById('customButtonsContainer'); if(!container) return; const ai = data.aiLinks || []; const btns = (data.customButtons||[]).concat(ai.map(a=>({ id:'ai_'+a.name, name:a.name, url:a.url }))); container.innerHTML = btns.map(b=>`<button onclick="window.open('${b.url}','_blank')">${escapeAttr(b.name)}</button>`).join(''); }
+
+/* custom bottom button */
+function openCustomBtnModal(){ document.getElementById('customBtnModal').classList.add('show'); document.getElementById('customBtnName').value=''; document.getElementById('customBtnURL').value=''; }
+function closeCustomBtnModal(){ document.getElementById('customBtnModal').classList.remove('show'); }
+function saveCustomButton(){ const name=document.getElementById('customBtnName').value.trim(); const url=document.getElementById('customBtnURL').value.trim(); if(!name||!url) return alert('Enter both'); data.customButtons = data.customButtons || []; data.customButtons.push({ id: generateId(), name, url}); saveData(); closeCustomBtnModal(); renderBottomBar(); }
+
+/* Delete confirm utils */
+let deleteCallback = null;
+function showDeleteConfirm(message, callback){ document.getElementById('deleteConfirmMessage').textContent = message; document.getElementById('deleteConfirmOverlay').classList.add('show'); deleteCallback = callback; }
+function cancelDelete(){ document.getElementById('deleteConfirmOverlay').classList.remove('show'); deleteCallback = null; }
+function confirmDelete(){ if(deleteCallback) deleteCallback(); deleteCallback = null; document.getElementById('deleteConfirmOverlay').classList.remove('show'); }
+
+/* Misc helpers */
+function openFile(dataUrl, fileName){ fetch(dataUrl).then(r=>r.blob()).then(blob=>{ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(url),10000); }).catch(()=>window.open(dataUrl,'_blank')); }
+
+/* Init app */
+let data = {};
+async function initApp(){
+    try {
+        data = loadData();
+        if(!data.homeOrder) data.homeOrder = HOME_DEFAULT_ORDER.slice();
+        HOME_DEFAULT_ORDER.forEach(id=>{ if(!data.homeOrder.includes(id)) data.homeOrder.push(id); });
+        saveData();
+        migrateBase64FilesIfAny().then(()=>{ console.log('migration done'); }).catch(e=>console.error('migration error', e));
+        resetHabitsIfNewDay();
+        updateHeaderClock();
+        navigateTo('home');
+        renderBottomBar();
+        window.addEventListener('resize', ()=>{ if(document.getElementById('page-statistics').classList.contains('active')) renderStatistics(); if(document.getElementById('page-home').classList.contains('active')) renderStatPreview(); });
+        console.log('Ching Study unlocked.');
+    } catch (e) {
+        console.error('initApp failed', e);
+        document.getElementById('loginError').textContent = 'App init error: ' + (e && e.message ? e.message : String(e));
+    }
+}
+
+/* small helpers for quiz page, etc. */
+function openQuiz(){ currentCategory='Quiz'; document.getElementById('quizTitle').innerText='Quiz'; const container=document.getElementById('quizContent'); container.innerHTML = '<div class="subject-grid" id="quizSubjectGrid"></div>'; const grid2=document.getElementById('quizSubjectGrid'); SUBJECTS.forEach(subj=>{ const d=document.createElement('div'); d.className='subject-item'; d.innerHTML=`<div class="subj-name">${subj}</div>`; d.onclick = ()=> openSubjectDetail('Quiz', subj); grid2.appendChild(d); }); navigateTo('quiz'); }
+function goBackFromQuiz(){ navigateTo('home'); }
+
+/* Final startup: if already logged in, run init */
+try {
+    checkLoginStatus();
 } catch (e) {
-    console.error('Startup error:', e);
-    // Show message to user (login area) so they know there's an app error to report.
-    const errEl = document.getElementById('loginError');
-    if (errEl) errEl.textContent = 'App error: ' + (e && e.message ? e.message : String(e));
+    console.error('checkLoginStatus failed', e);
 }
 </script>
+
 </body>
 </html>
