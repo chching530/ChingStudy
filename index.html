@@ -760,6 +760,307 @@
         // ============================================================
         const CORRECT_PASSWORD = 'ching';
 
+        /* =====================
+            Bottom bar <-> AI sync helpers
+            - renderBottomBar() : 用 data.aiLinks 產生底部按鈕
+            - renderAiLinks()    : 在 AI 管理頁面顯示可排序、編輯、刪除的清單
+            - addAiLink() / updateAiLink() / deleteAiLink()
+            - reorder handling for drag/drop (管理頁)
+            - saveUserData()/startUserListener()/stopUserListener() hooks for Firebase (if signed in)
+            ===================== */
+
+        let currentUser = null; // firebase user object when signed in
+        let userUnsubscribe = null; // firestore onSnapshot unsubscribe
+
+        function renderBottomBar(){
+            const container = document.getElementById('bottomBar');
+            if(!container) return;
+            // keep fixed buttons: Home, AI, Add (with ids). We'll rebuild custom area in between.
+            // Clear existing custom area (but keep fixed elements)
+            // We'll create content programmatically for more control.
+            container.innerHTML = '';
+
+            // Home button (fixed)
+            const btnHome = document.createElement('button');
+            btnHome.id = 'bbHome';
+            btnHome.textContent = 'Home';
+            btnHome.classList.add('active');
+            btnHome.onclick = ()=> navigateTo('home');
+            container.appendChild(btnHome);
+
+            // AI category (fixed)
+            const btnAI = document.createElement('button');
+            btnAI.id = 'bbAI';
+            btnAI.textContent = 'AI';
+            btnAI.onclick = ()=> navigateTo('ai');
+            container.appendChild(btnAI);
+
+            // Container for dynamic AI links (managed by AI page)
+            const customWrap = document.createElement('div');
+            customWrap.id = 'bottomBarAiWrap';
+            customWrap.style.display = 'inline-flex';
+            customWrap.style.gap = '6px';
+            // for each aiLink create a textual button
+            (data.aiLinks || []).forEach((link, idx) => {
+                const b = document.createElement('button');
+                b.className = 'bb-ai-link';
+                b.textContent = link.name || ('AI ' + (idx+1));
+                b.dataset.index = idx;
+                b.onclick = ()=> {
+                    // open url in new tab
+                    if(link.url) window.open(link.url, '_blank');
+                };
+                // make draggable so user can reorder directly in bottom bar (optional)
+                b.setAttribute('draggable', 'true');
+                b.addEventListener('dragstart', (e)=> {
+                    e.dataTransfer.setData('text/plain', String(idx));
+                    b.classList.add('dragging');
+                });
+                b.addEventListener('dragend', ()=> {
+                    b.classList.remove('dragging');
+                });
+                b.addEventListener('dragover', (e)=> e.preventDefault());
+                b.addEventListener('drop', (e)=> {
+                    e.preventDefault();
+                    const src = Number(e.dataTransfer.getData('text/plain'));
+                    const dest = Number(b.dataset.index);
+                    if(!Number.isNaN(src) && !Number.isNaN(dest) && src !== dest){
+                        const arr = data.aiLinks || [];
+                        const [item] = arr.splice(src,1);
+                        arr.splice(dest,0,item);
+                        data.aiLinks = arr;
+                        saveData();
+                        renderAiLinks();
+                        renderBottomBar();
+                        if(currentUser) saveUserData(); // sync up
+                    }
+                });
+
+                customWrap.appendChild(b);
+            });
+            container.appendChild(customWrap);
+
+            // Add button (fixed)
+            const btnAdd = document.createElement('button');
+            btnAdd.id = 'bbAdd';
+            btnAdd.textContent = 'Add';
+            btnAdd.onclick = ()=> openCustomBtnModal();
+            container.appendChild(btnAdd);
+
+            // spacer to push items left
+            const spacer = document.createElement('div');
+            spacer.className = 'bb-spacer';
+            container.appendChild(spacer);
+        }
+
+        function renderAiLinks(){
+            const listWrap = document.getElementById('aiLinksList');
+            if(!listWrap) return;
+            listWrap.innerHTML = '';
+
+            // instruction + add form
+            const addRow = document.createElement('div');
+            addRow.style.display = 'flex';
+            addRow.style.gap = '8px';
+            addRow.style.marginBottom = '8px';
+            const nameInput = document.createElement('input');
+            nameInput.placeholder = 'Name';
+            nameInput.id = 'aiNameInput';
+            const urlInput = document.createElement('input');
+            urlInput.placeholder = 'URL (https://...)';
+            urlInput.id = 'aiUrlInput';
+            const addBtn = document.createElement('button');
+            addBtn.textContent = 'Add';
+            addBtn.onclick = ()=> {
+                const n = nameInput.value.trim();
+                const u = urlInput.value.trim();
+                if(!n || !u){ alert('Please provide name and url'); return; }
+                addAiLink({ name:n, url:u });
+                nameInput.value = ''; urlInput.value = '';
+            };
+            addRow.appendChild(nameInput);
+            addRow.appendChild(urlInput);
+            addRow.appendChild(addBtn);
+            listWrap.appendChild(addRow);
+
+            // list header
+            const header = document.createElement('div');
+            header.style.fontSize = '13px';
+            header.style.color = '#bbb';
+            header.style.margin = '6px 0';
+            header.textContent = 'Drag the ⠿ handle to reorder. Changes will update bottom bar.';
+            listWrap.appendChild(header);
+
+            const ul = document.createElement('div');
+            ul.id = 'aiListInner';
+            ul.style.display = 'flex';
+            ul.style.flexDirection = 'column';
+            ul.style.gap = '6px';
+
+            (data.aiLinks || []).forEach((link, idx) => {
+                const item = document.createElement('div');
+                item.className = 'link-item';
+                item.style.display = 'flex';
+                item.style.alignItems = 'center';
+                item.style.gap = '8px';
+
+                // drag handle
+                const dragHandle = document.createElement('div');
+                dragHandle.textContent = '⠿';
+                dragHandle.style.cursor = 'grab';
+                dragHandle.style.padding = '6px';
+                dragHandle.draggable = true;
+
+                dragHandle.addEventListener('dragstart', (e)=>{
+                    e.dataTransfer.setData('text/plain', String(idx));
+                    item.classList.add('dragging');
+                });
+                dragHandle.addEventListener('dragend', ()=> item.classList.remove('dragging'));
+
+                item.addEventListener('dragover', (e)=> e.preventDefault());
+                item.addEventListener('drop', (e)=>{
+                    e.preventDefault();
+                    const src = Number(e.dataTransfer.getData('text/plain'));
+                    const dest = idx;
+                    if(src === dest) return;
+                    const arr = data.aiLinks || [];
+                    const [it] = arr.splice(src,1);
+                    arr.splice(dest,0,it);
+                    data.aiLinks = arr;
+                    saveData();
+                    renderAiLinks();
+                    renderBottomBar();
+                    if(currentUser) saveUserData();
+                });
+
+                const info = document.createElement('div');
+                info.style.flex = '1';
+                const title = document.createElement('div');
+                title.style.color = '#fff';
+                title.textContent = link.name || 'AI';
+                const sub = document.createElement('div');
+                sub.style.fontSize = '12px';
+                sub.style.color = '#888';
+                sub.textContent = link.url || '';
+                info.appendChild(title);
+                info.appendChild(sub);
+
+                const btnEdit = document.createElement('button');
+                btnEdit.textContent = 'Edit';
+                btnEdit.onclick = ()=> {
+                    const newName = prompt('Name', link.name) || link.name;
+                    const newUrl = prompt('URL', link.url) || link.url;
+                    data.aiLinks[idx] = { name: newName, url: newUrl };
+                    saveData(); renderAiLinks(); renderBottomBar();
+                    if(currentUser) saveUserData();
+                };
+
+                const btnDel = document.createElement('button');
+                btnDel.textContent = 'Delete';
+                btnDel.onclick = ()=>{
+                    if(!confirm('Delete this AI link?')) return;
+                    data.aiLinks.splice(idx,1);
+                    saveData(); renderAiLinks(); renderBottomBar();
+                    if(currentUser) saveUserData();
+                };
+
+                item.appendChild(dragHandle);
+                item.appendChild(info);
+                item.appendChild(btnEdit);
+                item.appendChild(btnDel);
+                ul.appendChild(item);
+            });
+
+            listWrap.appendChild(ul);
+        }
+
+        /* add a new ai link */
+        function addAiLink(link){
+            if(!data.aiLinks) data.aiLinks = [];
+            data.aiLinks.push(link);
+            saveData();
+            renderAiLinks();
+            renderBottomBar();
+            if(currentUser) saveUserData();
+        }
+
+        /* call this from your initApp() so bottomBar and ai list are initially rendered */
+        function setupAiBottomBarIntegration(){
+            if(!data.aiLinks) data.aiLinks = [];
+            renderBottomBar();
+            renderAiLinks();
+            // also observe localStorage changes if another tab updates
+            window.addEventListener('storage', (e)=>{
+                if(e.key === 'ching_study_data'){
+                    data = loadData();
+                    renderAiLinks();
+                    renderBottomBar();
+                }
+            });
+        }
+
+        /* =========================
+        Firebase: user data save/load helpers
+        (placeholders — assumes firebase initialized as `firebase` app)
+        ========================= */
+        async function saveUserData(){
+            if(!currentUser) return;
+            try{
+                const db = firebase.firestore();
+                const docRef = db.collection('users').doc(currentUser.uid);
+                // we store only the parts we want to sync (aiLinks + other data)
+                await docRef.set({ data }, { merge: true });
+                console.log('Saved user data to firestore');
+            }catch(err){
+                console.error('saveUserData err', err);
+            }
+        }
+
+        function startUserListener(uid){
+            stopUserListener();
+            const db = firebase.firestore();
+            const docRef = db.collection('users').doc(uid);
+            userUnsubscribe = docRef.onSnapshot(snapshot=>{
+                if(!snapshot.exists) return;
+                const remote = snapshot.data().data;
+                if(!remote) return;
+                // Merge remote.aiLinks -> local (prefer remote newest)
+                if(remote.aiLinks){
+                    data.aiLinks = remote.aiLinks;
+                }
+                // optionally merge other keys...
+                saveData();
+                renderAiLinks();
+                renderBottomBar();
+            }, err => {
+                console.error('snapshot err', err);
+            });
+        }
+
+        function stopUserListener(){
+            if(typeof userUnsubscribe === 'function') userUnsubscribe();
+            userUnsubscribe = null;
+        }
+
+        /* call this once when auth state changes to set currentUser */
+        function onUserSignedIn(user){
+            currentUser = user;
+            if(user){
+                // start syncing listener
+                startUserListener(user.uid);
+                // push local -> remote once (optionally)
+                saveUserData();
+            } else {
+                stopUserListener();
+                currentUser = null;
+            }
+        }
+
+        /* =========================
+        Hook into existing initApp()
+        - add setupAiBottomBarIntegration() call inside initApp()
+        ========================= */
+
         window.signUpWithEmail = async function() {
             const email = document.getElementById('authEmail').value.trim();
             const pw = document.getElementById('authPassword').value;
@@ -2368,7 +2669,15 @@
 
                 localStorage.setItem('loggedIn', 'true');
                 showApp();
+                onUserSignedIn(user);
+                // 切換到 app，顯示主頁
+                document.getElementById('loginContainer').style.display = 'none';
+                showApp(); // 如果你的 showApp() 做顯示和 init
             } else {
+                onUserSignedIn(null);
+                // show login UI
+                document.getElementById('loginContainer').style.display = 'flex';
+                document.getElementById('appContainer').classList.remove('active');
                 console.log('User signed out');
                 // 不自動清除 local 登入
             }
@@ -2414,6 +2723,7 @@
 
         // Start
         checkLoginStatus();
+        setupAiBottomBarIntegration();
     </script>
 </body>
 </html>
