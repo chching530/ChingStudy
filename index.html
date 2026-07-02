@@ -8,7 +8,7 @@
     <meta name="format-detection" content="telephone=no">
     <title>◇ Ching Study</title>
     <style>
-        /* （內容與你原本的大部分 CSS 相同 — 為簡潔，這裡直接保留你原本 CSS） */
+        /* 完整樣式保持不變（跟你 Version5 的 CSS） */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background: #0b0b0b; color: #f0f0f0; padding: 16px; padding-bottom: 110px; max-width: 1000px; margin: 0 auto; min-height: 100vh; }
         button, .main-card, .subject-item, .chapter-card, .habit-box, .link-item, .item-card .actions button, .chapter-file-item .actions button, .stat-filter-btn, .folder-item, .file-item, .bottom-bar button {
@@ -148,6 +148,8 @@
         .study-log-container .log-subjects { display: flex; flex-wrap: wrap; gap: 6px; }
         .study-log-container .log-subject { background: #222; padding: 4px 12px; border-radius: 20px; font-size: 13px; color: #ddd; border: 1px solid #444; }
         .study-log-container .log-subject.done { border-color: var(--habit-color, #8ab4f8); color: #fff; }
+        .study-log-empty { color: #555; font-size: 13px; }
+        /* ===== STATISTICS ===== */
         .stat-container { padding: 8px 0; }
         .stat-filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
         .stat-filters .stat-filter-btn { background: #222; border: 1px solid #444; color: #888; padding: 6px 16px; border-radius: 30px; font-size: 14px; cursor: pointer; transition: 0.15s; }
@@ -159,7 +161,163 @@
         .stat-summary .stat-item .stat-number { font-size: 24px; font-weight: 300; color: #fff; }
         .stat-summary .stat-item .stat-label { font-size: 12px; color: #888; }
         .stat-no-data { text-align: center; padding: 40px 0; color: #666; }
-        /* rest responsive etc kept as-is */
+        /* ===== TIMER ===== */
+        .timer-container { display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
+        .timer-clock { position: relative; width: 240px; height: 240px; border-radius: 50%; border: 2px solid #333; background: #0b0b0b; display: flex; align-items: center; justify-content: center; margin: 10px auto; }
+        .timer-clock svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+        .timer-clock .circle-bg { fill: none; stroke: #222; stroke-width: 3; }
+        .timer-clock .circle-progress { fill: none; stroke: #8ab4f8; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.3s; }
+        .timer-clock .timer-display { font-size: 36px; font-weight: 300; color: #fff; letter-spacing: 2px; z-index: 2; font-variant-numeric: tabular-nums; }
+        .timer-controls { display: flex; gap: 16px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+        .timer-controls button { background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 10px 24px; border-radius: 30px; font-size: 14px; cursor: pointer; min-width: 80px; touch-action: manipulation; }
+        .timer-controls button:active { background: #444; }
+        .timer-controls button.primary { background: #444; border-color: #555; }
+        .timer-mode { display: flex; gap: 12px; margin-bottom: 16px; }
+        .timer-mode button { background: #222; border: 1px solid #444; color: #888; padding: 8px 20px; border-radius: 30px; font-size: 14px; cursor: pointer; touch-action: manipulation; }
+        .timer-mode button.active { background: #333; color: #fff; border-color: #666; }
+        .timer-input { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; justify-content: center; }
+        .timer-input input { background: #222; border: 1px solid #444; border-radius: 30px; padding: 10px 16px; color: #fff; font-size: 18px; width: 80px; text-align: center; }
+        .timer-input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .timer-input input[type=number] { -moz-appearance: textfield; }
+        .timer-input span { color: #888; font-size: 18px; }
+        /* ===== LINKS ===== */
+        .link-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 8px 12px 8px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; cursor: grab; transition: 0.15s; }
+        .link-item:active { cursor: grabbing; }
+        .link-item.dragging { opacity: 0.3; transform: scale(0.95); }
+        .link-item.drag-over { border-color: #8ab4f8; background: #1a2a3a; }
+        .link-item .link-content { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .link-item .link-content .drag-handle { color: #555; font-size: 16px; cursor: grab; user-select: none; padding: 4px; touch-action: none; }
+        .link-item .link-content a { color: #8ab4f8; text-decoration: none; font-size: 14px; flex: 1; }
+        .link-item .link-content a:active { color: #fff; }
+        .link-item .del-link { background: none; border: none; color: #e74c3c; font-size: 16px; cursor: pointer; padding: 4px; touch-action: manipulation; }
+        /* ===== CHAPTER LINKS & FILES (Quiz) ===== */
+        .chapter-link-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .chapter-link-item a { color: #8ab4f8; text-decoration: none; font-size: 14px; flex: 1; }
+        .chapter-link-item a:active { color: #fff; }
+        .chapter-link-item .del-link { background: none; border: none; color: #e74c3c; font-size: 16px; cursor: pointer; touch-action: manipulation; }
+        .chapter-file-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .chapter-file-item .info { flex: 1; margin-right: 10px; }
+        .chapter-file-item .info .title { font-weight: 400; color: #fff; font-size: 14px; word-break: break-all; }
+        .chapter-file-item .info .sub { font-size: 12px; color: #888; }
+        .chapter-file-item .actions { display: flex; gap: 6px; align-items: center; }
+        .chapter-file-item .actions button { background: none; border: none; color: #e74c3c; font-size: 16px; cursor: pointer; padding: 0 4px; touch-action: manipulation; }
+        .chapter-file-item .actions .open-btn { color: #8ab4f8; font-size: 16px; text-decoration: none; cursor: pointer; background: none; border: none; padding: 0 4px; }
+        .chapter-file-item .actions .download-btn { color: #8ab4f8; font-size: 16px; text-decoration: none; margin-right: 2px; }
+        /* ===== BOTTOM BAR ===== */
+        .bottom-bar-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #141414;
+            border-top: 1px solid #2a2a2a;
+            max-width: 1000px;
+            margin: 0 auto;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .bottom-bar-wrapper::-webkit-scrollbar { display: none; }
+        .bottom-bar {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            gap: 4px;
+            min-width: 100%;
+        }
+        .bottom-bar button {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 12px;
+            padding: 6px 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            transition: 0.15s;
+            touch-action: manipulation;
+            min-width: 44px;
+            flex-shrink: 0;
+            border-radius: 8px;
+        }
+        .bottom-bar button:active { transform: scale(0.92); color: #fff; background: #2a2a2a; }
+        .bottom-bar button .btn-icon { font-size: 20px; line-height: 1; }
+        .bottom-bar button .btn-label { font-size: 10px; color: #666; }
+        .bottom-bar button.active .btn-label { color: #8ab4f8; }
+        .bottom-bar .bb-spacer { flex: 1; min-width: 8px; }
+        /* ===== MODAL ===== */
+        .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); display:none; justify-content:center; align-items:center; z-index:999; }
+        .modal-overlay.show { display:flex; }
+        .modal-box { background:#1c1c1c; width:90%; max-width:480px; border-radius:24px; padding:24px; max-height:80vh; overflow-y:auto; border:1px solid #333; }
+        .modal-box h3 { display:flex; justify-content:space-between; align-items:center; font-weight:300; font-size:20px; color:#fff; margin-bottom:16px; }
+        .modal-box .close-modal { background:none; border:none; font-size:24px; color:#aaa; cursor:pointer; touch-action: manipulation; }
+        .modal-box input, .modal-box select, .modal-box textarea { width:100%; margin-bottom:10px; padding:12px; background:#222; border:1px solid #444; border-radius:12px; color:#fff; font-size:14px; }
+        .modal-box textarea { min-height:60px; }
+        .modal-box button { background:#444; border:none; color:#fff; padding:12px; border-radius:30px; font-weight:500; width:100%; cursor:pointer; touch-action: manipulation; }
+        .modal-box button:active { background:#666; }
+        .icon-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center; }
+        .icon-selector .icon-option { font-size: 28px; cursor: pointer; padding: 4px 8px; border-radius: 8px; border: 2px solid transparent; transition: 0.15s; }
+        .icon-selector .icon-option.selected { border-color: #8ab4f8; background: #1a2a3a; }
+        .icon-selector .icon-upload { background: #222; border: 1px solid #444; border-radius: 8px; padding: 4px 10px; color: #aaa; font-size: 13px; cursor: pointer; }
+        .icon-selector input[type="file"] { display: none; }
+        /* ===== DELETE CONFIRM ===== */
+        .delete-confirm-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .delete-confirm-overlay.show { display: flex; }
+        .delete-confirm-box {
+            background: #1c1c1c;
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 300px;
+            width: 85%;
+            border: 1px solid #333;
+            text-align: center;
+        }
+        .delete-confirm-box p { color: #ddd; margin-bottom: 16px; font-size: 16px; }
+        .delete-confirm-box .btn-group { display: flex; gap: 12px; }
+        .delete-confirm-box .btn-group button { flex: 1; padding: 10px; border-radius: 30px; border: none; font-size: 15px; cursor: pointer; touch-action: manipulation; }
+        .delete-confirm-box .btn-group .btn-cancel { background: #333; color: #aaa; }
+        .delete-confirm-box .btn-group .btn-delete { background: #e74c3c; color: #fff; }
+        /* ===== Responsive ===== */
+        @media (max-width: 480px) {
+            .header .center { font-size: 11px; min-width: 100px; }
+            .timer-clock { width: 180px; height: 180px; }
+            .timer-clock .timer-display { font-size: 28px; }
+            .habits-container { grid-template-columns: 1fr 1fr; gap: 6px; }
+            .habit-row .habit-name { font-size: 12px; }
+            .habit-row .habit-fire { font-size: 12px; min-width: 24px; }
+            .main-card .title { font-size: 15px; }
+            .main-card .desc { font-size: 11px; }
+            .stat-summary { flex-wrap: wrap; gap: 8px; }
+            .bottom-bar button { font-size: 10px; min-width: 36px; padding: 2px 6px; }
+            .bottom-bar button .btn-icon { font-size: 16px; }
+        }
+        @media (min-width: 800px) {
+            body { max-width: 1000px; padding: 24px; padding-bottom: 120px; }
+            .habits-container { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (min-width: 768px) and (max-width: 1024px) {
+            body { padding: 30px; padding-bottom: 120px; }
+            .habits-container { grid-template-columns: repeat(3, 1fr); }
+        }
+        input, select, textarea { border-radius: 12px !important; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0b0b0b; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -313,8 +471,30 @@
     <div id="page-calendar" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
         <h2 style="font-weight:300; font-size:22px;">Calendar</h2>
-        <div class="cal-grid" id="calGrid" style="margin-top:12px;"></div>
+
+        <div class="cal-header" style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 12px;">
+            <button onclick="changeMonth(-1)" style="background:#222; border:1px solid #444; padding:6px 16px; border-radius:30px; font-size:18px; color:#ddd; cursor:pointer;">◀</button>
+            <span class="month-year" id="calMonthYear" style="font-size:18px; font-weight:300; color:#fff;"></span>
+            <button onclick="changeMonth(1)" style="background:#222; border:1px solid #444; padding:6px 16px; border-radius:30px; font-size:18px; color:#ddd; cursor:pointer;">▶</button>
+        </div>
+
+        <div class="cal-grid" id="calGrid" style="margin-top:0;"></div>
+
+        <div style="display:flex; gap:10px; margin:16px 0 12px; flex-wrap:wrap;">
+            <select id="eventFilter" style="flex:1; background:#222; border:1px solid #444; border-radius:30px; padding:10px 16px; color:#ddd;">
+                <option value="all">All (Future)</option>
+                <option value="countdown">Countdown</option>
+                <option value="schedule">Schedule</option>
+            </select>
+            <button onclick="openAddEvent()" style="background:#444; border:none; color:#fff; padding:10px 20px; border-radius:30px; cursor:pointer;">+ Add</button>
+        </div>
+
         <div id="eventList" style="margin-top:12px;"></div>
+
+        <div class="study-log-container" id="studyLogContainer" style="margin-top:12px;">
+            <div class="log-title">📖 Study Log</div>
+            <div id="studyLogContent" class="study-log-empty">Select a date to see study records.</div>
+        </div>
     </div>
 
     <!-- CHAPTER MODAL -->
@@ -323,6 +503,17 @@
             <h3>New Chapter <button class="close-modal" onclick="closeChapterModal()">✕</button></h3>
             <input id="chapterName" placeholder="Chapter name (e.g. Ch.1)" />
             <button onclick="saveChapter()">Create Chapter</button>
+        </div>
+    </div>
+
+    <!-- ADD EVENT MODAL -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal-box">
+            <h3>Add Event <button class="close-modal" onclick="closeEventModal()">✕</button></h3>
+            <input id="evTitle" placeholder="Title" />
+            <input id="evDate" type="date" />
+            <select id="evType"><option value="schedule">Schedule</option><option value="countdown">Countdown</option></select>
+            <button onclick="saveEvent()">Save</button>
         </div>
     </div>
 
@@ -346,13 +537,44 @@
             </div>
         </div>
     </div>
+
+    <!-- NOTIF MODAL (simple) -->
+    <div class="modal-overlay" id="notifModal">
+        <div class="modal-box">
+            <h3>Notifications <button class="close-modal" onclick="closeNotif()">✕</button></h3>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #2a2a2a;">
+                    <span style="font-size:20px;color:#aaa;">✉</span>
+                    <span style="flex:1;color:#eee;">Contact tutor</span>
+                    <a href="mailto:?subject=Study Question" style="color:#8ab4f8;text-decoration:none;font-weight:500;">Email</a>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #2a2a2a;">
+                    <span style="font-size:20px;color:#aaa;">✆</span>
+                    <span style="flex:1;color:#eee;">Remind yourself</span>
+                    <a href="sms:?body=Time to study!" style="color:#8ab4f8;text-decoration:none;font-weight:500;">SMS</a>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:8px 0;">
+                    <span style="font-size:20px;color:#aaa;">📌</span>
+                    <span style="flex:1;color:#eee;">Daily reminder: review your notes</span>
+                    <span style="color:#666;font-size:13px;">Read</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <!-- ===== BOTTOM BAR ===== -->
 <div class="bottom-bar-wrapper">
     <div class="bottom-bar" id="bottomBar">
-        <button onclick="navigateTo('home')" class="active" id="bbHome">Home</button>
-        <button id="bbAI" onclick="navigateTo('ai')">AI</button>
+        <button onclick="navigateTo('home')" class="active" id="bbHome">
+            <span class="btn-icon">🏠</span>
+            <span class="btn-label">Home</span>
+        </button>
+        <button id="bbAI" onclick="navigateTo('ai')">
+            <span class="btn-icon">🤖</span>
+            <span class="btn-label">AI</span>
+        </button>
         <div id="customButtonsContainer" style="display:inline-flex; gap:4px;"></div>
         <button onclick="openCustomBtnModal()" id="bbAdd">+ Add</button>
         <div class="bb-spacer"></div>
@@ -361,13 +583,12 @@
 
 <script>
     // ============================================================
-    // Data model & helpers
+    // Data model & helpers (保持與你 Version5 一致)
     // ============================================================
     const CATEGORIES = ['Information', 'Quiz', 'DSE'];
     const SUBJECTS = ['Chinese', 'English', 'Mathematics', 'CS', 'Economics', 'Bafs', 'Ict'];
     const HOME_DEFAULT_ORDER = ['information','quiz','dse','links','objectives','statistics','tools','ai','timer'];
     function keyFor(category, subject){ return `${category}_${subject}`; }
-
     function generateId(){ return Date.now() + '_' + Math.random().toString(36).substr(2,6); }
     function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
 
@@ -392,13 +613,11 @@
             if (!raw) return defaultData();
             const parsed = JSON.parse(raw);
 
-            // ensure chapters exist for each category/subject
             if (!parsed.chapters) parsed.chapters = {};
             CATEGORIES.forEach(c => SUBJECTS.forEach(s => {
                 const k = keyFor(c,s);
                 if (!parsed.chapters[k]) parsed.chapters[k] = [];
             }));
-
             if (!parsed.links) parsed.links = [];
             if (!parsed.habits) parsed.habits = {};
             if (!parsed.objectives) parsed.objectives = {};
@@ -406,7 +625,7 @@
             if (!parsed.homeOrder) parsed.homeOrder = HOME_DEFAULT_ORDER.slice();
             if (!parsed.aiLinks) parsed.aiLinks = [];
 
-            // Migrate old infoFolders/dseFolders (if present) into chapters structure
+            // Migrate old infoFolders/dseFolders
             if (parsed.infoFolders) {
                 SUBJECTS.forEach(s => {
                     const arr = parsed.infoFolders[s] || [];
@@ -440,7 +659,6 @@
                 delete parsed.dseFolders;
             }
 
-            // ensure objectives for each subject
             SUBJECTS.forEach(s => {
                 if (!parsed.objectives[s]) parsed.objectives[s] = { target: '5', current: '4' };
             });
@@ -452,18 +670,10 @@
         }
     }
 
-    // --- CHANGED: centralized saveData that refreshes stat preview & stats page ---
     function saveData(){
         localStorage.setItem('ching_study_data', JSON.stringify(data));
-        // refresh preview and statistics if available (safe-call)
-        try {
-            if (typeof renderStatPreview === 'function') renderStatPreview();
-        } catch(e) {}
-        try {
-            const statPage = document.getElementById('page-statistics');
-            if (statPage && statPage.classList.contains('active') && typeof renderStatistics === 'function') renderStatistics();
-        } catch(e) {}
     }
+
     // ============================================================
     // Login & init
     // ============================================================
@@ -517,9 +727,14 @@
 
     function navigateTo(page) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        // bottom bar active style
+        document.querySelectorAll('.bottom-bar button').forEach(btn => btn.classList.remove('active'));
+        const btnMap = { home: 'bbHome', ai: 'bbAI' };
+        if (btnMap[page]) document.getElementById(btnMap[page])?.classList.add('active');
+
         const el = document.getElementById(pageMap[page]);
         if (el) el.classList.add('active');
-        if (page === 'home') { renderHomeCards(); renderHabits(); renderObjectives(); renderBottomBar(); }
+        if (page === 'home') { renderHomeCards(); renderHabits(); renderObjectives(); renderBottomBar(); setTimeout(renderStatPreview, 80); }
         if (page === 'subjects') { /* nothing */ }
         if (page === 'detail') { renderDetail(); }
         if (page === 'quiz') { openQuiz(); }
@@ -534,7 +749,7 @@
     }
 
     // ============================================================
-    // Home cards (order from data.homeOrder, migration safe)
+    // Home cards (order from data.homeOrder)
     // ============================================================
     function renderHomeCards(){
         const container = document.getElementById('homeCardGrid');
@@ -578,10 +793,8 @@
             }
         });
         container.innerHTML = html;
-        // draw preview (ensure slight delay to allow DOM layout)
-        setTimeout(() => {
-            try { renderStatPreview(); } catch(e) { console.error('preview draw failed', e); }
-        }, 80);
+        // draw preview
+        setTimeout(renderStatPreview, 60);
     }
 
     function handleCardClick(id) {
@@ -631,7 +844,7 @@
     }
 
     // ============================================================
-    // Chapters (unified for Information / Quiz / DSE)
+    // Chapters
     // ============================================================
     function renderDetail() {
         const container = document.getElementById('detailContent');
@@ -787,10 +1000,8 @@
     }
 
     function renderFileTreeHtml(list) {
-        // recursive HTML builder that creates folder headers with toggle
         return list.map(item => {
             if (item.type === 'folder') {
-                // ensure id exists
                 if (!item.id) item.id = generateId();
                 return `
                     <div class="folder-item" data-folder-id="${item.id}">
@@ -894,7 +1105,7 @@
     }
 
     // ============================================================
-    // File upload helpers: add single file at root
+    // File upload helpers
     // ============================================================
     function addChapterFile() {
         const input = document.getElementById('chapterFileInput');
@@ -915,7 +1126,6 @@
         reader.readAsDataURL(file);
     }
 
-    // Upload entire folder (webkitdirectory) and preserve structure
     function uploadChapterFolder() {
         const input = document.createElement('input');
         input.type = 'file';
@@ -931,12 +1141,10 @@
 
             files.forEach(file => {
                 const parts = file.webkitRelativePath.split('/');
-                // navigate/create nested folder objects
                 let pointer = root;
                 for (let i = 0; i < parts.length; i++) {
                     const name = parts[i];
                     if (i === parts.length - 1) {
-                        // file
                         const reader = new FileReader();
                         reader.onload = function(ev) {
                             const entry = { id: generateId(), name, type: 'file', data: ev.target.result, size: file.size };
@@ -947,7 +1155,6 @@
                         };
                         reader.readAsDataURL(file);
                     } else {
-                        // folder level
                         let folder = pointer.find(it => it.type === 'folder' && it.name === name);
                         if (!folder) {
                             folder = { id: generateId(), name, type: 'folder', children: [] };
@@ -1095,7 +1302,7 @@
             data.habits[today] = {}; SUBJECTS.forEach(s => data.habits[today][s] = false);
         }
         data.habits[today][subject] = !data.habits[today][subject];
-        saveData(); // saveData will also refresh preview & stats
+        saveData();
         renderHabits();
     }
 
@@ -1107,18 +1314,155 @@
     }, 60000);
 
     // ============================================================
-    // Calendar & Events (kept simple)
+    // Calendar & Events (從之前版本完整還原)
     // ============================================================
     let calYear = new Date().getFullYear();
     let calMonth = new Date().getMonth();
 
     function renderCalendar() {
         const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        document.getElementById('calGrid').innerText = `${calYear} ${monthNames[calMonth]}`;
+        document.getElementById('calMonthYear').innerText = calYear + ' ' + monthNames[calMonth];
+        const grid = document.getElementById('calGrid');
+        const firstDay = new Date(calYear, calMonth, 1).getDay();
+        const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+        const today = getTodayLocal();
+        let html = `<div class="day-name">Sun</div><div class="day-name">Mon</div><div class="day-name">Tue</div><div class="day-name">Wed</div><div class="day-name">Thu</div><div class="day-name">Fri</div><div class="day-name">Sat</div>`;
+        for (let i=0; i<firstDay; i++) html += `<div class="day-cell empty"></div>`;
+        for (let d=1; d<=daysInMonth; d++) {
+            const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const hasEvent = (data.events || []).some(e => e.date === dateStr);
+            const isToday = dateStr === getTodayLocal();
+            const cls = 'day-cell' + (hasEvent ? ' has-event' : '') + (isToday ? ' today' : '');
+            html += `<div class="${cls}" onclick="selectDate('${dateStr}')">${d}</div>`;
+        }
+        grid.innerHTML = html;
+        selectDate(getTodayLocal());
     }
 
+    function changeMonth(delta) {
+        calMonth += delta;
+        if (calMonth < 0) { calMonth = 11; calYear--; }
+        if (calMonth > 11) { calMonth = 0; calYear++; }
+        renderCalendar();
+    }
+
+    function selectDate(dateStr) {
+        renderEventList('all', dateStr);
+        showStudyLogForDate(dateStr);
+    }
+
+    function showStudyLogForDate(dateStr) {
+        const container = document.getElementById('studyLogContent');
+        container.dataset.date = dateStr;
+        const habitsForDate = data.habits[dateStr] || {};
+        const studiedSubjects = SUBJECTS.filter(s => habitsForDate[s] === true);
+        if (studiedSubjects.length === 0) {
+            container.innerHTML = '<span class="study-log-empty">No study records on this day.</span>';
+            return;
+        }
+        const colorMap = {
+            'Chinese': '#e74c3c',
+            'English': '#f1c40f',
+            'Mathematics': '#3498db',
+            'CS': '#2ecc71',
+            'Economics': '#9b59b6',
+            'Bafs': '#e67e22',
+            'Ict': '#1abc9c'
+        };
+        let html = '<div class="log-subjects">';
+        studiedSubjects.forEach(subj => {
+            const color = colorMap[subj] || '#8ab4f8';
+            html += `<span class="log-subject done" style="border-color:${color}; color:${color};" onclick="toggleHabitForDate('${dateStr}','${subj}')">${subj}</span>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function toggleHabitForDate(dateStr, subj) {
+        if (!data.habits[dateStr]) data.habits[dateStr] = {};
+        data.habits[dateStr][subj] = !data.habits[dateStr][subj];
+        saveData();
+        showStudyLogForDate(dateStr);
+        renderHabits();
+    }
+
+    function renderEventList(filter, specificDate = null) {
+        const container = document.getElementById('eventList');
+        let events = [...(data.events || [])];
+        const filterVal = filter || document.getElementById('eventFilter').value;
+        const today = getTodayLocal();
+
+        if (specificDate) {
+            events = events.filter(e => e.date === specificDate);
+        } else {
+            if (filterVal === 'all') {
+                events = events.filter(e => e.date >= today);
+            } else if (filterVal === 'countdown') {
+                events = events.filter(e => e.type === 'countdown' && e.date >= today);
+            } else if (filterVal === 'schedule') {
+                events = events.filter(e => e.type === 'schedule' && e.date >= today);
+            }
+        }
+        events.sort((a,b) => a.date.localeCompare(b.date));
+
+        if (events.length === 0) {
+            container.innerHTML = '<div class="empty-state">No events.</div>';
+            return;
+        }
+
+        container.innerHTML = events.map(ev => {
+            const diff = Math.ceil((new Date(ev.date + 'T00:00:00') - new Date(today + 'T00:00:00')) / (1000*60*60*24));
+            let countdownText = '';
+            if (ev.type === 'countdown') {
+                if (diff === 0) countdownText = 'Today!';
+                else if (diff < 0) countdownText = Math.abs(diff) + ' days ago';
+                else countdownText = diff + ' days left';
+            }
+            return `<div class="event-item" style="border-left-color:${ev.type==='countdown'?'#f1c40f':'#888'};">
+                <div><div class="ev-title">${ev.title}</div><div class="ev-date">📅 ${ev.date}</div></div>
+                ${countdownText ? `<div class="ev-countdown">${countdownText}</div>` : `<div style="color:#666;">Schedule</div>`}
+                <button class="del-ev" onclick="deleteEvent(${ev.id})">✕</button>
+            </div>`;
+        }).join('');
+        document.getElementById('eventFilter').value = filterVal;
+    }
+
+    function openAddEvent() {
+        document.getElementById('eventModal').classList.add('show');
+        document.getElementById('evTitle').value = '';
+        document.getElementById('evDate').value = getTodayLocal();
+        document.getElementById('evType').value = 'schedule';
+    }
+
+    function closeEventModal() { document.getElementById('eventModal').classList.remove('show'); }
+
+    function saveEvent() {
+        const title = document.getElementById('evTitle').value.trim();
+        const date = document.getElementById('evDate').value;
+        const type = document.getElementById('evType').value;
+        if (!title || !date) return alert('Fill in title and date.');
+        if (!data.events) data.events = [];
+        data.events.push({ id: Date.now(), title, date, type });
+        saveData();
+        closeEventModal();
+        renderCalendar();
+    }
+
+    function deleteEvent(id) {
+        showDeleteConfirm(`Delete event?`, () => {
+            data.events = data.events.filter(e => e.id !== id);
+            saveData();
+            renderCalendar();
+            closeDeleteConfirm();
+        });
+    }
+
+    document.getElementById('eventFilter')?.addEventListener('change', function() {
+        renderEventList(this.value);
+    });
+
     // ============================================================
-    // Statistics (full page)
+    // Statistics (page + preview) — 保持你先前的設計與漸層
     // ============================================================
     let statRange = 'week';
     function setStatRange(range) {
@@ -1160,9 +1504,9 @@
         const dpr = window.devicePixelRatio || 1;
         const rect = canvas.parentElement.getBoundingClientRect();
         const width = Math.max(200, rect.width - 24); const height = Math.min(280, width * 0.6);
-        canvas.width = Math.max(1, Math.floor(width * dpr)); canvas.height = Math.max(1, Math.floor(height * dpr));
+        canvas.width = width * dpr; canvas.height = height * dpr;
         canvas.style.width = width + 'px'; canvas.style.height = height + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.scale(dpr, dpr);
         ctx.clearRect(0,0,width,height);
         if (filteredCounts.length < 2) { ctx.fillStyle = '#666'; ctx.font = '14px -apple-system, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Need at least 2 days of data to show trend.', width/2, height/2); return; }
         const padding = { top: 24, bottom: 32, left: 32, right: 16 };
@@ -1183,14 +1527,10 @@
         points.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fillStyle = '#8ab4f8'; ctx.fill(); ctx.strokeStyle = '#0b0b0b'; ctx.lineWidth = 1.5; ctx.stroke(); });
         ctx.fillStyle = '#666'; ctx.font = '10px -apple-system, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
         const step = Math.max(1, Math.floor(points.length / 8));
-        points.forEach((p, idx) => { if (idx % step === 0 || idx === points.length - 1) {
-            const lab = filtered[idx] ? filtered[idx].d.split('-').slice(1).join('/') : '';
-            ctx.fillText(lab, p.x, padding.top + chartHeight + 6);
-        }});
+        points.forEach((p, idx) => { if (idx % step === 0 || idx === points.length - 1) ctx.fillText(filtered[idx] ? filtered[idx].d.split('-').slice(1).join('/') : '', p.x, padding.top + chartHeight + 6); });
         ctx.fillStyle = '#555'; ctx.font = '12px -apple-system, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText('Subjects per day', padding.left, 4);
     }
 
-    // Stat preview small canvas on home
     function renderStatPreview() {
         const canvas = document.getElementById('statPreviewCanvas');
         if (!canvas) return;
@@ -1214,17 +1554,26 @@
     }
 
     // ============================================================
-    // Tools: Calculator & Grade calculator
+    // Tools: Calculator & Grade calculator (完整按鈕介面)
     // ============================================================
     function navigateToToolsDefault(){ navigateTo('tools'); showTool('calculator'); }
 
+    // We'll implement a full keypad calculator (從以前版本還原)
     function showTool(name) {
         const container = document.getElementById('toolsContent');
         if (name === 'calculator') {
-            container.innerHTML = `<div style="display:flex;gap:8px;align-items:center">
-                <input id="calcExpr" placeholder="Type expression, e.g. (2+3)*4" style="flex:1" />
-                <button class="btn-secondary" onclick="runCalc()">Calc</button>
-            </div><div style="margin-top:8px"><strong>Result: </strong><span id="calcResult"></span></div>`;
+            container.innerHTML = `<div class="calc-container" style="max-width:420px;">
+                <div id="calcDisplay" class="calc-display">0</div>
+                <div class="calc-buttons" style="margin-top:8px; display:grid; grid-template-columns: repeat(4,1fr); gap:8px;">
+                    <button onclick="calcInput('7')">7</button><button onclick="calcInput('8')">8</button><button onclick="calcInput('9')">9</button><button class="op" onclick="calcInput('/')">÷</button>
+                    <button onclick="calcInput('4')">4</button><button onclick="calcInput('5')">5</button><button onclick="calcInput('6')">6</button><button class="op" onclick="calcInput('*')">×</button>
+                    <button onclick="calcInput('1')">1</button><button onclick="calcInput('2')">2</button><button onclick="calcInput('3')">3</button><button class="op" onclick="calcInput('-')">−</button>
+                    <button onclick="calcInput('0')">0</button><button onclick="calcInput('.')">.</button><button class="equal" onclick="calcEvaluate()">=</button><button class="op" onclick="calcInput('+')">+</button>
+                    <button onclick="calcClear()">C</button><button onclick="calcBack()">⌫</button><button onclick="calcInput('(')">(</button><button onclick="calcInput(')')">)</button>
+                </div>
+            </div>`;
+            // bind keyboard
+            document.addEventListener('keydown', calcKeyHandler);
         } else if (name === 'grade') {
             data._gradeTmp = data._gradeTmp || [];
             if (data._gradeTmp.length === 0) data._gradeTmp = [{name:'Test',weight:40,score:80},{name:'Exam',weight:60,score:75}];
@@ -1238,18 +1587,15 @@
         }
     }
 
-    function runCalc() {
-        const expr = document.getElementById('calcExpr').value.trim();
-        if (!expr) return;
-        try {
-            const res = Function('"use strict"; return (' + expr + ')')();
-            document.getElementById('calcResult').textContent = String(res);
-        } catch(e) {
-            document.getElementById('calcResult').textContent = 'Error';
-        }
-    }
+    let calcExpr = '';
+    function calcInput(ch){ calcExpr += ch; updateCalc(); }
+    function calcClear(){ calcExpr=''; updateCalc(); }
+    function calcBack(){ calcExpr = calcExpr.slice(0,-1); updateCalc(); }
+    function updateCalc(){ const el = document.getElementById('calcDisplay'); if(el) el.textContent = calcExpr === '' ? '0' : calcExpr; }
+    function calcEvaluate(){ try{ const res = Function('"use strict"; return ('+calcExpr+')')(); calcExpr = String(res); updateCalc(); }catch(e){ document.getElementById('calcDisplay').textContent = 'Error'; } }
+    function calcKeyHandler(e){ if(document.getElementById('page-tools').classList.contains('active')){ if(/[\d\+\-\*\/\.\(\)]/.test(e.key)){ calcExpr += e.key; updateCalc(); e.preventDefault(); } else if(e.key==='Enter'){ calcEvaluate(); e.preventDefault(); } else if(e.key==='Backspace'){ calcBack(); e.preventDefault(); } } }
 
-    // Grade calculator
+    // Grade calculator functions (已存在)
     function renderGradeRows() {
         const container = document.getElementById('gradeRows');
         const rows = data._gradeTmp || [];
@@ -1272,7 +1618,7 @@
     }
 
     // ============================================================
-    // AI links management & bottom bar (text-only custom buttons)
+    // AI links management & bottom bar
     // ============================================================
     function renderAiLinks() {
         const container = document.getElementById('aiLinksList');
@@ -1312,6 +1658,14 @@
     function cancelDelete() { document.getElementById('deleteConfirmOverlay').classList.remove('show'); deleteCallback = null; }
     function confirmDelete() { if (deleteCallback) deleteCallback(); deleteCallback = null; document.getElementById('deleteConfirmOverlay').classList.remove('show'); }
 
+    function closeDeleteConfirm(){ cancelDelete(); }
+
+    // ============================================================
+    // Notifications modal
+    // ============================================================
+    function openNotif(){ document.getElementById('notifModal').classList.add('show'); }
+    function closeNotif(){ document.getElementById('notifModal').classList.remove('show'); }
+
     // ============================================================
     // File open helper
     // ============================================================
@@ -1328,7 +1682,7 @@
     }
 
     // ============================================================
-    // Misc: Quiz page, etc.
+    // Quiz helpers
     // ============================================================
     function openQuiz() {
         currentCategory = 'Quiz';
@@ -1349,12 +1703,11 @@
     function goBackFromQuiz(){ navigateTo('home'); }
 
     // ============================================================
-    // Init app
+    // Init
     // ============================================================
     let data = {};
     function initApp() {
         data = loadData();
-        // ensure homeOrder contains defaults
         if (!data.homeOrder) data.homeOrder = HOME_DEFAULT_ORDER.slice();
         HOME_DEFAULT_ORDER.forEach(id => { if (!data.homeOrder.includes(id)) data.homeOrder.push(id); });
         saveData();
@@ -1363,16 +1716,26 @@
         updateHeaderClock();
         navigateTo('home');
         renderBottomBar();
+
         window.addEventListener('resize', () => {
             if (document.getElementById('page-statistics').classList.contains('active')) renderStatistics();
             if (document.getElementById('page-home').classList.contains('active')) renderStatPreview();
         });
-        // ensure preview drawn after initial render
-        setTimeout(() => { try { renderStatPreview(); } catch(e) {} }, 150);
+
+        // close modals on outside click
+        window.onclick = function(e) {
+            if (e.target === document.getElementById('eventModal')) closeEventModal();
+            if (e.target === document.getElementById('chapterModal')) closeChapterModal();
+            if (e.target === document.getElementById('customBtnModal')) closeCustomBtnModal();
+            if (e.target === document.getElementById('deleteConfirmOverlay')) cancelDelete();
+            if (e.target === document.getElementById('notifModal')) closeNotif();
+        };
+
         console.log('Ching Study unlocked.');
     }
 
     checkLoginStatus();
+
 </script>
 </body>
 </html>
