@@ -8,8 +8,9 @@
     <meta name="format-detection" content="telephone=no">
     <title>◇ Ching Study</title>
     <style>
+        /* === 全部 CSS: 以你之前的完整樣式為基礎 (包含 folder-tree collapse) === */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { background: #0b0b0b; color: #f0f0f0; padding: 16px; padding-bottom: 110px; max-width: 1000px; margin: 0 auto; min-height: 100vh; }
+        body { background: #0b0b0b; color: #f0f0f0; padding: 16px; padding-bottom: 120px; max-width: 1000px; margin: 0 auto; min-height: 100vh; }
         button, .main-card, .subject-item, .chapter-card, .habit-box, .link-item, .item-card .actions button, .chapter-file-item .actions button, .stat-filter-btn, .folder-item, .file-item, .bottom-bar button {
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
@@ -121,22 +122,19 @@
         /* ===== OBJECTIVES ===== */
         .objective-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
         .objective-row { background: #151515; border: 1px solid #2a2a2a; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+        .objective-row .obj-left { display:flex;align-items:center;gap:10px;min-width:140px; }
         .objective-row .obj-name { font-size: 15px; color: #ddd; min-width: 70px; }
-        .objective-row .obj-grade-group { display: flex; align-items: center; gap: 14px; }
-        .objective-row .obj-grade-group .grade-label { font-size: 11px; color: #666; text-align: center; }
-        .objective-row .grade-selector { display: flex; align-items: center; gap: 4px; background: #222; border-radius: 30px; padding: 2px 8px; border: 1px solid #444; }
-        .objective-row .grade-selector button { background: none; border: none; color: #aaa; font-size: 16px; cursor: pointer; padding: 2px 6px; line-height: 1; touch-action: manipulation; }
-        .objective-row .grade-selector button:active { color: #fff; }
-        .objective-row .grade-selector .grade-display { font-size: 16px; font-weight: 500; min-width: 28px; text-align: center; }
-        .objective-row .grade-selector .grade-display.target { color: #f1c40f; }
-        .objective-row .grade-selector .grade-display.current { color: #3498db; }
+        .grade-selector { display:flex; gap:8px; align-items:center; background:#222; padding:4px 8px; border-radius:20px; border:1px solid #444; }
+        .grade-selector button { background:none;border:none;color:#aaa;padding:6px 10px;border-radius:10px;cursor:pointer }
+        .grade-display { min-width:48px;text-align:center;font-weight:600 }
         /* ===== CALENDAR ===== */
+        .cal-header { display:flex; justify-content:space-between; align-items:center; margin:16px 0 12px; }
         .cal-grid { background: #141414; border: 1px solid #2a2a2a; border-radius: 16px; padding: 12px 8px; display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
         .cal-grid .day-name { text-align:center; font-size:12px; color:#777; padding:6px 0; }
         .cal-grid .day-cell { text-align:center; padding:8px 0; font-size:15px; border-radius:30px; cursor:pointer; color:#ddd; touch-action: manipulation; }
         .cal-grid .day-cell.empty { color:#444; }
         .cal-grid .day-cell.has-event { background:#2a2a2a; color:#fff; font-weight:500; }
-        .cal-grid .day-cell:active { background:#3a3a3a; }
+        .cal-grid .day-cell.today { border:1px solid #8ab4f8; color:#8ab4f8; }
         .event-item { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:#1a1a1a; border-left:4px solid #888; border-radius:12px; margin-bottom:6px; }
         .event-item .ev-title { color:#fff; font-size:14px; }
         .event-item .ev-date { font-size:12px; color:#999; }
@@ -145,63 +143,26 @@
         .study-log-container { margin-top: 12px; padding: 12px 16px; background: #141414; border-radius: 12px; border: 1px solid #2a2a2a; }
         .study-log-container .log-title { font-size: 14px; color: #888; margin-bottom: 6px; }
         .study-log-container .log-subjects { display: flex; flex-wrap: wrap; gap: 6px; }
-        .study-log-container .log-subject { background: #222; padding: 4px 12px; border-radius: 20px; font-size: 13px; color: #ddd; border: 1px solid #444; }
+        .study-log-container .log-subject { background: #222; padding: 4px 12px; border-radius: 20px; font-size: 13px; color: #ddd; border: 1px solid #444; cursor:pointer }
         .study-log-container .log-subject.done { border-color: var(--habit-color, #8ab4f8); color: #fff; }
-        .study-log-empty { color: #555; font-size: 13px; }
         /* ===== STATISTICS ===== */
         .stat-container { padding: 8px 0; }
         .stat-filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
         .stat-filters .stat-filter-btn { background: #222; border: 1px solid #444; color: #888; padding: 6px 16px; border-radius: 30px; font-size: 14px; cursor: pointer; transition: 0.15s; }
         .stat-filters .stat-filter-btn.active { background: #444; color: #fff; border-color: #666; }
-        .stat-filters .stat-filter-btn:active { background: #555; }
         .stat-chart-container { background: #141414; border-radius: 16px; padding: 12px; border: 1px solid #2a2a2a; }
         .stat-chart-container canvas { width: 100% !important; height: auto !important; max-height: 280px; display: block; border-radius: 8px; }
         .stat-summary { display: flex; justify-content: space-around; margin-top: 16px; padding: 12px; background: #1a1a1a; border-radius: 12px; border: 1px solid #2a2a2a; text-align: center; }
         .stat-summary .stat-item .stat-number { font-size: 24px; font-weight: 300; color: #fff; }
         .stat-summary .stat-item .stat-label { font-size: 12px; color: #888; }
         .stat-no-data { text-align: center; padding: 40px 0; color: #666; }
-        /* ===== TIMER ===== */
-        .timer-container { display: flex; flex-direction: column; align-items: center; padding: 20px 0; }
-        .timer-clock { position: relative; width: 240px; height: 240px; border-radius: 50%; border: 2px solid #333; background: #0b0b0b; display: flex; align-items: center; justify-content: center; margin: 10px auto; }
-        .timer-clock svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
-        .timer-clock .circle-bg { fill: none; stroke: #222; stroke-width: 3; }
-        .timer-clock .circle-progress { fill: none; stroke: #8ab4f8; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 0.3s; }
-        .timer-clock .timer-display { font-size: 36px; font-weight: 300; color: #fff; letter-spacing: 2px; z-index: 2; font-variant-numeric: tabular-nums; }
-        .timer-controls { display: flex; gap: 16px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
-        .timer-controls button { background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 10px 24px; border-radius: 30px; font-size: 14px; cursor: pointer; min-width: 80px; touch-action: manipulation; }
-        .timer-controls button:active { background: #444; }
-        .timer-controls button.primary { background: #444; border-color: #555; }
-        .timer-mode { display: flex; gap: 12px; margin-bottom: 16px; }
-        .timer-mode button { background: #222; border: 1px solid #444; color: #888; padding: 8px 20px; border-radius: 30px; font-size: 14px; cursor: pointer; touch-action: manipulation; }
-        .timer-mode button.active { background: #333; color: #fff; border-color: #666; }
-        .timer-input { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; justify-content: center; }
-        .timer-input input { background: #222; border: 1px solid #444; border-radius: 30px; padding: 10px 16px; color: #fff; font-size: 18px; width: 80px; text-align: center; }
-        .timer-input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .timer-input input[type=number] { -moz-appearance: textfield; }
-        .timer-input span { color: #888; font-size: 18px; }
-        /* ===== LINKS ===== */
-        .link-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 8px 12px 8px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; cursor: grab; transition: 0.15s; }
-        .link-item:active { cursor: grabbing; }
-        .link-item.dragging { opacity: 0.3; transform: scale(0.95); }
-        .link-item.drag-over { border-color: #8ab4f8; background: #1a2a3a; }
-        .link-item .link-content { display: flex; align-items: center; gap: 10px; flex: 1; }
-        .link-item .link-content .drag-handle { color: #555; font-size: 16px; cursor: grab; user-select: none; padding: 4px; touch-action: none; }
-        .link-item .link-content a { color: #8ab4f8; text-decoration: none; font-size: 14px; flex: 1; }
-        .link-item .link-content a:active { color: #fff; }
-        .link-item .del-link { background: none; border: none; color: #e74c3c; font-size: 16px; cursor: pointer; padding: 4px; touch-action: manipulation; }
-        /* ===== CHAPTER LINKS & FILES (Quiz) ===== */
-        .chapter-link-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .chapter-link-item a { color: #8ab4f8; text-decoration: none; font-size: 14px; flex: 1; }
-        .chapter-link-item a:active { color: #fff; }
-        .chapter-link-item .del-link { background: none; border: none; color: #e74c3c; font-size: 16px; cursor: pointer; touch-action: manipulation; }
-        .chapter-file-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .chapter-file-item .info { flex: 1; margin-right: 10px; }
-        .chapter-file-item .info .title { font-weight: 400; color: #fff; font-size: 14px; word-break: break-all; }
-        .chapter-file-item .info .sub { font-size: 12px; color: #888; }
-        .chapter-file-item .actions { display: flex; gap: 6px; align-items: center; }
-        .chapter-file-item .actions button { background: none; border: none; color: #e74c3c; font-size: 16px; cursor: pointer; padding: 0 4px; touch-action: manipulation; }
-        .chapter-file-item .actions .open-btn { color: #8ab4f8; font-size: 16px; text-decoration: none; cursor: pointer; background: none; border: none; padding: 0 4px; }
-        .chapter-file-item .actions .download-btn { color: #8ab4f8; font-size: 16px; text-decoration: none; margin-right: 2px; }
+        /* ===== CALC UI (buttons) ===== */
+        .calc-container { background:#141414;border:1px solid #2a2a2a;padding:12px;border-radius:12px;max-width:420px; }
+        .calc-display { background:#0b0b0b;border:1px solid #333;padding:10px;border-radius:8px;color:#fff;font-size:20px;text-align:right;min-height:40px; }
+        .calc-buttons { display:grid; grid-template-columns: repeat(4,1fr); gap:8px; margin-top:8px; }
+        .calc-buttons button { padding:10px;border-radius:8px;border:none;background:#222;color:#fff;font-size:18px;cursor:pointer }
+        .calc-buttons button.op { background:#8ab4f8;color:#0b0b0b;font-weight:600 }
+        .calc-buttons button.equal { background:#2ecc71;color:#0b0b0b }
         /* ===== BOTTOM BAR ===== */
         .bottom-bar-wrapper {
             position: fixed;
@@ -247,25 +208,18 @@
             border-radius: 8px;
         }
         .bottom-bar button:active { transform: scale(0.92); color: #fff; background: #2a2a2a; }
-        .bottom-bar button .btn-icon { font-size: 20px; line-height: 1; }
-        .bottom-bar button .btn-label { font-size: 10px; color: #666; }
-        .bottom-bar button.active .btn-label { color: #8ab4f8; }
+        .bottom-bar button .btn-label { font-size: 12px; color: #666; }
         .bottom-bar .bb-spacer { flex: 1; min-width: 8px; }
         /* ===== MODAL ===== */
         .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); display:none; justify-content:center; align-items:center; z-index:999; }
         .modal-overlay.show { display:flex; }
-        .modal-box { background:#1c1c1c; width:90%; max-width:480px; border-radius:24px; padding:24px; max-height:80vh; overflow-y:auto; border:1px solid #333; }
+        .modal-box { background:#1c1c1c; width:90%; max-width:400px; border-radius:24px; padding:24px; max-height:80vh; overflow-y:auto; border:1px solid #333; }
         .modal-box h3 { display:flex; justify-content:space-between; align-items:center; font-weight:300; font-size:20px; color:#fff; margin-bottom:16px; }
         .modal-box .close-modal { background:none; border:none; font-size:24px; color:#aaa; cursor:pointer; touch-action: manipulation; }
         .modal-box input, .modal-box select, .modal-box textarea { width:100%; margin-bottom:10px; padding:12px; background:#222; border:1px solid #444; border-radius:12px; color:#fff; font-size:14px; }
         .modal-box textarea { min-height:60px; }
         .modal-box button { background:#444; border:none; color:#fff; padding:12px; border-radius:30px; font-weight:500; width:100%; cursor:pointer; touch-action: manipulation; }
         .modal-box button:active { background:#666; }
-        .icon-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center; }
-        .icon-selector .icon-option { font-size: 28px; cursor: pointer; padding: 4px 8px; border-radius: 8px; border: 2px solid transparent; transition: 0.15s; }
-        .icon-selector .icon-option.selected { border-color: #8ab4f8; background: #1a2a3a; }
-        .icon-selector .icon-upload { background: #222; border: 1px solid #444; border-radius: 8px; padding: 4px 10px; color: #aaa; font-size: 13px; cursor: pointer; }
-        .icon-selector input[type="file"] { display: none; }
         /* ===== DELETE CONFIRM ===== */
         .delete-confirm-overlay {
             position: fixed;
@@ -291,27 +245,17 @@
         .delete-confirm-box .btn-group button { flex: 1; padding: 10px; border-radius: 30px; border: none; font-size: 15px; cursor: pointer; touch-action: manipulation; }
         .delete-confirm-box .btn-group .btn-cancel { background: #333; color: #aaa; }
         .delete-confirm-box .btn-group .btn-delete { background: #e74c3c; color: #fff; }
-        /* ===== Responsive ===== */
+        /* Responsive */
         @media (max-width: 480px) {
             .header .center { font-size: 11px; min-width: 100px; }
-            .timer-clock { width: 180px; height: 180px; }
-            .timer-clock .timer-display { font-size: 28px; }
+            .calc-container { max-width: 100%; }
             .habits-container { grid-template-columns: 1fr 1fr; gap: 6px; }
-            .habit-row .habit-name { font-size: 12px; }
-            .habit-row .habit-fire { font-size: 12px; min-width: 24px; }
             .main-card .title { font-size: 15px; }
             .main-card .desc { font-size: 11px; }
-            .stat-summary { flex-wrap: wrap; gap: 8px; }
-            .bottom-bar button { font-size: 10px; min-width: 36px; padding: 2px 6px; }
-            .bottom-bar button .btn-icon { font-size: 16px; }
         }
         @media (min-width: 800px) {
             body { max-width: 1000px; padding: 24px; padding-bottom: 120px; }
             .habits-container { grid-template-columns: repeat(4, 1fr); }
-        }
-        @media (min-width: 768px) and (max-width: 1024px) {
-            body { padding: 30px; padding-bottom: 120px; }
-            .habits-container { grid-template-columns: repeat(3, 1fr); }
         }
         input, select, textarea { border-radius: 12px !important; }
         ::-webkit-scrollbar { width: 4px; }
@@ -378,7 +322,7 @@
         <div id="quizContent"></div>
     </div>
 
-    <!-- PAGE: CHAPTER LINKS & FILES (shared) -->
+    <!-- PAGE: CHAPTER LINKS & FILES -->
     <div id="page-chapter-links" class="page">
         <button class="back-btn" onclick="goBackFromChapterLinks()">← Back</button>
         <h2 id="chapterLinksTitle" style="font-weight:300; font-size:20px;">Chapter</h2>
@@ -457,21 +401,50 @@
     <!-- PAGE: AI links management -->
     <div id="page-ai" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
-        <h2 style="font-weight:300; font-size:22px;">AI Links</h2>
+        <h2 style="font-weight:300; font-size:22px;">Manage AI (bottom bar)</h2>
         <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
             <input id="aiName" placeholder="Name" />
             <input id="aiURL" placeholder="URL (https://...)" />
             <button class="btn-secondary" onclick="addAiLink()">Add</button>
         </div>
         <div id="aiLinksList" style="margin-top:12px;"></div>
+        <div style="margin-top:8px; font-size:13px; color:#888;">Drag to reorder AI links (bottom bar will reflect order)</div>
     </div>
 
     <!-- PAGE: CALENDAR -->
     <div id="page-calendar" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
         <h2 style="font-weight:300; font-size:22px;">Calendar</h2>
-        <div class="cal-grid" id="calGrid" style="margin-top:12px;"></div>
-        <div id="eventList" style="margin-top:12px;"></div>
+        <div class="cal-header" style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 12px;">
+            <button onclick="changeMonth(-1)" style="background:#222; border:1px solid #444; padding:6px 16px; border-radius:30px; font-size:18px; color:#ddd; cursor:pointer;">◀</button>
+            <span class="month-year" id="calMonthYear" style="font-size:18px; font-weight:300; color:#fff;">2026-06</span>
+            <button onclick="changeMonth(1)" style="background:#222; border:1px solid #444; padding:6px 16px; border-radius:30px; font-size:18px; color:#ddd; cursor:pointer;">▶</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div style="display:flex; gap:10px; margin:16px 0 12px; flex-wrap:wrap;">
+            <select id="eventFilter" style="flex:1; background:#222; border:1px solid #444; border-radius:30px; padding:10px 16px; color:#ddd;">
+                <option value="all">All (Future)</option>
+                <option value="countdown">Countdown</option>
+                <option value="schedule">Schedule</option>
+            </select>
+            <button onclick="openAddEvent()" style="background:#444; border:none; color:#fff; padding:10px 20px; border-radius:30px; cursor:pointer;">+ Add</button>
+        </div>
+        <div class="event-list" id="eventList"></div>
+        <div class="study-log-container" id="studyLogContainer">
+            <div class="log-title">📖 Study Log</div>
+            <div id="studyLogContent" class="study-log-empty">Select a date to see study records.</div>
+        </div>
+    </div>
+
+    <!-- EVENT MODAL -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal-box">
+            <h3>Add Event <button class="close-modal" onclick="closeEventModal()">✕</button></h3>
+            <input id="evTitle" placeholder="Title" />
+            <input id="evDate" type="date" />
+            <select id="evType"><option value="schedule">Schedule</option><option value="countdown">Countdown</option></select>
+            <button onclick="saveEvent()">Save</button>
+        </div>
     </div>
 
     <!-- CHAPTER MODAL -->
@@ -486,7 +459,7 @@
     <!-- CUSTOM BUTTON MODAL (text only) -->
     <div class="modal-overlay" id="customBtnModal">
         <div class="modal-box">
-            <h3>Add Custom Button <button class="close-modal" onclick="closeCustomBtnModal()">✕</button></h3>
+            <h3>Add Button <button class="close-modal" onclick="closeCustomBtnModal()">✕</button></h3>
             <input id="customBtnName" placeholder="Button name" />
             <input id="customBtnURL" placeholder="URL (https://...)" />
             <button onclick="saveCustomButton()">Add</button>
@@ -503,6 +476,7 @@
             </div>
         </div>
     </div>
+
 </div>
 
 <!-- ===== BOTTOM BAR ===== -->
@@ -517,1031 +491,798 @@
 </div>
 
 <script>
-    // ============================================================
-    // Data model & helpers
-    // ============================================================
-    const CATEGORIES = ['Information', 'Quiz', 'DSE'];
-    const SUBJECTS = ['Chinese', 'English', 'Mathematics', 'CS', 'Economics', 'Bafs', 'Ict'];
-    const HOME_DEFAULT_ORDER = ['information','quiz','dse','links','objectives','statistics','tools','ai','timer'];
-    function keyFor(category, subject){ return `${category}_${subject}`; }
+/* =========================
+   Data model & helpers
+   ========================= */
+const CATEGORIES = ['Information','Quiz','DSE'];
+const SUBJECTS = ['Chinese','English','Mathematics','CS','Economics','Bafs','Ict'];
+const GRADE_LEVELS = ['1','2','3','4','5','5*','5**'];
+const CS_GRADE_LEVELS = ['U','A'];
+const HOME_DEFAULT_ORDER = ['information','quiz','dse','links','objectives','statistics','tools','ai','timer'];
 
-    function generateId(){ return Date.now() + '_' + Math.random().toString(36).substr(2,6); }
-    function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
+function keyFor(category,subject){ return `${category}_${subject}`; }
+function generateId(){ return Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
 
-    function defaultData(){
-        const chapters = {};
-        CATEGORIES.forEach(c => SUBJECTS.forEach(s => chapters[keyFor(c,s)] = []));
-        return {
-            chapters,
-            events: [],
-            links: [{ name: 'DeepSeek', url: 'https://deepseek.com' }, { name: 'Google', url: 'https://google.com' }],
-            habits: {},
-            objectives: {},
-            customButtons: [],
-            homeOrder: HOME_DEFAULT_ORDER.slice(),
-            aiLinks: []
-        };
-    }
-
-    function loadData(){
-        try {
-            const raw = localStorage.getItem('ching_study_data');
-            if (!raw) return defaultData();
-            const parsed = JSON.parse(raw);
-
-            // ensure chapters exist for each category/subject
-            if (!parsed.chapters) parsed.chapters = {};
-            CATEGORIES.forEach(c => SUBJECTS.forEach(s => {
-                const k = keyFor(c,s);
-                if (!parsed.chapters[k]) parsed.chapters[k] = [];
-            }));
-
-            if (!parsed.links) parsed.links = [];
-            if (!parsed.habits) parsed.habits = {};
-            if (!parsed.objectives) parsed.objectives = {};
-            if (!parsed.customButtons) parsed.customButtons = [];
-            if (!parsed.homeOrder) parsed.homeOrder = HOME_DEFAULT_ORDER.slice();
-            if (!parsed.aiLinks) parsed.aiLinks = [];
-
-            // Migrate old infoFolders/dseFolders (if present) into chapters structure
-            if (parsed.infoFolders) {
-                SUBJECTS.forEach(s => {
-                    const arr = parsed.infoFolders[s] || [];
-                    const k = keyFor('Information', s);
-                    arr.forEach(item => {
-                        if (item.type === 'folder') {
-                            parsed.chapters[k].push({ name: item.name || 'Folder', links: [], files: item.children || [] });
-                        } else {
-                            // put non-folder items into a default chapter
-                            let defaultCh = parsed.chapters[k].find(ch => ch.name === 'Files');
-                            if (!defaultCh) { defaultCh = { name: 'Files', links: [], files: [] }; parsed.chapters[k].push(defaultCh); }
-                            defaultCh.files.push(item);
-                        }
-                    });
-                });
-                delete parsed.infoFolders;
-            }
-            if (parsed.dseFolders) {
-                SUBJECTS.forEach(s => {
-                    const arr = parsed.dseFolders[s] || [];
-                    const k = keyFor('DSE', s);
-                    arr.forEach(item => {
-                        if (item.type === 'folder') {
-                            parsed.chapters[k].push({ name: item.name || 'Folder', links: [], files: item.children || [] });
-                        } else {
-                            let defaultCh = parsed.chapters[k].find(ch => ch.name === 'Files');
-                            if (!defaultCh) { defaultCh = { name: 'Files', links: [], files: [] }; parsed.chapters[k].push(defaultCh); }
-                            defaultCh.files.push(item);
-                        }
-                    });
-                });
-                delete parsed.dseFolders;
-            }
-
-            // ensure objectives for each subject
-            SUBJECTS.forEach(s => {
-                if (!parsed.objectives[s]) parsed.objectives[s] = { target: '5', current: '4' };
-            });
-
-            return parsed;
-        } catch(e) {
-            console.error(e);
-            return defaultData();
-        }
-    }
-
-    function saveData(){
-        localStorage.setItem('ching_study_data', JSON.stringify(data));
-    }
-
-    // ============================================================
-    // Login & init
-    // ============================================================
-    const CORRECT_PASSWORD = 'ching';
-    function checkLoginStatus(){ if (localStorage.getItem('loggedIn') === 'true') showApp(); }
-    function verifyPassword(){
-        const v = document.getElementById('passwordInput').value.trim();
-        if (v === CORRECT_PASSWORD) { localStorage.setItem('loggedIn','true'); showApp(); }
-        else { document.getElementById('loginError').textContent = 'Wrong password, try again'; }
-    }
-    document.getElementById('passwordInput').addEventListener('keydown', e => { if (e.key === 'Enter') verifyPassword(); });
-    function showApp(){
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('appContainer').classList.add('active');
-        initApp();
-    }
-    function logout(){ if(confirm('Logout?')) { localStorage.removeItem('loggedIn'); location.reload(); } }
-
-    // ============================================================
-    // Header clock
-    // ============================================================
-    function updateHeaderClock(){
-        const now = new Date();
-        const h = String(now.getHours()).padStart(2,'0');
-        const m = String(now.getMinutes()).padStart(2,'0');
-        const s = String(now.getSeconds()).padStart(2,'0');
-        const y = now.getFullYear();
-        const mo = String(now.getMonth() + 1).padStart(2,'0');
-        const d = String(now.getDate()).padStart(2,'0');
-        document.getElementById('headerDateTime').textContent = `${h}:${m}:${s}  ${y}-${mo}-${d}`;
-    }
-    setInterval(updateHeaderClock, 1000);
-
-    // ============================================================
-    // Navigation
-    // ============================================================
-    const pageMap = {
-        home: 'page-home',
-        subjects: 'page-subjects',
-        detail: 'page-detail',
-        quiz: 'page-quiz',
-        chapterLinks: 'page-chapter-links',
-        links: 'page-links',
-        objectives: 'page-objectives',
-        statistics: 'page-statistics',
-        tools: 'page-tools',
-        ai: 'page-ai',
-        calendar: 'page-calendar',
-        timer: 'page-timer'
+function defaultData(){
+    const chapters = {};
+    CATEGORIES.forEach(c=>SUBJECTS.forEach(s=> chapters[keyFor(c,s)] = []));
+    return {
+        chapters,
+        events: [],
+        links: [{ name: 'Google', url: 'https://google.com' }],
+        habits: {},
+        objectives: {},
+        customButtons: [],
+        homeOrder: HOME_DEFAULT_ORDER.slice(),
+        aiLinks: []
     };
+}
 
-    function navigateTo(page) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        const el = document.getElementById(pageMap[page]);
-        if (el) el.classList.add('active');
-        if (page === 'home') { renderHomeCards(); renderHabits(); renderObjectives(); renderBottomBar(); }
-        if (page === 'subjects') { /* nothing */ }
-        if (page === 'detail') { renderDetail(); }
-        if (page === 'quiz') { openQuiz(); }
-        if (page === 'chapterLinks') { renderChapterLinks(); renderChapterFiles(); }
-        if (page === 'links') { renderLinks(); }
-        if (page === 'objectives') renderObjectives();
-        if (page === 'statistics') renderStatistics();
-        if (page === 'tools') { navigateToToolsDefault(); }
-        if (page === 'ai') renderAiLinks();
-        if (page === 'calendar') renderCalendar();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+function loadData(){
+    try {
+        const raw = localStorage.getItem('ching_study_data');
+        if (!raw) return defaultData();
+        const parsed = JSON.parse(raw);
+
+        if (!parsed.chapters) parsed.chapters = {};
+        CATEGORIES.forEach(c=>SUBJECTS.forEach(s=> {
+            const k = keyFor(c,s);
+            if (!parsed.chapters[k]) parsed.chapters[k] = [];
+        }));
+
+        if(!parsed.links) parsed.links = [];
+        if(!parsed.habits) parsed.habits = {};
+        if(!parsed.objectives) parsed.objectives = {};
+        if(!parsed.customButtons) parsed.customButtons = [];
+        if(!parsed.homeOrder) parsed.homeOrder = HOME_DEFAULT_ORDER.slice();
+        if(!parsed.aiLinks) parsed.aiLinks = [];
+
+        // migrate old infoFolders/dseFolders -> chapters if present (best-effort)
+        if(parsed.infoFolders){
+            SUBJECTS.forEach(s=>{
+                const arr = parsed.infoFolders[s] || [];
+                const k = keyFor('Information', s);
+                arr.forEach(item=>{
+                    if(item.type === 'folder') parsed.chapters[k].push({ name: item.name||'Folder', links: [], files: item.children || [] });
+                    else {
+                        let defaultCh = parsed.chapters[k].find(ch=>ch.name==='Files');
+                        if(!defaultCh){ defaultCh = { name:'Files', links:[], files:[] }; parsed.chapters[k].push(defaultCh); }
+                        defaultCh.files.push(item);
+                    }
+                });
+            });
+            delete parsed.infoFolders;
+        }
+        if(parsed.dseFolders){
+            SUBJECTS.forEach(s=>{
+                const arr = parsed.dseFolders[s] || [];
+                const k = keyFor('DSE', s);
+                arr.forEach(item=>{
+                    if(item.type === 'folder') parsed.chapters[k].push({ name: item.name||'Folder', links: [], files: item.children || [] });
+                    else {
+                        let defaultCh = parsed.chapters[k].find(ch=>ch.name==='Files');
+                        if(!defaultCh){ defaultCh = { name:'Files', links:[], files:[] }; parsed.chapters[k].push(defaultCh); }
+                        defaultCh.files.push(item);
+                    }
+                });
+            });
+            delete parsed.dseFolders;
+        }
+
+        // ensure objectives
+        SUBJECTS.forEach(s=> { if(!parsed.objectives[s]) parsed.objectives[s] = { target:'5', current:'4' }; });
+
+        return parsed;
+    } catch(e) {
+        console.error(e);
+        return defaultData();
     }
+}
 
-    // ============================================================
-    // Home cards (order from data.homeOrder, migration safe)
-    // ============================================================
-    function renderHomeCards(){
-        const container = document.getElementById('homeCardGrid');
-        const order = data.homeOrder || HOME_DEFAULT_ORDER.slice();
-        const cardMap = {
-            information: { title: 'Information', desc: 'Folders & Files' },
-            quiz: { title: 'Quiz', desc: 'Chapters & Files' },
-            dse: { title: 'DSE', desc: 'Folders & Files' },
-            links: { title: 'Links', desc: 'Bookmarks & app shortcuts' },
-            objectives: { title: 'Objectives', desc: 'Target & Current Grades' },
-            statistics: { title: 'Statistics', desc: 'Study habit trends' },
-            tools: { title: 'Tools', desc: 'Calculator & Grade' },
-            ai: { title: 'AI', desc: 'Manage AI links' },
-            timer: { title: 'Timer', desc: 'Stopwatch & Countdown' }
-        };
-        let html = '';
-        order.forEach(id => {
-            if (!cardMap[id]) return;
-            if (id === 'statistics') {
-                html += `
-                    <div class="main-card" data-card-id="${id}" onclick="handleCardClick('${id}')">
-                        <div style="display:flex; align-items:center; gap:6px;">
-                            <span class="title">${cardMap[id].title}</span>
-                            <span class="desc">${cardMap[id].desc}</span>
-                        </div>
-                        <div style="width:160px; height:60px; margin-left:10px;">
-                            <canvas id="statPreviewCanvas" style="width:100%; height:100%; display:block;"></canvas>
-                        </div>
-                    </div>
-                `;
-            } else {
-                html += `
-                    <div class="main-card" data-card-id="${id}" onclick="handleCardClick('${id}')">
-                        <div style="display:flex; align-items:center; gap:6px;">
-                            <span class="title">${cardMap[id].title}</span>
-                            <span class="desc">${cardMap[id].desc}</span>
-                        </div>
+function saveData(){ localStorage.setItem('ching_study_data', JSON.stringify(data)); }
+
+/* =========================
+   Login & init
+   ========================= */
+const CORRECT_PASSWORD = 'ching';
+function checkLoginStatus(){ if(localStorage.getItem('loggedIn')==='true') showApp(); }
+function verifyPassword(){
+    const v = document.getElementById('passwordInput').value.trim();
+    if(v === CORRECT_PASSWORD){ localStorage.setItem('loggedIn','true'); showApp(); }
+    else document.getElementById('loginError').textContent = 'Wrong password, try again';
+}
+document.getElementById('passwordInput').addEventListener('keydown', e=>{ if(e.key==='Enter') verifyPassword(); });
+function showApp(){ document.getElementById('loginContainer').style.display='none'; document.getElementById('appContainer').classList.add('active'); initApp(); }
+function logout(){ if(confirm('Logout?')) { localStorage.removeItem('loggedIn'); location.reload(); } }
+
+/* =========================
+   Header clock
+   ========================= */
+function updateHeaderClock(){
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2,'0'), mm = String(now.getMinutes()).padStart(2,'0'), ss = String(now.getSeconds()).padStart(2,'0');
+    const y = now.getFullYear(), mo = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
+    document.getElementById('headerDateTime').textContent = `${hh}:${mm}:${ss}  ${y}-${mo}-${d}`;
+}
+setInterval(updateHeaderClock,1000);
+
+/* =========================
+   Navigation
+   ========================= */
+const pageMap = { home:'page-home', subjects:'page-subjects', detail:'page-detail', quiz:'page-quiz', chapterLinks:'page-chapter-links', links:'page-links', objectives:'page-objectives', statistics:'page-statistics', tools:'page-tools', ai:'page-ai', calendar:'page-calendar', timer:'page-timer' };
+function navigateTo(page){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    const el = document.getElementById(pageMap[page]); if(el) el.classList.add('active');
+    if(page==='home'){ renderHomeCards(); renderHabits(); renderObjectives(); renderBottomBar(); }
+    if(page==='detail') renderDetail();
+    if(page==='quiz') openQuiz();
+    if(page==='chapterLinks'){ renderChapterLinks(); renderChapterFiles(); }
+    if(page==='links') renderLinks();
+    if(page==='statistics') renderStatistics();
+    if(page==='tools') navigateToToolsDefault();
+    if(page==='ai') renderAiLinks();
+    if(page==='calendar') renderCalendar();
+    window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* =========================
+   Home Cards & stat preview
+   ========================= */
+function renderHomeCards(){
+    const container = document.getElementById('homeCardGrid'); const order = data.homeOrder || HOME_DEFAULT_ORDER.slice();
+    const cardMap = {
+        information:{title:'Information',desc:'Folders & Files'},
+        quiz:{title:'Quiz',desc:'Chapters & Files'},
+        dse:{title:'DSE',desc:'Folders & Files'},
+        links:{title:'Links',desc:'Bookmarks'},
+        objectives:{title:'Objectives',desc:'Target & Current Grades'},
+        statistics:{title:'Statistics',desc:'Study habit trends'},
+        tools:{title:'Tools',desc:'Calculator & Grade'},
+        ai:{title:'AI',desc:'Manage AI links'},
+        timer:{title:'Timer',desc:'Stopwatch & Countdown'}
+    };
+    let html='';
+    order.forEach(id=>{
+        if(!cardMap[id]) return;
+        if(id==='statistics'){
+            html += `<div class="main-card" data-card-id="${id}" onclick="handleCardClick('${id}')">
+                        <div style="display:flex;align-items:center;gap:6px"><span class="title">${cardMap[id].title}</span><span class="desc">${cardMap[id].desc}</span></div>
+                        <div style="width:160px;height:60px;margin-left:10px"><canvas id="statPreviewCanvas" style="width:100%;height:100%"></canvas></div>
+                     </div>`;
+        } else {
+            html += `<div class="main-card" data-card-id="${id}" onclick="handleCardClick('${id}')">
+                        <div style="display:flex;align-items:center;gap:6px"><span class="title">${cardMap[id].title}</span><span class="desc">${cardMap[id].desc}</span></div>
                         <div class="drag-hint">⋮⋮</div>
+                     </div>`;
+        }
+    });
+    container.innerHTML = html;
+    setTimeout(renderStatPreview,60);
+}
+
+function handleCardClick(id){
+    if(id==='information' || id==='dse') openCategory(id.charAt(0).toUpperCase() + id.slice(1));
+    else if(id==='quiz') openQuiz();
+    else if(id==='links') navigateTo('links');
+    else if(id==='objectives') navigateTo('objectives');
+    else if(id==='statistics') navigateTo('statistics');
+    else if(id==='tools') navigateTo('tools');
+    else if(id==='ai') navigateTo('ai');
+    else if(id==='timer') navigateTo('timer');
+}
+
+/* =========================
+   Categories & Subjects
+   ========================= */
+let currentCategory=null, currentSubject=null, currentChapterKey=null, currentChapterIndex=null;
+function openCategory(category){
+    currentCategory = category; document.getElementById('categoryTitle').innerText = category;
+    const grid = document.getElementById('subjectGrid'); grid.innerHTML='';
+    SUBJECTS.forEach(subj => {
+        const div = document.createElement('div'); div.className='subject-item'; div.innerHTML = `<div class="subj-name">${subj}</div>`;
+        div.onclick = ()=> openSubjectDetail(category, subj); grid.appendChild(div);
+    });
+    navigateTo('subjects');
+}
+function openSubjectDetail(category, subject){
+    currentCategory = category; currentSubject = subject; document.getElementById('detailTitle').innerText = `${subject} (${category})`; renderDetail(); navigateTo('detail');
+}
+function goBackFromDetail(){ if(currentCategory) openCategory(currentCategory); else navigateTo('home'); }
+
+/* =========================
+   Chapters (unified)
+   ========================= */
+function renderDetail(){
+    const container = document.getElementById('detailContent');
+    if(!currentCategory || !currentSubject){ container.innerHTML = '<div class="empty-state">Select a subject.</div>'; return; }
+    const key = keyFor(currentCategory, currentSubject); const chapters = data.chapters[key] || [];
+    let html = `<div class="flex-between" style="margin-bottom:12px;align-items:center;">
+                    <div style="font-size:16px;font-weight:300;">${currentSubject} — ${currentCategory}</div>
+                    <div style="display:flex;gap:8px;"><button class="btn-secondary" onclick="openChapterModal('${key}')">+ New Chapter</button></div>
+                </div><div id="chapterList_${key}"></div>`;
+    container.innerHTML = html; renderChapterList(key);
+}
+function renderChapterList(key){
+    const container = document.getElementById('chapterList_' + key);
+    if(!container) return;
+    const chapters = data.chapters[key] || [];
+    if(chapters.length===0){ container.innerHTML = '<div class="empty-state">No chapters yet. Create one!</div>'; return; }
+    container.innerHTML = chapters.map((ch,idx)=>{
+        const linkCount = (ch.links||[]).length; const fileCount = (ch.files||[]).length;
+        return `<div class="chapter-card" onclick="openChapterLinks('${key}',${idx})">
+                    <div class="flex-between"><div style="font-weight:400">${ch.name}</div><div class="small">${linkCount} links · ${fileCount} files</div></div>
+                    <div style="margin-top:8px;display:flex;gap:8px">
+                        <button class="btn-secondary" onclick="event.stopPropagation(); openChapterModal('${key}',${idx})">Rename</button>
+                        <button class="btn-secondary" style="background:#e74c3c" onclick="event.stopPropagation(); deleteChapter('${key}',${idx})">Delete</button>
                     </div>
-                `;
+                </div>`;
+    }).join('');
+}
+function openChapterModal(key, editIdx=null){
+    const modal = document.getElementById('chapterModal'); modal.dataset.key = key; modal.dataset.editIdx = editIdx!==null?editIdx:''; document.getElementById('chapterName').value = editIdx!==null?data.chapters[key][editIdx].name:''; modal.classList.add('show');
+}
+function closeChapterModal(){ document.getElementById('chapterModal').classList.remove('show'); }
+function saveChapter(){
+    const modal = document.getElementById('chapterModal'); const key = modal.dataset.key; const editIdx = modal.dataset.editIdx;
+    const name = document.getElementById('chapterName').value.trim(); if(!name) return alert('Enter a chapter name.');
+    if(!data.chapters[key]) data.chapters[key] = [];
+    if(editIdx!=='') data.chapters[key][parseInt(editIdx)].name = name;
+    else data.chapters[key].push({ name, links: [], files: [] });
+    saveData(); closeChapterModal(); renderChapterList(key);
+}
+function deleteChapter(key, idx){ if(!confirm('Delete this chapter?')) return; data.chapters[key].splice(idx,1); saveData(); renderChapterList(key); }
+
+/* =========================
+   Chapter Links & Files
+   ========================= */
+function openChapterLinks(key, chIdx){
+    currentChapterKey = key; currentChapterIndex = chIdx;
+    const ch = data.chapters[key][chIdx];
+    document.getElementById('chapterLinksTitle').textContent = ch.name;
+    document.getElementById('chapterLinksList').dataset.key = key; document.getElementById('chapterLinksList').dataset.chIdx = chIdx;
+    document.getElementById('chapterFilesList').dataset.key = key; document.getElementById('chapterFilesList').dataset.chIdx = chIdx;
+    renderChapterLinks(); renderChapterFiles(); navigateTo('chapterLinks');
+}
+function goBackFromChapterLinks(){ renderDetail(); navigateTo('detail'); }
+
+function renderChapterLinks(){
+    const container = document.getElementById('chapterLinksList'); const key = container.dataset.key; const chIdx = parseInt(container.dataset.chIdx);
+    const chapters = data.chapters[key] || []; if(chIdx>=chapters.length) return;
+    const links = chapters[chIdx].links || [];
+    if(links.length===0){ container.innerHTML = '<div class="empty-state">No links in this chapter.</div>'; return; }
+    container.innerHTML = links.map((l,idx)=>`<div class="chapter-link-item"><a href="${escapeAttr(l.url)}" target="_blank">${l.name}</a><button class="del-link" onclick="deleteChapterLink(${idx})">✕</button></div>`).join('');
+}
+function addChapterLink(){
+    const key = document.getElementById('chapterLinksList').dataset.key; const chIdx = parseInt(document.getElementById('chapterLinksList').dataset.chIdx);
+    const name = document.getElementById('chapterLinkName').value.trim(); const url = document.getElementById('chapterLinkURL').value.trim();
+    if(!name||!url) return alert('Enter both name and URL');
+    if(!data.chapters[key][chIdx].links) data.chapters[key][chIdx].links = [];
+    data.chapters[key][chIdx].links.push({ name, url }); saveData(); document.getElementById('chapterLinkName').value=''; document.getElementById('chapterLinkURL').value=''; renderChapterLinks(); renderChapterList(key);
+}
+function deleteChapterLink(idx){ if(!confirm('Delete this link?')) return; const key = document.getElementById('chapterLinksList').dataset.key; const chIdx = parseInt(document.getElementById('chapterLinksList').dataset.chIdx); data.chapters[key][chIdx].links.splice(idx,1); saveData(); renderChapterLinks(); renderChapterList(key); }
+
+/* =========================
+   Files tree rendering with expand/collapse
+   ========================= */
+function renderChapterFiles(){
+    const container = document.getElementById('chapterFilesList'); const key = container.dataset.key; const chIdx = parseInt(container.dataset.chIdx);
+    const chapters = data.chapters[key] || []; if(chIdx>=chapters.length) return;
+    const files = chapters[chIdx].files || [];
+    if(files.length===0){ container.innerHTML = '<div class="empty-state">No files in this chapter.</div>'; return; }
+    container.innerHTML = renderFileTreeHtml(files);
+}
+
+function renderFileTreeHtml(list){
+    return list.map(item=>{
+        if(item.type==='folder'){
+            if(!item.id) item.id = generateId();
+            return `
+                <div class="folder-item" data-folder-id="${item.id}">
+                    <div class="folder-header">
+                        <button class="btn-secondary" style="padding:6px 8px;font-size:13px;" onclick="toggleFolderById('${item.id}'); event.stopPropagation();">▾</button>
+                        <div class="folder-name" style="flex:1;padding-left:6px;" onclick="toggleFolderById('${item.id}')">${item.name}</div>
+                        <div class="folder-actions">
+                            <button onclick="event.stopPropagation(); renameFolderById('${item.id}')">✎</button>
+                            <button onclick="event.stopPropagation(); deleteFolderById('${item.id}')">✕</button>
+                        </div>
+                    </div>
+                    <div id="folder_children_${item.id}" class="folder-children">
+                        ${renderFileTreeHtml(item.children || [])}
+                    </div>
+                </div>
+            `;
+        } else {
+            return `
+                <div class="chapter-file-item">
+                    <div class="info">
+                        <span class="title">${item.name}</span>
+                        <div class="sub">${item.size ? (Math.round(item.size/1024) + ' KB') : ''}</div>
+                    </div>
+                    <div class="actions">
+                        ${item.data ? `<button class="open-btn" onclick="openFile('${item.data}','${escapeAttr(item.name)}')">📂</button>` : ''}
+                        ${item.data ? `<a class="download-btn" href="${item.data}" download="${escapeAttr(item.name)}">⬇</a>` : ''}
+                        <button onclick="deleteFileById('${item.id || ''}')">✕</button>
+                    </div>
+                </div>
+            `;
+        }
+    }).join('');
+}
+
+function toggleFolderById(id){
+    const el = document.getElementById('folder_children_' + id); if(!el) return;
+    el.classList.toggle('collapsed');
+}
+function deleteFileById(id){
+    if(!confirm('Delete this file?')) return;
+    const key = document.getElementById('chapterFilesList').dataset.key; const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+    const chapter = data.chapters[key][chIdx];
+    if(!chapter) return;
+    function recurse(arr){
+        for(let i=0;i<arr.length;i++){
+            const it = arr[i];
+            if(it.id === id){ arr.splice(i,1); return true; }
+            if(it.type==='folder' && it.children){ if(recurse(it.children)) return true; }
+        }
+        return false;
+    }
+    if(recurse(chapter.files || [])){ saveData(); renderChapterFiles(); renderChapterList(key); }
+}
+function deleteFolderById(id){
+    if(!confirm('Delete folder and its contents?')) return;
+    const key = document.getElementById('chapterFilesList').dataset.key; const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+    const chapter = data.chapters[key][chIdx]; if(!chapter) return;
+    function recurse(arr){
+        for(let i=0;i<arr.length;i++){
+            const it = arr[i];
+            if(it.type==='folder' && it.id===id){ arr.splice(i,1); return true; }
+            if(it.type==='folder' && it.children){ if(recurse(it.children)) return true; }
+        }
+        return false;
+    }
+    if(recurse(chapter.files || [])){ saveData(); renderChapterFiles(); renderChapterList(key); }
+}
+function renameFolderById(id){
+    const key = document.getElementById('chapterFilesList').dataset.key; const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+    const chapter = data.chapters[key][chIdx]; if(!chapter) return;
+    function recurse(arr){
+        for(let i=0;i<arr.length;i++){
+            const it = arr[i];
+            if(it.type==='folder' && it.id===id){ const newName = prompt('Rename folder:', it.name); if(newName && newName.trim()!==''){ it.name = newName.trim(); saveData(); renderChapterFiles(); renderChapterList(key); } return true; }
+            if(it.type==='folder' && it.children){ if(recurse(it.children)) return true; }
+        }
+        return false;
+    }
+    recurse(chapter.files || []);
+}
+
+/* =========================
+   Upload single file or folder
+   ========================= */
+function addChapterFile(){
+    const input = document.getElementById('chapterFileInput'); const file = input.files[0]; if(!file) return alert('Please select a file.');
+    const key = document.getElementById('chapterFilesList').dataset.key; const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+    const reader = new FileReader();
+    reader.onload = function(e){
+        const entry = { id: generateId(), name: file.name, type: 'file', data: e.target.result, size: file.size };
+        if(!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
+        data.chapters[key][chIdx].files.push(entry); saveData(); input.value=''; renderChapterFiles(); renderChapterList(key);
+    };
+    reader.readAsDataURL(file);
+}
+
+function uploadChapterFolder(){
+    const input = document.createElement('input'); input.type='file'; input.webkitdirectory=true; input.multiple=true;
+    input.onchange = function(e){
+        const files = Array.from(e.target.files); if(files.length===0) return;
+        const key = document.getElementById('chapterFilesList').dataset.key; const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+        if(!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
+        const root = data.chapters[key][chIdx].files;
+        files.forEach(file=>{
+            const parts = file.webkitRelativePath.split('/');
+            let pointer = root;
+            for(let i=0;i<parts.length;i++){
+                const name = parts[i];
+                if(i === parts.length - 1){
+                    const reader = new FileReader();
+                    reader.onload = function(ev){
+                        const entry = { id: generateId(), name, type:'file', data: ev.target.result, size: file.size };
+                        pointer.push(entry); saveData(); renderChapterFiles(); renderChapterList(key);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    let folder = pointer.find(it => it.type === 'folder' && it.name === name);
+                    if(!folder){ folder = { id: generateId(), name, type:'folder', children: [] }; pointer.push(folder); }
+                    pointer = folder.children;
+                }
             }
         });
-        container.innerHTML = html;
-        // draw preview
-        setTimeout(renderStatPreview, 60);
-    }
+    };
+    input.click();
+}
 
-    function handleCardClick(id) {
-        if (id === 'information' || id === 'dse') openCategory(id.charAt(0).toUpperCase() + id.slice(1));
-        else if (id === 'quiz') openQuiz();
-        else if (id === 'links') navigateTo('links');
-        else if (id === 'objectives') navigateTo('objectives');
-        else if (id === 'statistics') navigateTo('statistics');
-        else if (id === 'tools') navigateTo('tools');
-        else if (id === 'ai') navigateTo('ai');
-        else if (id === 'timer') navigateTo('timer');
-    }
+/* =========================
+   Links main
+   ========================= */
+function renderLinks(){
+    const container = document.getElementById('linksList'); const links = data.links || [];
+    if(links.length===0){ container.innerHTML = '<div class="empty-state">No links saved.</div>'; return; }
+    container.innerHTML = links.map((l,i)=>`<div class="link-item"><div class="link-content"><a href="${escapeAttr(l.url)}" target="_blank">${l.name}</a></div><button class="del-link" onclick="deleteLink(${i})">✕</button></div>`).join('');
+}
+function addLink(){ const name = document.getElementById('linkName').value.trim(); const url = document.getElementById('linkURL').value.trim(); if(!name||!url) return alert('Enter both'); data.links = data.links || []; data.links.push({ name, url }); saveData(); renderLinks(); document.getElementById('linkName').value=''; document.getElementById('linkURL').value=''; }
+function deleteLink(i){ if(!confirm('Delete?')) return; data.links.splice(i,1); saveData(); renderLinks(); }
 
-    // ============================================================
-    // Categories & subjects
-    // ============================================================
-    let currentCategory = null;
-    let currentSubject = null;
-    let currentChapterKey = null;
-    let currentChapterIndex = null;
-
-    function openCategory(category) {
-        currentCategory = category;
-        document.getElementById('categoryTitle').innerText = category;
-        const grid = document.getElementById('subjectGrid'); grid.innerHTML = '';
-        SUBJECTS.forEach(subj => {
-            const div = document.createElement('div');
-            div.className = 'subject-item';
-            div.innerHTML = `<div class="subj-name">${subj}</div>`;
-            div.onclick = () => openSubjectDetail(category, subj);
-            grid.appendChild(div);
-        });
-        navigateTo('subjects');
-    }
-
-    function openSubjectDetail(category, subject) {
-        currentCategory = category;
-        currentSubject = subject;
-        document.getElementById('detailTitle').innerText = `${subject} (${category})`;
-        renderDetail();
-        navigateTo('detail');
-    }
-
-    function goBackFromDetail() {
-        if (currentCategory) openCategory(currentCategory);
-        else navigateTo('home');
-    }
-
-    // ============================================================
-    // Chapters (unified for Information / Quiz / DSE)
-    // ============================================================
-    function renderDetail() {
-        const container = document.getElementById('detailContent');
-        if (!currentCategory || !currentSubject) { container.innerHTML = '<div class="empty-state">Select a subject.</div>'; return; }
-        const key = keyFor(currentCategory, currentSubject);
-        const chapters = data.chapters[key] || [];
-        let html = `
-            <div class="flex-between" style="margin-bottom:12px;align-items:center;">
-                <div style="font-size:16px;font-weight:300;">${currentSubject} — ${currentCategory}</div>
-                <div style="display:flex;gap:8px;">
-                    <button class="btn-secondary" onclick="openChapterModal('${key}')">+ New Chapter</button>
+/* =========================
+   Objectives (HKDSE grades, CS uses U/A)
+   UI: buttons ← › for selection (as you requested)
+   ========================= */
+function renderObjectives(){
+    const container = document.getElementById('objectiveGrid'); if(!container) return;
+    let html = '';
+    const iconMap = { Chinese:'🈶', English:'🅔', Mathematics:'∑', CS:'💻', Economics:'📈', Bafs:'💼', Ict:'🖥' };
+    SUBJECTS.forEach(subj=>{
+        const obj = data.objectives[subj] || { target:'5', current:'4' };
+        const gradeList = (subj === 'CS') ? CS_GRADE_LEVELS : GRADE_LEVELS;
+        if(!gradeList.includes(obj.target)) obj.target = gradeList[0];
+        if(!gradeList.includes(obj.current)) obj.current = gradeList[0];
+        html += `
+            <div class="objective-row">
+                <div class="obj-left">
+                    <div style="font-size:20px">${iconMap[subj]||'📚'}</div>
+                    <div class="obj-name">${subj}</div>
+                </div>
+                <div style="display:flex;gap:16px;align-items:center">
+                    <div>
+                        <div class="grade-label" style="color:#888;font-size:12px;">Target</div>
+                        <div class="grade-selector" id="target_${subj}">
+                            <button onclick="changeGrade('${subj}','target',-1)">‹</button>
+                            <div class="grade-display target">${escapeAttr(obj.target)}</div>
+                            <button onclick="changeGrade('${subj}','target',1)">›</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="grade-label" style="color:#888;font-size:12px;">Current</div>
+                        <div class="grade-selector" id="current_${subj}">
+                            <button onclick="changeGrade('${subj}','current',-1)">‹</button>
+                            <div class="grade-display current">${escapeAttr(obj.current)}</div>
+                            <button onclick="changeGrade('${subj}','current',1)">›</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div id="chapterList_${key}"></div>
         `;
-        container.innerHTML = html;
-        renderChapterList(key);
-    }
+    });
+    container.innerHTML = html;
+}
 
-    function renderChapterList(key) {
-        const container = document.getElementById('chapterList_' + key);
-        if (!container) return;
-        const chapters = data.chapters[key] || [];
-        if (chapters.length === 0) { container.innerHTML = '<div class="empty-state">No chapters yet. Create one!</div>'; return; }
-        container.innerHTML = chapters.map((ch, idx) => {
-            const linkCount = ch.links ? ch.links.length : 0;
-            const fileCount = ch.files ? ch.files.length : 0;
-            return `
-                <div class="chapter-card" onclick="openChapterLinks('${key}', ${idx})">
-                    <div class="flex-between">
-                        <span class="ch-title">${ch.name}</span>
-                        <span class="ch-count">${linkCount} links · ${fileCount} files</span>
-                    </div>
-                    <div style="display:flex; gap:8px; margin-top:6px;">
-                        <button class="btn-secondary" onclick="event.stopPropagation(); openChapterModal('${key}', ${idx})">Rename</button>
-                        <button class="btn-secondary" style="background:#e74c3c" onclick="event.stopPropagation(); deleteChapter('${key}', ${idx})">Delete</button>
-                    </div>
+function changeGrade(subject,type,delta){
+    const gradeList = (subject === 'CS') ? CS_GRADE_LEVELS : GRADE_LEVELS;
+    if(!data.objectives) data.objectives = {};
+    const obj = data.objectives[subject] || { target: gradeList[0], current: gradeList[0] };
+    if(!gradeList.includes(obj[type])) obj[type] = gradeList[0];
+    const idx = gradeList.indexOf(obj[type]); let newIdx = idx + delta;
+    if(newIdx < 0) newIdx = 0; if(newIdx >= gradeList.length) newIdx = gradeList.length - 1;
+    obj[type] = gradeList[newIdx];
+    data.objectives[subject] = obj; saveData(); renderObjectives();
+}
+
+/* =========================
+   Habits & Study log
+   ========================= */
+function getTodayLocal(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+function resetHabitsIfNewDay(){ const today = getTodayLocal(); if(!data.habits[today]){ data.habits[today] = {}; SUBJECTS.forEach(s=>data.habits[today][s]=false); saveData(); renderHabits(); } }
+function renderHabits(){
+    const container = document.getElementById('habitsContainer'); if(!container) return;
+    const today = getTodayLocal(); if(!data.habits[today]) resetHabitsIfNewDay();
+    const streaks = {}; SUBJECTS.forEach(subj=>{
+        let count=0; let d=new Date(); while(true){ const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; if(data.habits[key] && data.habits[key][subj]){ count++; d.setDate(d.getDate()-1);} else break; } streaks[subj]=count;
+    });
+    let html='';
+    SUBJECTS.forEach(subj=>{
+        const done = data.habits[today][subj] || false; const streak = streaks[subj]||0;
+        html += `<div class="habit-row" data-subject="${subj}"><div class="habit-box ${done?'done':''}" onclick="toggleHabit('${subj}')"><span class="habit-name">${subj}</span><span class="habit-status"></span><span class="habit-fire">${streak>0?('🔥'+streak):''}</span></div></div>`;
+    });
+    container.innerHTML = html;
+}
+function toggleHabit(subject){
+    const today = getTodayLocal(); if(!data.habits[today]) data.habits[today]={}; data.habits[today][subject] = !data.habits[today][subject]; saveData(); renderHabits();
+}
+
+/* =========================
+   Calendar & Events (full)
+   ========================= */
+let calYear = new Date().getFullYear(); let calMonth = new Date().getMonth();
+
+function renderCalendar(){
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    document.getElementById('calMonthYear').innerText = calYear + ' ' + monthNames[calMonth];
+    const grid = document.getElementById('calGrid');
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+    const todayStr = getTodayLocal();
+    let html = `<div class="day-name">Sun</div><div class="day-name">Mon</div><div class="day-name">Tue</div><div class="day-name">Wed</div><div class="day-name">Thu</div><div class="day-name">Fri</div><div class="day-name">Sat</div>`;
+    for(let i=0;i<firstDay;i++) html += `<div class="day-cell empty"></div>`;
+    for(let d=1; d<=daysInMonth; d++){
+        const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const hasEvent = data.events.some(e => e.date === dateStr);
+        const isToday = dateStr === todayStr;
+        const classes = 'day-cell' + (hasEvent ? ' has-event' : '') + (isToday ? ' today' : '');
+        html += `<div class="${classes}" onclick="selectDate('${dateStr}')">${d}</div>`;
+    }
+    grid.innerHTML = html;
+    selectDate(todayStr);
+}
+
+function changeMonth(delta){ calMonth += delta; if(calMonth<0){ calMonth=11; calYear--; } if(calMonth>11){ calMonth=0; calYear++; } renderCalendar(); }
+
+function selectDate(dateStr){
+    renderEventList('all', dateStr); showStudyLogForDate(dateStr);
+}
+
+function showStudyLogForDate(dateStr){
+    const container = document.getElementById('studyLogContent'); container.dataset.date = dateStr;
+    const habitsForDate = data.habits[dateStr] || {};
+    const studiedSubjects = SUBJECTS.filter(s => habitsForDate[s] === true);
+    if(studiedSubjects.length===0){ container.innerHTML = '<span class="study-log-empty">No study records on this day.</span>'; return; }
+    const colorMap = { 'Chinese':'#e74c3c','English':'#f1c40f','Mathematics':'#3498db','CS':'#2ecc71','Economics':'#9b59b6','Bafs':'#e67e22','Ict':'#1abc9c' };
+    let html = '<div class="log-subjects">';
+    studiedSubjects.forEach(subj => {
+        const color = colorMap[subj] || '#8ab4f8';
+        html += `<span class="log-subject done" style="border-color:${color}; color:${color};" onclick="toggleHabitForDate('${dateStr}','${subj}')">${subj}</span>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
+function toggleHabitForDate(dateStr, subj){
+    if(!data.habits[dateStr]) data.habits[dateStr] = {}; data.habits[dateStr][subj] = !data.habits[dateStr][subj]; saveData(); showStudyLogForDate(dateStr); renderHabits();
+}
+
+function renderEventList(filter, specificDate=null){
+    const container = document.getElementById('eventList'); let events = [...data.events];
+    const filterVal = filter || document.getElementById('eventFilter').value; const today = getTodayLocal();
+    if(specificDate){ events = events.filter(e => e.date === specificDate); }
+    else {
+        if(filterVal === 'all') events = events.filter(e => e.date >= today);
+        else if(filterVal === 'countdown') events = events.filter(e => e.type === 'countdown' && e.date >= today);
+        else if(filterVal === 'schedule') events = events.filter(e => e.type === 'schedule' && e.date >= today);
+    }
+    events.sort((a,b)=>a.date.localeCompare(b.date));
+    if(events.length===0){ container.innerHTML = '<div class="empty-state">No events.</div>'; return; }
+    container.innerHTML = events.map(ev=>{
+        const diff = Math.ceil((new Date(ev.date + 'T00:00:00') - new Date(today + 'T00:00:00')) / (1000*60*60*24));
+        let countdownText = '';
+        if(ev.type === 'countdown'){
+            if(diff === 0) countdownText = 'Today!';
+            else if(diff < 0) countdownText = `${Math.abs(diff)} days ago`;
+            else countdownText = `${diff} days left`;
+        }
+        return `<div class="event-item" style="border-left-color:${ev.type==='countdown'?'#f1c40f':'#888'};">
+                    <div><div class="ev-title">${ev.title}</div><div class="ev-date">📅 ${ev.date}</div></div>
+                    ${countdownText ? `<div class="ev-countdown">${countdownText}</div>` : `<div style="color:#666;">Schedule</div>`}
+                    <button class="del-ev" onclick="deleteEvent(${ev.id})">✕</button>
+                </div>`;
+    }).join('');
+    document.getElementById('eventFilter').value = filterVal;
+}
+
+function openAddEvent(){ document.getElementById('eventModal').classList.add('show'); document.getElementById('evTitle').value=''; document.getElementById('evDate').value = getTodayLocal(); document.getElementById('evType').value='schedule'; }
+function closeEventModal(){ document.getElementById('eventModal').classList.remove('show'); }
+
+function saveEvent(){
+    const title = document.getElementById('evTitle').value.trim(); const date = document.getElementById('evDate').value; const type = document.getElementById('evType').value;
+    if(!title || !date) return alert('Fill in title and date.');
+    data.events.push({ id: Date.now(), title, date, type }); saveData(); closeEventModal(); renderCalendar();
+}
+
+function deleteEvent(id){ if(!confirm('Delete event?')) return; data.events = data.events.filter(e=>e.id !== id); saveData(); renderCalendar(); }
+
+/* =========================
+   Statistics (full)
+   ========================= */
+let statRange = 'week';
+function setStatRange(range){ statRange = range; document.querySelectorAll('.stat-filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.range === range)); renderStatistics(); }
+function renderStatistics(){
+    const canvas = document.getElementById('statChart'); if(!canvas) return;
+    const habitDates = Object.keys(data.habits).sort(); if(habitDates.length===0){ document.getElementById('statSummary').innerHTML = '<div class="stat-no-data">No study data yet. Start tracking your habits!</div>'; return; }
+    const dailyCounts = habitDates.map(date => Object.values(data.habits[date]||{}).filter(v=>v===true).length);
+    const today = new Date(); let cutoffDate = new Date(today);
+    switch(statRange){ case 'week': cutoffDate.setDate(today.getDate()-7); break; case 'month': cutoffDate.setMonth(today.getMonth()-1); break; case 'halfyear': cutoffDate.setMonth(today.getMonth()-6); break; case 'year': cutoffDate.setFullYear(today.getFullYear()-1); break; }
+    const cutoffStr = `${cutoffDate.getFullYear()}-${String(cutoffDate.getMonth()+1).padStart(2,'0')}-${String(cutoffDate.getDate()).padStart(2,'0')}`;
+    const filtered = habitDates.map((d,i)=> d>=cutoffStr ? { d, c: dailyCounts[i]} : null).filter(x=>x);
+    if(filtered.length===0){ document.getElementById('statSummary').innerHTML = '<div class="stat-no-data">No data in this period.</div>'; return; }
+    const counts = filtered.map(f=>f.c);
+    const totalDays = counts.filter(c=>c>0).length; const avg = counts.reduce((a,b)=>a+b,0)/counts.length; const max = Math.max(...counts);
+    document.getElementById('statTotalDays').textContent = totalDays; document.getElementById('statAvgSubjects').textContent = avg.toFixed(1); document.getElementById('statMaxSubjects').textContent = max;
+
+    // draw chart (same as earlier)
+    const ctx = canvas.getContext('2d'); const dpr = window.devicePixelRatio||1; const rect = canvas.parentElement.getBoundingClientRect(); const width = rect.width - 24; const height = Math.min(280, width * 0.6);
+    canvas.width = width * dpr; canvas.height = height * dpr; canvas.style.width = width + 'px'; canvas.style.height = height + 'px'; ctx.scale(dpr,dpr);
+    ctx.clearRect(0,0,width,height);
+    if(counts.length < 2){ ctx.fillStyle = '#666'; ctx.font = '14px sans-serif'; ctx.textAlign='center'; ctx.fillText('Need at least 2 days of data to show trend.', width/2, height/2); return; }
+    const padding = { top:24, bottom:32, left:32, right:16 }; const chartW = width - padding.left - padding.right; const chartH = height - padding.top - padding.bottom;
+    const yMax = Math.max(1, Math.max(...counts));
+    const points = counts.map((val, idx) => ({ x: padding.left + (idx/(counts.length-1))*chartW, y: padding.top + chartH - (val/yMax)*chartH, val }));
+    const gradient = ctx.createLinearGradient(0,padding.top,0,padding.top+chartH); gradient.addColorStop(0,'rgba(138,180,248,0.5)'); gradient.addColorStop(1,'rgba(138,180,248,0)');
+    ctx.beginPath(); ctx.moveTo(points[0].x, padding.top+chartH); points.forEach(p=>ctx.lineTo(p.x,p.y)); ctx.lineTo(points[points.length-1].x,padding.top+chartH); ctx.closePath(); ctx.fillStyle = gradient; ctx.fill();
+    ctx.beginPath(); points.forEach((p,i)=> i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y)); ctx.strokeStyle='#8ab4f8'; ctx.lineWidth=2.5; ctx.stroke();
+    points.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fillStyle='#8ab4f8'; ctx.fill(); ctx.strokeStyle='#0b0b0b'; ctx.lineWidth=1.5; ctx.stroke(); });
+}
+
+/* home small preview */
+function renderStatPreview(){
+    const canvas = document.getElementById('statPreviewCanvas'); if(!canvas) return;
+    const ctx = canvas.getContext('2d'); const dpr = window.devicePixelRatio||1; const rect = canvas.getBoundingClientRect(); const width = rect.width||160; const height = rect.height||60;
+    canvas.width = Math.max(1, Math.floor(width*dpr)); canvas.height = Math.max(1, Math.floor(height*dpr)); ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,width,height);
+    const N=14; const today = new Date(); const dates=[];
+    for(let i=N-1;i>=0;i--){ const d=new Date(today); d.setDate(today.getDate()-i); dates.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`); }
+    const counts = dates.map(d=> (data.habits[d]?Object.values(data.habits[d]).filter(v=>v===true).length:0) );
+    if(counts.every(c=>c===0)){ ctx.fillStyle='#666'; ctx.font='12px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('No data', width/2, height/2); return; }
+    const max = Math.max(1,...counts); const pad={left:6,right:6,top:6,bottom:12}; const cw=width-pad.left-pad.right; const ch=height-pad.top-pad.bottom;
+    const points = counts.map((v,i)=>({x:pad.left + (i/(counts.length-1))*cw, y:pad.top + ch - (v/max)*ch }));
+    const grad = ctx.createLinearGradient(0,pad.top,0,pad.top+ch); grad.addColorStop(0,'rgba(138,180,248,0.5)'); grad.addColorStop(1,'rgba(138,180,248,0)');
+    ctx.beginPath(); ctx.moveTo(points[0].x,pad.top+ch); points.forEach(p=>ctx.lineTo(p.x,p.y)); ctx.lineTo(points[points.length-1].x,pad.top+ch); ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+    ctx.beginPath(); points.forEach((p,i)=> i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y)); ctx.strokeStyle='#8ab4f8'; ctx.lineWidth=2; ctx.stroke();
+    points.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2); ctx.fillStyle='#8ab4f8'; ctx.fill(); });
+}
+
+/* =========================
+   Tools: Calculator (button UI) & Grade (same as before)
+   ========================= */
+function navigateToToolsDefault(){ navigateTo('tools'); showTool('calculator'); }
+
+function showTool(name){
+    const container = document.getElementById('toolsContent');
+    if(name==='calculator'){
+        container.innerHTML = `
+            <div class="calc-container">
+                <div id="calcDisplay" class="calc-display">0</div>
+                <div class="calc-buttons">
+                    <button onclick="calcInput('7')">7</button><button onclick="calcInput('8')">8</button><button onclick="calcInput('9')">9</button><button onclick="calcOp('/')">÷</button>
+                    <button onclick="calcInput('4')">4</button><button onclick="calcInput('5')">5</button><button onclick="calcInput('6')">6</button><button onclick="calcOp('*')">×</button>
+                    <button onclick="calcInput('1')">1</button><button onclick="calcInput('2')">2</button><button onclick="calcInput('3')">3</button><button onclick="calcOp('-')">−</button>
+                    <button onclick="calcInput('0')">0</button><button onclick="calcInput('.')">.</button><button class="equal" onclick="calcEvaluate()">=</button><button onclick="calcOp('+')">+</button>
+                    <button onclick="calcClear()">C</button><button onclick="calcBack()">⌫</button><button onclick="calcInput('(')">(</button><button onclick="calcInput(')')">)</button>
                 </div>
-            `;
-        }).join('');
+            </div>
+        `;
+        // keyboard support
+        document.addEventListener('keydown', calcKeyHandler);
+    } else if(name==='grade'){
+        if(!data._gradeTmp || data._gradeTmp.length===0) data._gradeTmp = [{name:'Test',weight:40,score:80},{name:'Exam',weight:60,score:75}];
+        container.innerHTML = `<div id="gradeRows"></div>
+        <div style="margin-top:8px;display:flex;gap:8px"><button class="btn-secondary" onclick="addGradeRow()">+ Add Item</button><button class="btn-secondary" onclick="calcGrade()">Calculate</button></div>
+        <div style="margin-top:8px"><strong>Total: </strong><span id="gradeResult"></span></div>`;
+        renderGradeRows();
     }
+}
 
-    function openChapterModal(key, editIdx = null) {
-        const modal = document.getElementById('chapterModal');
-        modal.dataset.key = key;
-        modal.dataset.editIdx = editIdx !== null ? editIdx : '';
-        document.getElementById('chapterName').value = editIdx !== null ? data.chapters[key][editIdx].name : '';
-        modal.classList.add('show');
+/* calculator logic */
+let calcExpr = '';
+function calcInput(char){ calcExpr += char; updateCalcDisplay(); }
+function calcOp(op){ calcExpr += op; updateCalcDisplay(); }
+function calcClear(){ calcExpr = ''; updateCalcDisplay(); }
+function calcBack(){ calcExpr = calcExpr.slice(0,-1); updateCalcDisplay(); }
+function updateCalcDisplay(){ document.getElementById('calcDisplay').textContent = calcExpr === '' ? '0' : calcExpr; }
+function calcEvaluate(){
+    try{
+        // evaluate safely in local context
+        const res = Function('"use strict"; return (' + calcExpr.replace(/÷/g,'/').replace(/×/g,'*') + ')')();
+        calcExpr = String(res); updateCalcDisplay();
+    } catch(e){ document.getElementById('calcDisplay').textContent = 'Error'; }
+}
+function calcKeyHandler(e){
+    if(document.getElementById('page-tools').classList.contains('active')){
+        if(/[\d\+\-\*\/\.\(\)]/.test(e.key)){ calcExpr += e.key; updateCalcDisplay(); e.preventDefault(); }
+        else if(e.key === 'Enter'){ calcEvaluate(); e.preventDefault(); }
+        else if(e.key === 'Backspace'){ calcBack(); e.preventDefault(); }
     }
+}
 
-    function closeChapterModal() { document.getElementById('chapterModal').classList.remove('show'); }
+/* grade calculator */
+function renderGradeRows(){
+    const container = document.getElementById('gradeRows'); const rows = data._gradeTmp || [];
+    container.innerHTML = rows.map((r,i)=>`<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+        <input placeholder="Name" value="${escapeAttr(r.name)}" onchange="updateGradeRow(${i},'name',this.value)" />
+        <input placeholder="Weight (%)" style="width:100px" value="${r.weight}" onchange="updateGradeRow(${i},'weight',this.value)" />
+        <input placeholder="Score" style="width:100px" value="${r.score}" onchange="updateGradeRow(${i},'score',this.value)" />
+        <button class="btn-secondary" onclick="removeGradeRow(${i})">Remove</button>
+    </div>`).join('');
+}
+function addGradeRow(){ data._gradeTmp = data._gradeTmp || []; data._gradeTmp.push({name:'Item',weight:0,score:0}); renderGradeRows(); }
+function updateGradeRow(i,k,v){ if(!data._gradeTmp) data._gradeTmp = []; data._gradeTmp[i][k] = (k==='name'?v:parseFloat(v)||0); renderGradeRows(); }
+function removeGradeRow(i){ data._gradeTmp.splice(i,1); renderGradeRows(); }
+function calcGrade(){ const rows = data._gradeTmp || []; if(rows.length===0) return alert('Add items'); let totalW=0,sum=0; rows.forEach(r=>{ totalW += Number(r.weight)||0; sum += (Number(r.score)||0) * (Number(r.weight)||0); }); const res = totalW>0 ? sum/totalW : 0; document.getElementById('gradeResult').textContent = res.toFixed(2); }
 
-    function saveChapter() {
-        const modal = document.getElementById('chapterModal');
-        const key = modal.dataset.key;
-        const editIdx = modal.dataset.editIdx;
-        const name = document.getElementById('chapterName').value.trim();
-        if (!name) return alert('Enter a chapter name.');
-        if (!data.chapters[key]) data.chapters[key] = [];
-        if (editIdx !== '') data.chapters[key][parseInt(editIdx)].name = name;
-        else data.chapters[key].push({ name: name, links: [], files: [] });
-        saveData();
-        closeChapterModal();
-        renderChapterList(key);
-    }
+/* =========================
+   AI links manage & bottom bar sync (drag reorder)
+   ========================= */
+function renderAiLinks(){
+    const container = document.getElementById('aiLinksList');
+    const arr = data.aiLinks || [];
+    if(arr.length===0){ container.innerHTML = '<div class="empty-state">No AI links. Add one above.</div>'; return; }
+    container.innerHTML = arr.map((a,i)=>`<div draggable="true" class="item-card" data-ai-index="${i}">
+        <div class="info"><div class="title">${escapeAttr(a.name)}</div><div class="sub">${escapeAttr(a.url)}</div></div>
+        <div class="actions"><button onclick="editAiLink(${i})">✎</button><button onclick="deleteAiLink(${i})">✕</button></div>
+    </div>`).join('');
+    // add drag handlers for reorder
+    container.querySelectorAll('.item-card').forEach(card=>{
+        card.addEventListener('dragstart', aiDragStart);
+        card.addEventListener('dragover', aiDragOver);
+        card.addEventListener('drop', aiDrop);
+        card.addEventListener('dragend', aiDragEnd);
+    });
+}
+let aiDragSrcIndex = null;
+function aiDragStart(e){ aiDragSrcIndex = parseInt(this.dataset.aiIndex); this.style.opacity='0.4'; e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',String(aiDragSrcIndex)); }
+function aiDragOver(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; }
+function aiDrop(e){ e.preventDefault(); const targetIdx = parseInt(this.dataset.aiIndex); const srcIdx = parseInt(e.dataTransfer.getData('text/plain')); if(srcIdx===targetIdx) return; const arr = data.aiLinks; const [moved] = arr.splice(srcIdx,1); arr.splice(targetIdx,0,moved); saveData(); renderAiLinks(); renderBottomBar(); }
+function aiDragEnd(e){ this.style.opacity=''; }
 
-    function deleteChapter(key, idx) {
-        if (!confirm('Delete this chapter?')) return;
-        data.chapters[key].splice(idx, 1);
-        saveData();
-        renderChapterList(key);
-    }
+function addAiLink(){
+    const name = document.getElementById('aiName').value.trim(); const url = document.getElementById('aiURL').value.trim();
+    if(!name || !url) return alert('Enter both');
+    data.aiLinks = data.aiLinks || []; data.aiLinks.push({ name, url }); saveData(); document.getElementById('aiName').value=''; document.getElementById('aiURL').value=''; renderAiLinks(); renderBottomBar();
+}
+function editAiLink(i){ const a = data.aiLinks[i]; const newName = prompt('Name:', a.name); if(newName===null) return; const newUrl = prompt('URL:', a.url); if(newUrl===null) return; a.name = newName; a.url = newUrl; saveData(); renderAiLinks(); renderBottomBar(); }
+function deleteAiLink(i){ if(!confirm('Delete?')) return; data.aiLinks.splice(i,1); saveData(); renderAiLinks(); renderBottomBar(); }
 
-    // ============================================================
-    // Chapter Links & Files (shared)
-    // ============================================================
-    function openChapterLinks(key, chIdx) {
-        currentChapterKey = key;
-        currentChapterIndex = chIdx;
-        const ch = data.chapters[key][chIdx];
-        document.getElementById('chapterLinksTitle').textContent = ch.name;
-        document.getElementById('chapterLinksList').dataset.key = key;
-        document.getElementById('chapterLinksList').dataset.chIdx = chIdx;
-        document.getElementById('chapterFilesList').dataset.key = key;
-        document.getElementById('chapterFilesList').dataset.chIdx = chIdx;
-        renderChapterLinks();
-        renderChapterFiles();
-        navigateTo('chapterLinks');
-    }
+/* bottom bar render: include AI links (in order) and custom buttons */
+function renderBottomBar(){
+    const container = document.getElementById('customButtonsContainer'); if(!container) return;
+    // Show AI links as text buttons in order
+    const ai = data.aiLinks || [];
+    const btns = (data.customButtons||[]).concat(ai.map(a=>({ id: 'ai_'+a.name, name: a.name, url: a.url })));
+    container.innerHTML = btns.map(b=>`<button onclick="window.open('${b.url}','_blank')">${escapeAttr(b.name)}</button>`).join('');
+}
 
-    function goBackFromChapterLinks() {
-        renderDetail();
-        navigateTo('detail');
-    }
+/* custom bottom buttons (text-only) */
+function openCustomBtnModal(){ document.getElementById('customBtnModal').classList.add('show'); document.getElementById('customBtnName').value=''; document.getElementById('customBtnURL').value=''; }
+function closeCustomBtnModal(){ document.getElementById('customBtnModal').classList.remove('show'); }
+function saveCustomButton(){ const name = document.getElementById('customBtnName').value.trim(); const url = document.getElementById('customBtnURL').value.trim(); if(!name||!url) return alert('Enter both'); data.customButtons = data.customButtons || []; data.customButtons.push({ id: generateId(), name, url }); saveData(); closeCustomBtnModal(); renderBottomBar(); }
 
-    function renderChapterLinks() {
-        const container = document.getElementById('chapterLinksList');
-        const key = container.dataset.key;
-        const chIdx = parseInt(container.dataset.chIdx);
-        const chapters = data.chapters[key] || [];
-        if (chIdx >= chapters.length) return;
-        const links = chapters[chIdx].links || [];
-        if (links.length === 0) { container.innerHTML = '<div class="empty-state">No links in this chapter.</div>'; return; }
-        container.innerHTML = links.map((link, idx) =>
-            `<div class="chapter-link-item">
-                <a href="${escapeAttr(link.url)}" target="_blank">${link.name}</a>
-                <button class="del-link" onclick="deleteChapterLink(${idx})">✕</button>
-            </div>`
-        ).join('');
-    }
+/* =========================
+   Delete confirm utilities
+   ========================= */
+let deleteCallback = null;
+function showDeleteConfirm(message, callback){ document.getElementById('deleteConfirmMessage').textContent = message; document.getElementById('deleteConfirmOverlay').classList.add('show'); deleteCallback = callback; }
+function cancelDelete(){ document.getElementById('deleteConfirmOverlay').classList.remove('show'); deleteCallback = null; }
+function confirmDelete(){ if(deleteCallback) deleteCallback(); deleteCallback = null; document.getElementById('deleteConfirmOverlay').classList.remove('show'); }
 
-    function addChapterLink() {
-        const container = document.getElementById('chapterLinksList');
-        const key = container.dataset.key;
-        const chIdx = parseInt(container.dataset.chIdx);
-        const name = document.getElementById('chapterLinkName').value.trim();
-        const url = document.getElementById('chapterLinkURL').value.trim();
-        if (!name || !url) return alert('Enter both name and URL.');
-        const chapters = data.chapters[key] || [];
-        if (chIdx >= chapters.length) return;
-        if (!chapters[chIdx].links) chapters[chIdx].links = [];
-        chapters[chIdx].links.push({ name, url });
-        saveData();
-        renderChapterLinks();
-        document.getElementById('chapterLinkName').value = '';
-        document.getElementById('chapterLinkURL').value = '';
-        renderChapterList(key);
-    }
+/* =========================
+   Misc helpers
+   ========================= */
+function openFile(dataUrl, fileName){
+    fetch(dataUrl).then(r=>r.blob()).then(blob=>{
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(()=>URL.revokeObjectURL(url),10000);
+    }).catch(()=>window.open(dataUrl,'_blank'));
+}
 
-    function deleteChapterLink(idx) {
-        if (!confirm('Delete this link?')) return;
-        const container = document.getElementById('chapterLinksList');
-        const key = container.dataset.key;
-        const chIdx = parseInt(container.dataset.chIdx);
-        data.chapters[key][chIdx].links.splice(idx, 1);
-        saveData();
-        renderChapterLinks();
-        renderChapterList(key);
-    }
+/* =========================
+   Init
+   ========================= */
+let data = {};
+function initApp(){
+    data = loadData();
+    if(!data.homeOrder) data.homeOrder = HOME_DEFAULT_ORDER.slice();
+    HOME_DEFAULT_ORDER.forEach(id=>{ if(!data.homeOrder.includes(id)) data.homeOrder.push(id); });
+    saveData();
+    resetHabitsIfNewDay(); updateHeaderClock(); navigateTo('home'); renderBottomBar();
+    window.addEventListener('resize', ()=>{ if(document.getElementById('page-statistics').classList.contains('active')) renderStatistics(); if(document.getElementById('page-home').classList.contains('active')) renderStatPreview(); });
+    console.log('Ching Study unlocked.');
+}
 
-    // ============================================================
-    // Files: rendering nested tree with expand/collapse and helpers
-    // ============================================================
-    function renderChapterFiles() {
-        const container = document.getElementById('chapterFilesList');
-        const key = container.dataset.key;
-        const chIdx = parseInt(container.dataset.chIdx);
-        const chapters = data.chapters[key] || [];
-        if (chIdx >= chapters.length) return;
-        const files = chapters[chIdx].files || [];
-        if (files.length === 0) { container.innerHTML = '<div class="empty-state">No files in this chapter.</div>'; return; }
-        container.innerHTML = renderFileTreeHtml(files);
-    }
+/* =========================
+   Auto page helpers
+   ========================= */
+function openQuiz(){ currentCategory='Quiz'; document.getElementById('quizTitle').innerText='Quiz'; const container = document.getElementById('quizContent'); container.innerHTML = '<div class="subject-grid" id="quizSubjectGrid"></div>'; const grid2 = document.getElementById('quizSubjectGrid'); SUBJECTS.forEach(subj=>{ const d=document.createElement('div'); d.className='subject-item'; d.innerHTML=`<div class="subj-name">${subj}</div>`; d.onclick = ()=> openSubjectDetail('Quiz', subj); grid2.appendChild(d); }); navigateTo('quiz'); }
+function goBackFromQuiz(){ navigateTo('home'); }
 
-    function renderFileTreeHtml(list) {
-        // recursive HTML builder that creates folder headers with toggle
-        return list.map(item => {
-            if (item.type === 'folder') {
-                // ensure id exists
-                if (!item.id) item.id = generateId();
-                return `
-                    <div class="folder-item" data-folder-id="${item.id}">
-                        <div class="folder-header">
-                            <button class="btn-secondary" style="padding:6px 8px;font-size:13px;" onclick="toggleFolderById('${item.id}'); event.stopPropagation();">▾</button>
-                            <div class="folder-name" style="flex:1;color:#fff;font-weight:500;padding-left:6px;" onclick="toggleFolderById('${item.id}')">${item.name}</div>
-                            <div class="folder-actions">
-                                <button onclick="event.stopPropagation(); renameFolderById('${item.id}')">✎</button>
-                                <button onclick="event.stopPropagation(); deleteFolderById('${item.id}')">✕</button>
-                            </div>
-                        </div>
-                        <div id="folder_children_${item.id}" class="folder-children">
-                            ${renderFileTreeHtml(item.children || [])}
-                        </div>
-                    </div>
-                `;
-            } else {
-                return `
-                    <div class="chapter-file-item">
-                        <div class="info">
-                            <span class="title">${item.name}</span>
-                            <div class="sub">${item.size ? (Math.round(item.size/1024) + ' KB') : ''}</div>
-                        </div>
-                        <div class="actions">
-                            ${item.data ? `<button class="open-btn" onclick="openFile('${item.data}', '${escapeAttr(item.name)}')">📂</button>` : ''}
-                            ${item.data ? `<a class="download-btn" href="${item.data}" download="${escapeAttr(item.name)}">⬇</a>` : ''}
-                            <button onclick="deleteFileById('${item.id || ''}')">✕</button>
-                        </div>
-                    </div>
-                `;
-            }
-        }).join('');
-    }
-
-    function toggleFolderById(id) {
-        const el = document.getElementById('folder_children_' + id);
-        if (!el) return;
-        el.classList.toggle('collapsed');
-        // also toggle caret symbol — simple approach: find the previous sibling button and rotate
-        // (we used a button with inner text "▾"; we can rotate by toggling style)
-        // keep simple: no caret rotation necessary
-    }
-
-    // helpers to find node and its parent array by id within a chapter
-    function findNodeAndParentArray(key, chIdx, id) {
-        const rootArr = data.chapters[key][chIdx].files || [];
-        let parent = null;
-        let parentArr = rootArr;
-
-        function recurse(arr){
-            for (let i=0;i<arr.length;i++){
-                const it = arr[i];
-                if (it.id === id) return { node: it, parentArr: arr, index: i };
-                if (it.type === 'folder' && it.children) {
-                    const res = recurse(it.children);
-                    if (res) return res;
-                }
-            }
-            return null;
-        }
-        return recurse(rootArr);
-    }
-
-    function deleteFileById(id) {
-        if (!confirm('Delete this file?')) return;
-        // search across all chapters currently open (we know currentChapterKey/index)
-        const key = document.getElementById('chapterFilesList').dataset.key;
-        const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
-        const root = data.chapters[key][chIdx];
-        if (!root) return;
-        let found = null;
-        function recurse(arr){
-            for (let i=0;i<arr.length;i++){
-                const it = arr[i];
-                if (it.id === id) { arr.splice(i,1); return true; }
-                if (it.type === 'folder' && it.children) {
-                    if (recurse(it.children)) return true;
-                }
-            }
-            return false;
-        }
-        if (recurse(root.files || [])) { saveData(); renderChapterFiles(); renderChapterList(key); }
-    }
-
-    function deleteFolderById(id) {
-        if (!confirm('Delete folder and all its contents?')) return;
-        const key = document.getElementById('chapterFilesList').dataset.key;
-        const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
-        const chapter = data.chapters[key][chIdx];
-        if (!chapter) return;
-        function recurse(arr) {
-            for (let i=0;i<arr.length;i++){
-                const it = arr[i];
-                if (it.type === 'folder' && it.id === id) { arr.splice(i,1); return true; }
-                if (it.type === 'folder' && it.children) {
-                    if (recurse(it.children)) return true;
-                }
-            }
-            return false;
-        }
-        if (recurse(chapter.files || [])) { saveData(); renderChapterFiles(); renderChapterList(key); }
-    }
-
-    function renameFolderById(id) {
-        const key = document.getElementById('chapterFilesList').dataset.key;
-        const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
-        const chapter = data.chapters[key][chIdx];
-        if (!chapter) return;
-        function recurse(arr) {
-            for (let i=0;i<arr.length;i++){
-                const it = arr[i];
-                if (it.type === 'folder' && it.id === id) {
-                    const newName = prompt('Rename folder:', it.name);
-                    if (newName && newName.trim() !== '') {
-                        it.name = newName.trim(); saveData(); renderChapterFiles(); renderChapterList(key);
-                    }
-                    return true;
-                }
-                if (it.type === 'folder' && it.children) {
-                    if (recurse(it.children)) return true;
-                }
-            }
-            return false;
-        }
-        recurse(chapter.files || []);
-    }
-
-    // ============================================================
-    // File upload helpers: add single file at root
-    // ============================================================
-    function addChapterFile() {
-        const input = document.getElementById('chapterFileInput');
-        const file = input.files[0];
-        if (!file) return alert('Please select a file.');
-        const reader = new FileReader();
-        const key = document.getElementById('chapterFilesList').dataset.key;
-        const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
-        reader.onload = function(e) {
-            const entry = { id: generateId(), name: file.name, type: 'file', data: e.target.result, size: file.size };
-            if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
-            data.chapters[key][chIdx].files.push(entry);
-            saveData();
-            input.value = '';
-            renderChapterFiles();
-            renderChapterList(key);
-        };
-        reader.readAsDataURL(file);
-    }
-
-    // Upload entire folder (webkitdirectory) and preserve structure
-    function uploadChapterFolder() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.webkitdirectory = true;
-        input.multiple = true;
-        input.onchange = function(e){
-            const files = Array.from(e.target.files);
-            if (!files || files.length === 0) return;
-            const key = document.getElementById('chapterFilesList').dataset.key;
-            const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
-            if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
-            const root = data.chapters[key][chIdx].files;
-
-            files.forEach(file => {
-                const parts = file.webkitRelativePath.split('/');
-                // navigate/create nested folder objects
-                let pointer = root;
-                for (let i = 0; i < parts.length; i++) {
-                    const name = parts[i];
-                    if (i === parts.length - 1) {
-                        // file
-                        const reader = new FileReader();
-                        reader.onload = function(ev) {
-                            const entry = { id: generateId(), name, type: 'file', data: ev.target.result, size: file.size };
-                            pointer.push(entry);
-                            saveData();
-                            renderChapterFiles();
-                            renderChapterList(key);
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        // folder level
-                        let folder = pointer.find(it => it.type === 'folder' && it.name === name);
-                        if (!folder) {
-                            folder = { id: generateId(), name, type: 'folder', children: [] };
-                            pointer.push(folder);
-                        }
-                        pointer = folder.children;
-                    }
-                }
-            });
-        };
-        input.click();
-    }
-
-    // ============================================================
-    // Links (main)
-    // ============================================================
-    function renderLinks() {
-        const container = document.getElementById('linksList');
-        const links = data.links || [];
-        if (links.length === 0) { container.innerHTML = '<div class="empty-state">No links saved.</div>'; return; }
-        container.innerHTML = links.map((link, idx) =>
-            `<div class="link-item">
-                <div class="link-content"><a href="${escapeAttr(link.url)}" target="_blank">${link.name}</a></div>
-                <button class="del-link" onclick="deleteLink(${idx})">✕</button>
-            </div>`
-        ).join('');
-    }
-
-    function addLink() {
-        const name = document.getElementById('linkName').value.trim();
-        const url = document.getElementById('linkURL').value.trim();
-        if (!name || !url) return alert('Enter both name and URL.');
-        if (!data.links) data.links = [];
-        data.links.push({ name, url });
-        saveData();
-        renderLinks();
-        document.getElementById('linkName').value = '';
-        document.getElementById('linkURL').value = '';
-    }
-
-    function deleteLink(idx) {
-        if (!confirm('Delete this link?')) return;
-        data.links.splice(idx, 1);
-        saveData();
-        renderLinks();
-    }
-
-    // ============================================================
-    // Objectives
-    // ============================================================
-    function renderObjectives() {
-        const container = document.getElementById('objectiveGrid');
-        if (!container) return;
-        const subjOrder = SUBJECTS;
-        let html = '';
-        subjOrder.forEach(subj => {
-            const obj = data.objectives[subj] || { target: '5', current: '4' };
-            html += `
-                <div class="objective-row">
-                    <span class="obj-name">${subj}</span>
-                    <div class="obj-grade-group">
-                        <div>
-                            <div class="grade-label">Target</div>
-                            <div style="display:flex;align-items:center;gap:8px">
-                                <input style="width:60px" value="${escapeAttr(obj.target)}" onchange="changeObjective('${subj}','target',this.value)" />
-                            </div>
-                        </div>
-                        <div>
-                            <div class="grade-label">Current</div>
-                            <div style="display:flex;align-items:center;gap:8px">
-                                <input style="width:60px" value="${escapeAttr(obj.current)}" onchange="changeObjective('${subj}','current',this.value)" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
-    }
-
-    function changeObjective(subject, type, value) {
-        if (!data.objectives) data.objectives = {};
-        data.objectives[subject] = data.objectives[subject] || { target: '5', current: '4' };
-        data.objectives[subject][type] = value;
-        saveData();
-    }
-
-    // ============================================================
-    // Habits
-    // ============================================================
-    function getTodayLocal() {
-        const d = new Date();
-        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    }
-
-    function resetHabitsIfNewDay() {
-        const today = getTodayLocal();
-        if (!data.habits[today]) {
-            data.habits[today] = {};
-            SUBJECTS.forEach(s => data.habits[today][s] = false);
-            saveData();
-            renderHabits();
-        }
-    }
-
-    function renderHabits() {
-        const container = document.getElementById('habitsContainer');
-        if (!container) return;
-        const today = getTodayLocal();
-        if (!data.habits[today]) {
-            data.habits[today] = {}; SUBJECTS.forEach(s => data.habits[today][s] = false);
-            saveData();
-        }
-        const streaks = {};
-        SUBJECTS.forEach(subj => {
-            let count = 0; let date = new Date();
-            while (true) {
-                const d = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
-                if (data.habits[d] && data.habits[d][subj] === true) { count++; date.setDate(date.getDate()-1); } else break;
-            }
-            streaks[subj] = count;
-        });
-
-        let html = '';
-        SUBJECTS.forEach(subj => {
-            const done = data.habits[today][subj] || false;
-            const streak = streaks[subj] || 0;
-            const fireText = streak > 0 ? '🔥' + streak : '';
-            html += `
-                <div class="habit-row" data-subject="${subj}">
-                    <div class="habit-box ${done ? 'done' : ''}" onclick="toggleHabit('${subj}')">
-                        <span class="habit-name">${subj}</span>
-                        <span class="habit-status"></span>
-                        <span class="habit-fire">${fireText}</span>
-                    </div>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
-    }
-
-    function toggleHabit(subject) {
-        const today = getTodayLocal();
-        if (!data.habits[today]) {
-            data.habits[today] = {}; SUBJECTS.forEach(s => data.habits[today][s] = false);
-        }
-        data.habits[today][subject] = !data.habits[today][subject];
-        saveData();
-        renderHabits();
-    }
-
-    setInterval(() => {
-        const today = getTodayLocal();
-        if (!data.habits[today]) {
-            data.habits[today] = {}; SUBJECTS.forEach(s => data.habits[today][s] = false); saveData(); renderHabits();
-        }
-    }, 60000);
-
-    // ============================================================
-    // Calendar & Events (kept simple)
-    // ============================================================
-    let calYear = new Date().getFullYear();
-    let calMonth = new Date().getMonth();
-
-    function renderCalendar() {
-        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        document.getElementById('calGrid').innerText = `${calYear} ${monthNames[calMonth]}`;
-    }
-
-    // ============================================================
-    // Statistics (full page)
-    // ============================================================
-    let statRange = 'week';
-    function setStatRange(range) {
-        statRange = range;
-        document.querySelectorAll('.stat-filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.range === range));
-        renderStatistics();
-    }
-
-    function renderStatistics() {
-        const canvas = document.getElementById('statChart');
-        if (!canvas) return;
-        const habitDates = Object.keys(data.habits).sort();
-        if (habitDates.length === 0) {
-            document.getElementById('statSummary').innerHTML = '<div class="stat-no-data">No study data yet. Start tracking your habits!</div>';
-            return;
-        }
-        const dailyCounts = habitDates.map(date => Object.values(data.habits[date] || {}).filter(v => v === true).length);
-        const today = new Date();
-        let cutoffDate = new Date(today);
-        switch (statRange) {
-            case 'week': cutoffDate.setDate(today.getDate() - 7); break;
-            case 'month': cutoffDate.setMonth(today.getMonth() - 1); break;
-            case 'halfyear': cutoffDate.setMonth(today.getMonth() - 6); break;
-            case 'year': cutoffDate.setFullYear(today.getFullYear() - 1); break;
-        }
-        const cutoffStr = `${cutoffDate.getFullYear()}-${String(cutoffDate.getMonth()+1).padStart(2,'0')}-${String(cutoffDate.getDate()).padStart(2,'0')}`;
-        const filtered = habitDates.map((d,i) => d >= cutoffStr ? { d, c: dailyCounts[i] } : null).filter(x => x);
-        if (filtered.length === 0) { document.getElementById('statSummary').innerHTML = '<div class="stat-no-data">No data in this period.</div>'; return; }
-        const filteredCounts = filtered.map(f => f.c);
-        const totalDays = filteredCounts.filter(c => c > 0).length;
-        const avgSubjects = filteredCounts.reduce((a,b)=>a+b,0) / filteredCounts.length;
-        const maxSubjects = Math.max(...filteredCounts);
-        document.getElementById('statTotalDays').textContent = totalDays;
-        document.getElementById('statAvgSubjects').textContent = avgSubjects.toFixed(1);
-        document.getElementById('statMaxSubjects').textContent = maxSubjects;
-
-        // draw chart
-        const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.parentElement.getBoundingClientRect();
-        const width = rect.width - 24; const height = Math.min(280, width * 0.6);
-        canvas.width = width * dpr; canvas.height = height * dpr;
-        canvas.style.width = width + 'px'; canvas.style.height = height + 'px';
-        ctx.scale(dpr, dpr);
-        ctx.clearRect(0,0,width,height);
-        if (filteredCounts.length < 2) { ctx.fillStyle = '#666'; ctx.font = '14px -apple-system, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Need at least 2 days of data to show trend.', width/2, height/2); return; }
-        const padding = { top: 24, bottom: 32, left: 32, right: 16 };
-        const chartWidth = width - padding.left - padding.right;
-        const chartHeight = height - padding.top - padding.bottom;
-        const maxVal = Math.max(1, Math.max(...filteredCounts));
-        const yMax = Math.ceil(maxVal / 1) * 1;
-        const points = filteredCounts.map((val, idx) => {
-            const x = padding.left + (idx / (filteredCounts.length - 1)) * chartWidth;
-            const y = padding.top + chartHeight - (val / yMax) * chartHeight;
-            return { x, y, val };
-        });
-        const gradient = ctx.createLinearGradient(0, padding.top, 0, padding.top + chartHeight);
-        gradient.addColorStop(0, 'rgba(138, 180, 248, 0.5)');
-        gradient.addColorStop(1, 'rgba(138, 180, 248, 0.0)');
-        ctx.beginPath(); ctx.moveTo(points[0].x, padding.top + chartHeight); points.forEach(p => ctx.lineTo(p.x, p.y)); ctx.lineTo(points[points.length-1].x, padding.top + chartHeight); ctx.closePath(); ctx.fillStyle = gradient; ctx.fill();
-        ctx.beginPath(); points.forEach((p, idx) => idx === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)); ctx.strokeStyle = '#8ab4f8'; ctx.lineWidth = 2.5; ctx.stroke();
-        points.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fillStyle = '#8ab4f8'; ctx.fill(); ctx.strokeStyle = '#0b0b0b'; ctx.lineWidth = 1.5; ctx.stroke(); });
-        ctx.fillStyle = '#666'; ctx.font = '10px -apple-system, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-        const step = Math.max(1, Math.floor(points.length / 8));
-        points.forEach((p, idx) => { if (idx % step === 0 || idx === points.length - 1) ctx.fillText(filtered[idx] ? filtered[idx].d.split('-').slice(1).join('/') : '', p.x, padding.top + chartHeight + 6); });
-        ctx.fillStyle = '#555'; ctx.font = '12px -apple-system, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText('Subjects per day', padding.left, 4);
-    }
-
-    // Stat preview small canvas on home
-    function renderStatPreview() {
-        const canvas = document.getElementById('statPreviewCanvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        const width = rect.width || 160; const height = rect.height || 60;
-        canvas.width = Math.max(1, Math.floor(width * dpr)); canvas.height = Math.max(1, Math.floor(height * dpr));
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.clearRect(0,0,width,height);
-        const N = 14; const today = new Date(); const dates = [];
-        for (let i = N - 1; i >= 0; i--) { const d = new Date(today); d.setDate(today.getDate() - i); dates.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`); }
-        const counts = dates.map(d => (data.habits[d] ? Object.values(data.habits[d]).filter(v => v === true).length : 0));
-        if (counts.every(c => c === 0)) { ctx.fillStyle = '#666'; ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('No data', width / 2, height / 2); return; }
-        const maxVal = Math.max(...counts, 1); const pad = { left: 6, right: 6, top: 6, bottom: 12 }; const chartW = width - pad.left - pad.right; const chartH = height - pad.top - pad.bottom;
-        const points = counts.map((val, idx) => ({ x: pad.left + (chartW * (idx / (counts.length - 1))), y: pad.top + (chartH * (1 - val / maxVal)) }));
-        const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH); grad.addColorStop(0, 'rgba(138,180,248,0.5)'); grad.addColorStop(1, 'rgba(138,180,248,0)');
-        ctx.beginPath(); ctx.moveTo(points[0].x, pad.top + chartH); points.forEach(p => ctx.lineTo(p.x, p.y)); ctx.lineTo(points[points.length - 1].x, pad.top + chartH); ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
-        ctx.beginPath(); points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)); ctx.strokeStyle = '#8ab4f8'; ctx.lineWidth = 2; ctx.stroke();
-        points.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); ctx.fillStyle = '#8ab4f8'; ctx.fill(); });
-    }
-
-    // ============================================================
-    // Tools: Calculator & Grade calculator
-    // ============================================================
-    function navigateToToolsDefault(){ navigateTo('tools'); showTool('calculator'); }
-
-    function showTool(name) {
-        const container = document.getElementById('toolsContent');
-        if (name === 'calculator') {
-            container.innerHTML = `<div style="display:flex;gap:8px;align-items:center">
-                <input id="calcExpr" placeholder="Type expression, e.g. (2+3)*4" style="flex:1" />
-                <button class="btn-secondary" onclick="runCalc()">Calc</button>
-            </div><div style="margin-top:8px"><strong>Result: </strong><span id="calcResult"></span></div>`;
-        } else if (name === 'grade') {
-            data._gradeTmp = data._gradeTmp || [];
-            if (data._gradeTmp.length === 0) data._gradeTmp = [{name:'Test',weight:40,score:80},{name:'Exam',weight:60,score:75}];
-            container.innerHTML = `<div id="gradeRows"></div>
-                <div style="margin-top:8px;display:flex;gap:8px">
-                    <button class="btn-secondary" onclick="addGradeRow()">+ Add Item</button>
-                    <button class="btn-secondary" onclick="calcGrade()">Calculate</button>
-                </div>
-                <div style="margin-top:8px"><strong>Total: </strong><span id="gradeResult"></span></div>`;
-            renderGradeRows();
-        }
-    }
-
-    function runCalc() {
-        const expr = document.getElementById('calcExpr').value.trim();
-        if (!expr) return;
-        try {
-            // use Function to evaluate safely in local context
-            const res = Function('"use strict"; return (' + expr + ')')();
-            document.getElementById('calcResult').textContent = String(res);
-        } catch(e) {
-            document.getElementById('calcResult').textContent = 'Error';
-        }
-    }
-
-    // Grade calculator
-    function renderGradeRows() {
-        const container = document.getElementById('gradeRows');
-        const rows = data._gradeTmp || [];
-        container.innerHTML = rows.map((r,i) => `<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
-            <input placeholder="Name" value="${escapeAttr(r.name)}" onchange="updateGradeRow(${i},'name',this.value)" />
-            <input placeholder="Weight (%)" style="width:80px" value="${r.weight}" onchange="updateGradeRow(${i},'weight',this.value)" />
-            <input placeholder="Score" style="width:80px" value="${r.score}" onchange="updateGradeRow(${i},'score',this.value)" />
-            <button class="btn-secondary" onclick="removeGradeRow(${i})">Remove</button>
-        </div>`).join('');
-    }
-    function addGradeRow(){ data._gradeTmp = data._gradeTmp || []; data._gradeTmp.push({name:'Item',weight:0,score:0}); renderGradeRows(); }
-    function updateGradeRow(i,k,v){ if(!data._gradeTmp) data._gradeTmp=[]; data._gradeTmp[i][k] = (k==='name'?v:parseFloat(v)||0); renderGradeRows(); }
-    function removeGradeRow(i){ data._gradeTmp.splice(i,1); renderGradeRows(); }
-    function calcGrade(){
-        const rows = data._gradeTmp || []; if (rows.length===0) return alert('Add items');
-        let totalW = 0; let sum = 0;
-        rows.forEach(r => { totalW += Number(r.weight)||0; sum += (Number(r.score)||0) * (Number(r.weight)||0); });
-        const result = totalW > 0 ? (sum/totalW) : 0;
-        document.getElementById('gradeResult').textContent = result.toFixed(2);
-    }
-
-    // ============================================================
-    // AI links management & bottom bar (text-only custom buttons)
-    // ============================================================
-    function renderAiLinks() {
-        const container = document.getElementById('aiLinksList');
-        const arr = data.aiLinks || [];
-        if (arr.length === 0) { container.innerHTML = '<div class="empty-state">No AI links.</div>'; return; }
-        container.innerHTML = arr.map((a,i) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border:1px solid #2a2a2a;border-radius:8px;margin-bottom:6px">
-            <div><a href="${escapeAttr(a.url)}" target="_blank">${escapeAttr(a.name)}</a></div>
-            <div style="display:flex;gap:8px"><button class="btn-secondary" onclick="editAiLink(${i})">Edit</button><button class="btn-secondary" style="background:#e74c3c" onclick="deleteAiLink(${i})">Delete</button></div>
-        </div>`).join('');
-    }
-    function addAiLink(){
-        const name = document.getElementById('aiName').value.trim(); const url = document.getElementById('aiURL').value.trim();
-        if (!name || !url) return alert('Enter both');
-        data.aiLinks = data.aiLinks || []; data.aiLinks.push({ name, url }); saveData(); document.getElementById('aiName').value=''; document.getElementById('aiURL').value=''; renderAiLinks(); renderBottomBar();
-    }
-    function editAiLink(i){
-        const a = data.aiLinks[i]; const newName = prompt('Name:', a.name); if (newName === null) return; const newUrl = prompt('URL:', a.url); if (newUrl === null) return;
-        a.name = newName; a.url = newUrl; saveData(); renderAiLinks(); renderBottomBar();
-    }
-    function deleteAiLink(i){ if (!confirm('Delete?')) return; data.aiLinks.splice(i,1); saveData(); renderAiLinks(); renderBottomBar(); }
-
-    function renderBottomBar() {
-        const container = document.getElementById('customButtonsContainer');
-        if (!container) return;
-        const btns = data.customButtons || [];
-        container.innerHTML = btns.map(b => `<button onclick="window.open('${b.url}','_blank')">${escapeAttr(b.name)}</button>`).join('');
-    }
-    function openCustomBtnModal(){ document.getElementById('customBtnModal').classList.add('show'); document.getElementById('customBtnName').value=''; document.getElementById('customBtnURL').value=''; }
-    function closeCustomBtnModal(){ document.getElementById('customBtnModal').classList.remove('show'); }
-    function saveCustomButton(){ const name = document.getElementById('customBtnName').value.trim(); const url = document.getElementById('customBtnURL').value.trim(); if(!name||!url) return alert('Enter both'); data.customButtons = data.customButtons || []; data.customButtons.push({ id: generateId(), name, url }); saveData(); closeCustomBtnModal(); renderBottomBar(); }
-
-    // ============================================================
-    // Delete confirm utilities
-    // ============================================================
-    let deleteCallback = null;
-    function showDeleteConfirm(message, callback) { document.getElementById('deleteConfirmMessage').textContent = message; document.getElementById('deleteConfirmOverlay').classList.add('show'); deleteCallback = callback; }
-    function cancelDelete() { document.getElementById('deleteConfirmOverlay').classList.remove('show'); deleteCallback = null; }
-    function confirmDelete() { if (deleteCallback) deleteCallback(); deleteCallback = null; document.getElementById('deleteConfirmOverlay').classList.remove('show'); }
-
-    // ============================================================
-    // File open helper
-    // ============================================================
-    function openFile(dataUrl, fileName) {
-        fetch(dataUrl).then(response => response.blob()).then(blob => {
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.target = '_blank'; a.rel = 'noopener';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(() => URL.revokeObjectURL(url), 10000);
-        }).catch(() => { window.open(dataUrl, '_blank'); });
-    }
-
-    // ============================================================
-    // Misc: Quiz page, etc.
-    // ============================================================
-    function openQuiz() {
-        currentCategory = 'Quiz';
-        document.getElementById('quizTitle').innerText = 'Quiz';
-        const container = document.getElementById('quizContent');
-        container.innerHTML = `<div class="subject-grid" id="quizSubjectGrid"></div>`;
-        const grid2 = document.getElementById('quizSubjectGrid');
-        grid2.innerHTML = '';
-        SUBJECTS.forEach(subj => {
-            const div = document.createElement('div');
-            div.className = 'subject-item';
-            div.innerHTML = `<div class="subj-name">${subj}</div>`;
-            div.onclick = () => openSubjectDetail('Quiz', subj);
-            grid2.appendChild(div);
-        });
-        navigateTo('quiz');
-    }
-    function goBackFromQuiz(){ navigateTo('home'); }
-
-    // ============================================================
-    // Init app
-    // ============================================================
-    let data = {};
-    function initApp() {
-        data = loadData();
-        // ensure homeOrder contains defaults
-        if (!data.homeOrder) data.homeOrder = HOME_DEFAULT_ORDER.slice();
-        HOME_DEFAULT_ORDER.forEach(id => { if (!data.homeOrder.includes(id)) data.homeOrder.push(id); });
-        saveData();
-
-        resetHabitsIfNewDay();
-        updateHeaderClock();
-        navigateTo('home');
-        renderBottomBar();
-        window.addEventListener('resize', () => {
-            if (document.getElementById('page-statistics').classList.contains('active')) renderStatistics();
-            if (document.getElementById('page-home').classList.contains('active')) renderStatPreview();
-        });
-        console.log('Ching Study unlocked.');
-    }
-
-    checkLoginStatus();
+/* start */
+checkLoginStatus();
 </script>
 </body>
 </html>
