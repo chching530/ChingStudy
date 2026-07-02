@@ -369,8 +369,9 @@
                 <div class="habits-container" id="habitsContainer"></div>
             </div>
 
-            <button id="syncNowBtn" onclick="syncNow()" style="background:#444;border:none;color:#fff;padding:10px 20px;border-radius:30px;cursor:pointer;margin-bottom:12px;width:100%;">
-                sync
+            <!-- 同步按鈕 (新增) -->
+            <button id="syncNowBtn" onclick="syncNow()" style="background:#444;border:none;color:#fff;padding:10px;border-radius:30px;cursor:pointer;margin-bottom:12px;width:100%;">
+                sync now
             </button>
 
             <div class="card-grid" id="homeCardGrid"></div>
@@ -741,15 +742,12 @@
 
         // Legacy verifyPassword - kept for compatibility
         function verifyPassword() {
-            // This is now handled by useLocalPasswordMode()
-            // We keep it as a no-op or fallback
             const v = document.getElementById('passwordInput');
             if (v) {
                 const val = v.value.trim();
                 if (val === CORRECT_PASSWORD) { localStorage.setItem('loggedIn', 'true');
                     showApp(); } else { document.getElementById('loginError').textContent = 'Wrong password, try again'; }
             } else {
-                // fallback: prompt
                 const pw = prompt('Enter local password:');
                 if (pw === CORRECT_PASSWORD) { localStorage.setItem('loggedIn', 'true');
                     showApp(); } else { document.getElementById('authMsg').textContent = 'Wrong password';
@@ -757,7 +755,6 @@
             }
         }
 
-        // This is called from the "Use Local Password" button
         window.useLocalPasswordMode = function() {
             const pw = prompt('Enter local password:');
             if (pw === CORRECT_PASSWORD) {
@@ -774,20 +771,19 @@
         function showApp() {
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('appContainer').classList.add('active');
-            // Re-initialize data in case it was reloaded
             data = loadData();
             initApp();
         }
 
+        // ===== 修正後的 logout 函數 =====
         function logout() {
-            if (confirm('Logout?')) {
-                localStorage.removeItem('loggedIn');
-                // Also sign out from Firebase if available
-                if (typeof window.auth !== 'undefined' && window.auth.currentUser) {
-                    window.auth.signOut().catch(() => {});
-                }
-                location.reload();
+            if (!confirm('確定要登出嗎？')) return;
+            localStorage.removeItem('loggedIn');
+            if (typeof window.auth !== 'undefined' && window.auth.currentUser) {
+                window.auth.signOut().catch(() => {});
             }
+            // 強制重新載入，清除快取
+            window.location.href = window.location.href.split('?')[0] + '?t=' + Date.now();
         }
 
         // ============================================================
@@ -1281,7 +1277,6 @@
             const key = document.getElementById('chapterFilesList').dataset.key;
             const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
 
-            // If Firebase is available and user is signed in, upload to Storage
             if (typeof window.auth !== 'undefined' && window.auth.currentUser) {
                 try {
                     const uid = window.auth.currentUser.uid;
@@ -1302,7 +1297,7 @@
                 return;
             }
 
-            // Fallback: base64 (for local-only mode)
+            // Fallback: base64
             const reader = new FileReader();
             reader.onload = function(ev) {
                 const entry = { id: generateId(), name: file.name, type: 'file', data: ev.target.result, size: file
@@ -1330,7 +1325,6 @@
                 if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
                 const root = data.chapters[key][chIdx].files;
 
-                // Check if Firebase is available for uploads
                 const useFirebase = (typeof window.auth !== 'undefined' && window.auth.currentUser);
 
                 files.forEach(async (file) => {
@@ -2230,11 +2224,43 @@
         }
 
         // ============================================================
+        // 新增：同步函數 syncNow
+        // ============================================================
+        window.syncNow = async function() {
+            if (!window.auth || !window.auth.currentUser) {
+                alert('請先登入（使用 Email 帳號）才能同步');
+                return;
+            }
+            const uid = window.auth.currentUser.uid;
+            try {
+                // 這些函數由 Firebase 模組暴露
+                const remote = await window.loadRemoteData(uid);
+                if (remote) {
+                    localStorage.setItem('ching_study_data', JSON.stringify(remote));
+                    window.data = loadData();
+                    // 刷新所有頁面
+                    renderHomeCards();
+                    renderHabits();
+                    renderObjectives();
+                    renderBottomBar();
+                    renderStatPreview();
+                    if (document.getElementById('page-statistics').classList.contains('active')) renderStatistics();
+                    if (document.getElementById('page-calendar').classList.contains('active')) renderCalendar();
+                    alert('同步完成！');
+                } else {
+                    alert('雲端無資料，將上傳目前本地資料');
+                    await window.saveRemoteData(uid, window.data);
+                    alert('已上傳');
+                }
+            } catch (e) {
+                alert('同步失敗：' + e.message);
+                console.error(e);
+            }
+        };
+
+        // ============================================================
         // Init
         // ============================================================
-        // 'data' is already defined as a var at the top
-        // We'll re-assign it if loadData returns something different
-
         function initApp() {
             data = loadData();
             if (!data.homeOrder) data.homeOrder = HOME_DEFAULT_ORDER.slice();
@@ -2246,20 +2272,10 @@
             navigateTo('home');
             renderBottomBar();
 
-            // 新增同步按鈕（動態插入）
-            const homePage = document.getElementById('page-home');
-            const syncBtn = document.createElement('button');
-            syncBtn.id = 'syncNowBtn';
-            syncBtn.textContent = 'Sync';
-            syncBtn.style.cssText = 'background:#444;border:none;color:#fff;padding:10px 20px;border-radius:30px;cursor:pointer;margin-bottom:12px;width:100%;';
-            syncBtn.onclick = syncNow;
-            const grid = document.getElementById('homeCardGrid');
-            homePage.insertBefore(syncBtn, grid);
-
-            // 頁面可見時自動同步
+            // 頁面可見時自動同步（若已登入）
             document.addEventListener('visibilitychange', function() {
                 if (!document.hidden && window.auth && window.auth.currentUser) {
-                    setTimeout(() => { syncNow(); }, 300);
+                    setTimeout(() => { window.syncNow(); }, 300);
                 }
             });
 
@@ -2281,45 +2297,10 @@
             console.log('Ching Study unlocked.');
         }
 
-        window.syncNow = async function() {
-            if (!window.auth || !window.auth.currentUser) {
-                alert('請先登入才能同步');
-                return;
-            }
-            const uid = window.auth.currentUser.uid;
-            try {
-                const remote = await loadRemoteData(uid);
-                if (remote) {
-                    // 覆蓋本地資料
-                    localStorage.setItem('ching_study_data', JSON.stringify(remote));
-                    // 重新載入 data 並刷新所有畫面
-                    window.data = loadData();
-                    renderHomeCards();
-                    renderHabits();
-                    renderObjectives();
-                    renderBottomBar();
-                    renderStatPreview();
-                    // 也刷新當前頁面（若在統計、日曆等）
-                    if (document.getElementById('page-statistics').classList.contains('active')) renderStatistics();
-                    if (document.getElementById('page-calendar').classList.contains('active')) renderCalendar();
-                    alert('同步完成！');
-                } else {
-                    alert('雲端無資料，將上傳目前本地資料');
-                    await saveRemoteData(uid, window.data);
-                    alert('已上傳');
-                }
-            } catch (e) {
-                alert('同步失敗：' + e.message);
-            }
-        };
-
-
-        // Check if user is already logged in (localStorage flag)
+        // Check login status
         checkLoginStatus();
 
-        // ============================================================
-        // Expose key functions to window for module access
-        // ============================================================
+        // 暴露必要函數給 window，供 Firebase 模組調用
         window.data = data;
         window.loadData = loadData;
         window.saveData = saveData;
@@ -2333,45 +2314,35 @@
         window.CORRECT_PASSWORD = CORRECT_PASSWORD;
         window.navigateTo = navigateTo;
         window.logout = logout;
-        window.auth = null; // will be set by module
+        window.auth = null; // 會由 module 設置
     </script>
 
     <!-- ===== FIREBASE MODULE (ES Module) ===== -->
     <script type="module">
-        // Use the compat SDK from the CDN (already loaded via script tags)
-        // But we'll use the modular SDK for better tree-shaking and modern syntax
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
             onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
 
-                // Import the functions you need from the SDKs you need
-        import { initializeApp } from "firebase/app";
-        import { getAnalytics } from "firebase/analytics";
-        // TODO: Add SDKs for Firebase products that you want to use
-        // https://firebase.google.com/docs/web/setup#available-libraries
-
-        // Your web app's Firebase configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
             apiKey: "AIzaSyAdx9vadpwmZcJKuzAANnIYC_epmdFJ1xQ",
             authDomain: "chingstudy-c530.firebaseapp.com",
             projectId: "chingstudy-c530",
-            storageBucket: "chingstudy-c530.firebasestorage.app",
+            storageBucket: "chingstudy-c530.appspot.com",
             messagingSenderId: "661963537920",
             appId: "1:661963537920:web:6ef8ef3e7aed95b21322e5",
             measurementId: "G-HECJDWXH24"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
 
-        // Expose auth to the main script so it can check auth.currentUser
         window.auth = auth;
 
-        // --- Authentication helpers (exposed to window for inline onclick) ---
+        // --- Auth helpers ---
         window.signUpWithEmail = async function() {
             const email = document.getElementById('authEmail').value.trim();
             const pw = document.getElementById('authPassword').value;
@@ -2381,7 +2352,6 @@
                 msg.style.color = '#8ab4f8';
                 msg.textContent = 'Account created. Logged in.';
                 await setDoc(doc(db, 'users', cred.user.uid), { appData: null }, { merge: true });
-                // onAuthStateChanged will handle showing the app
             } catch (err) {
                 msg.style.color = '#e74c3c';
                 msg.textContent = err.message;
@@ -2397,7 +2367,6 @@
                 const cred = await signInWithEmailAndPassword(auth, email, pw);
                 msg.style.color = '#8ab4f8';
                 msg.textContent = 'Signed in.';
-                // onAuthStateChanged will handle showing the app
             } catch (err) {
                 msg.style.color = '#e74c3c';
                 msg.textContent = err.message;
@@ -2409,7 +2378,7 @@
             await signOut(auth);
         };
 
-        // --- Firestore sync helpers ---
+        // --- Firestore sync ---
         async function saveRemoteData(uid, appData) {
             if (!uid) return;
             try {
@@ -2433,6 +2402,10 @@
             }
         }
 
+        // 暴露給全域
+        window.saveRemoteData = saveRemoteData;
+        window.loadRemoteData = loadRemoteData;
+
         function debounce(fn, wait = 1500) {
             let t;
             return (...args) => {
@@ -2445,7 +2418,6 @@
             saveRemoteData(uid, appData);
         }, 1500);
 
-        // --- File upload helper (exposed to main script) ---
         window.uploadFileToStorage = async function(file, storagePath) {
             const r = ref(storage, storagePath);
             const snapshot = await uploadBytes(r, file);
@@ -2461,13 +2433,10 @@
                 const remote = await loadRemoteData(user.uid);
                 if (remote) {
                     try {
-                        // Overwrite local storage with remote data
                         localStorage.setItem('ching_study_data', JSON.stringify(remote));
-                        // Reload data in the main script
                         if (typeof window.loadData === 'function') {
                             window.data = window.loadData();
                         }
-                        // Re-render UI
                         if (typeof window.renderHomeCards === 'function') window.renderHomeCards();
                         if (typeof window.renderHabits === 'function') window.renderHabits();
                         if (typeof window.renderObjectives === 'function') window.renderObjectives();
@@ -2476,39 +2445,30 @@
                         80);
                     } catch (e) { console.error(e); }
                 } else {
-                    // Remote empty — upload local data if it exists
                     if (typeof window.data !== 'undefined' && window.data) {
                         await saveRemoteData(user.uid, window.data);
                     }
                 }
 
-                // --- Patch saveData to sync to Firestore ---
-                // We need to do this after the user is signed in
-                // The main script's saveData is already defined, we'll wrap it
+                // Wrap saveData to push to Firestore
                 const originalSave = window.saveData;
                 if (typeof originalSave === 'function') {
                     window.saveData = function() {
-                        // Call the original saveData (which writes to localStorage)
                         originalSave.apply(window, arguments);
-                        // Then push to Firestore (debounced)
                         if (auth.currentUser && typeof window.data !== 'undefined') {
                             saveRemoteDataDebounced(auth.currentUser.uid, window.data);
                         }
                     };
                 }
 
-                // --- Show the app! ---
-                // Set loggedIn flag and call showApp
                 localStorage.setItem('loggedIn', 'true');
                 if (typeof window.showApp === 'function') {
                     window.showApp();
                 } else {
-                    // Fallback: manually show app
                     document.getElementById('loginContainer').style.display = 'none';
                     document.getElementById('appContainer').classList.add('active');
                 }
 
-                // Make sure data is re-loaded after showing app
                 if (typeof window.loadData === 'function') {
                     window.data = window.loadData();
                     if (typeof window.initApp === 'function') window.initApp();
@@ -2516,8 +2476,7 @@
 
             } else {
                 console.log('User signed out');
-                // Do NOT auto-logout from local — keep local data
-                // But if user explicitly logs out, they can use local mode
+                // 不自動清除 local 登入狀態，保留給本地模式使用
             }
         });
 
