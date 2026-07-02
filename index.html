@@ -245,11 +245,10 @@
             font-weight: 400;
         }
         .bottom-bar button:active { transform: scale(0.92); color: #fff; background: #2a2a2a; }
-        .bottom-bar button .btn-icon { display: none; } /* Hide all emoji icons */
+        .bottom-bar button .btn-icon { display: none; }
         .bottom-bar button .btn-label { font-size: 11px; color: #888; }
         .bottom-bar button.active .btn-label { color: #8ab4f8; }
         .bottom-bar .bb-spacer { flex: 1; min-width: 8px; }
-        /* Custom buttons in bottom bar - text only, no delete button */
         .bottom-bar .custom-btn-wrapper {
             display: inline-flex;
             align-items: center;
@@ -369,9 +368,11 @@
             <div style="font-size: 14px; color: #888; margin-bottom: 4px;">Learning Habits</div>
             <div class="habits-container" id="habitsContainer"></div>
         </div>
-        <button id="syncNowBtn" onclick="syncNow()" style="background:#444;border:none;color:#fff;padding:10px;border-radius:30px;cursor:pointer;margin-bottom:12px;width:100%;">
-            🔄 Sync Now (pull latest from cloud)
+        <!-- 同步按鈕改名 + 訊息顯示區 -->
+        <button id="syncNowBtn" onclick="syncNow()" style="background:#444;border:none;color:#fff;padding:10px;border-radius:30px;cursor:pointer;margin-bottom:8px;width:100%;">
+            Sync now
         </button>
+        <div id="syncMessage" style="color:#8ab4f8;font-size:13px;text-align:center;min-height:22px;margin-bottom:12px;"></div>
         <div class="card-grid" id="homeCardGrid"></div>
         <button class="logout-btn" onclick="logout()">Logout</button>
         <div class="footnote">All data saved in this browser</div>
@@ -1152,9 +1153,9 @@ async function addChapterFile() {
     const key = document.getElementById('chapterFilesList').dataset.key;
     const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
 
-    const MAX_SIZE = 50 * 1024 * 1024;
+    const MAX_SIZE = 500 * 1024;
     if (file.size > MAX_SIZE) {
-        alert('File too large! Please upload files smaller than 50 MB.');
+        alert('File too large! Please upload files smaller than 500 KB.');
         input.value = '';
         return;
     }
@@ -2065,13 +2066,24 @@ function updateCircleProgress() {
 }
 
 // ============================================================
-// Sync
+// Sync - 靜音版本（無彈窗）
 // ============================================================
+function setSyncMessage(text, isSuccess = true) {
+    const el = document.getElementById('syncMessage');
+    if (!el) return;
+    el.textContent = text;
+    el.style.color = isSuccess ? '#8ab4f8' : '#e74c3c';
+    // 5秒後自動清除
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => { el.textContent = ''; }, 5000);
+}
+
 window.syncNow = async function() {
     if (!auth.currentUser) {
-        alert('Please sign in (with Email) to sync.');
+        setSyncMessage('Please sign in (with Email) to sync.', false);
         return;
     }
+    setSyncMessage('Syncing...');
     const uid = auth.currentUser.uid;
     try {
         const docRef = db.collection('users').doc(uid);
@@ -2089,22 +2101,23 @@ window.syncNow = async function() {
                 if (document.getElementById('page-statistics').classList.contains('active')) renderStatistics();
                 if (document.getElementById('page-calendar').classList.contains('active')) renderCalendar();
                 if (document.getElementById('page-ai').classList.contains('active')) renderCustomButtonsList();
-                alert('Sync complete!');
+                setSyncMessage('Sync complete!');
             } else {
-                alert('No data in cloud. Uploading current local data...');
+                // 無遠端資料，上傳本地
                 await docRef.set({ appData: window.data }, { merge: true });
-                alert('Uploaded.');
+                setSyncMessage('Uploaded local data to cloud.');
             }
         } else {
             await docRef.set({ appData: window.data });
-            alert('Uploaded.');
+            setSyncMessage('Uploaded local data to cloud.');
         }
     } catch (e) {
-        alert('Sync failed: ' + e.message);
         console.error(e);
+        setSyncMessage('Sync failed: ' + e.message, false);
     }
 };
 
+// 自動推送（靜音）
 let syncTimeout = null;
 function debouncedSync() {
     if (!auth.currentUser) return;
@@ -2206,6 +2219,7 @@ function initApp() {
 
     document.addEventListener('visibilitychange', function() {
         if (!document.hidden && auth.currentUser) {
+            // 自動同步，但唔彈窗（靜音）
             setTimeout(() => { window.syncNow(); }, 300);
         }
     });
