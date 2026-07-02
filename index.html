@@ -1313,14 +1313,34 @@
         // ============================================================
         // File upload helpers (with Firebase Storage support)
         // ============================================================
-        async function addChapterFile() {
-            const input = document.getElementById('chapterFileInput');
-            const file = input.files[0];
-            if (!file) return alert('Please select a file.');
-            const key = document.getElementById('chapterFilesList').dataset.key;
-            const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+            async function addChapterFile() {
+                const input = document.getElementById('chapterFileInput');
+                const file = input.files[0];
+                if (!file) return alert('請選擇檔案。');
+                const key = document.getElementById('chapterFilesList').dataset.key;
+                const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
 
-            if (auth.currentUser) {
+                // 如果未登入，改用 base64（但檔案不能太大）
+                if (!auth.currentUser) {
+                    if (file.size > 1024 * 1024) {
+                        alert('您未登入，無法上傳大檔案（>1MB）。請先用 Email 登入。');
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        const entry = { id: generateId(), name: file.name, type: 'file', data: ev.target.result, size: file.size };
+                        if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
+                        data.chapters[key][chIdx].files.push(entry);
+                        saveData();
+                        input.value = '';
+                        renderChapterFiles();
+                        renderChapterList(key);
+                    };
+                    reader.readAsDataURL(file);
+                    return;
+                }
+
+                // 已登入，使用 Firebase Storage
                 try {
                     const uid = auth.currentUser.uid;
                     const id = generateId();
@@ -1336,10 +1356,9 @@
                     renderChapterFiles();
                     renderChapterList(key);
                 } catch (e) {
-                    console.error(e);
-                    alert('Upload to Firebase Storage failed: ' + e.message);
+                    console.error('Upload error:', e);
+                    alert('上傳失敗：' + e.message + '\n請檢查 Firebase Storage 權限或網路。');
                 }
-                return;
             }
 
             // Fallback: base64
