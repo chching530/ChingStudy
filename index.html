@@ -370,7 +370,7 @@
             </div>
 
             <button id="syncNowBtn" onclick="syncNow()" style="background:#444;border:none;color:#fff;padding:10px 20px;border-radius:30px;cursor:pointer;margin-bottom:12px;width:100%;">
-                立即同步
+                sync
             </button>
 
             <div class="card-grid" id="homeCardGrid"></div>
@@ -2250,7 +2250,7 @@
             const homePage = document.getElementById('page-home');
             const syncBtn = document.createElement('button');
             syncBtn.id = 'syncNowBtn';
-            syncBtn.textContent = '🔄 立即同步（從雲端拉取最新資料）';
+            syncBtn.textContent = 'Sync';
             syncBtn.style.cssText = 'background:#444;border:none;color:#fff;padding:10px 20px;border-radius:30px;cursor:pointer;margin-bottom:12px;width:100%;';
             syncBtn.onclick = syncNow;
             const grid = document.getElementById('homeCardGrid');
