@@ -329,6 +329,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="https://js.puter.com/v2/"></script>
 </head>
 <body>
 
@@ -1153,34 +1154,28 @@ async function addChapterFile() {
     const key = document.getElementById('chapterFilesList').dataset.key;
     const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
 
-    const MAX_SIZE = 500 * 1024;
-    if (file.size > MAX_SIZE) {
-        alert('File too large! Please upload files smaller than 500 KB.');
-        input.value = '';
+    // 確保 Puter 已載入
+    if (typeof puter === 'undefined') {
+        alert('Puter.js not loaded. Please check your internet connection.');
         return;
     }
 
-    const existingFiles = data.chapters[key]?.[chIdx]?.files || [];
-    let totalBase64Size = 0;
-    existingFiles.forEach(f => { if (f.data) totalBase64Size += f.data.length; });
-    const newBase64Size = file.size * 1.37;
-    if (totalBase64Size + newBase64Size > 900 * 1024) {
-        alert('Firestore document size limit (1MB) approaching. Please delete some old files first.');
-        input.value = '';
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-        const entry = { id: generateId(), name: file.name, type: 'file', data: ev.target.result, size: file.size };
+    try {
+        // 用時間戳避免檔案名衝突
+        const timestamp = Date.now();
+        const path = `/ChingStudy/${timestamp}_${file.name}`;
+        await puter.fs.write(path, file);
+        const entry = { id: generateId(), name: file.name, type: 'file', data: path, size: file.size };
         if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
         data.chapters[key][chIdx].files.push(entry);
         saveData();
         input.value = '';
         renderChapterFiles();
         renderChapterList(key);
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+        alert('Upload to Puter failed: ' + err.message);
+        console.error(err);
+    }
 }
 
 function uploadChapterFolder() {
@@ -1188,38 +1183,41 @@ function uploadChapterFolder() {
     input.type = 'file';
     input.webkitdirectory = true;
     input.multiple = true;
-    input.onchange = function(e) {
+    input.onchange = async function(e) {
         const files = Array.from(e.target.files);
         if (!files || files.length === 0) return;
         const key = document.getElementById('chapterFilesList').dataset.key;
         const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
         if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
         const root = data.chapters[key][chIdx].files;
-        files.forEach(async (file) => {
+
+        // 先建立資料夾結構（只係在 data 中建立，實際檔案仍上傳到 Puter 根目錄）
+        const folderMap = {};
+        for (const file of files) {
             const parts = file.webkitRelativePath.split('/');
+            const folderName = parts[0];
+            const fileName = parts.slice(1).join('/');
             let pointer = root;
-            for (let i = 0; i < parts.length; i++) {
-                const name = parts[i];
-                if (i === parts.length - 1) {
-                    const reader = new FileReader();
-                    reader.onload = function(ev) {
-                        const entry = { id: generateId(), name, type: 'file', data: ev.target.result, size: file.size };
-                        pointer.push(entry);
-                        saveData();
-                        renderChapterFiles();
-                        renderChapterList(key);
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    let folder = pointer.find(it => it.type === 'folder' && it.name === name);
-                    if (!folder) {
-                        folder = { id: generateId(), name, type: 'folder', children: [] };
-                        pointer.push(folder);
-                    }
-                    pointer = folder.children;
-                }
+            // 尋找或建立 folder 節點
+            let folderNode = pointer.find(it => it.type === 'folder' && it.name === folderName);
+            if (!folderNode) {
+                folderNode = { id: generateId(), name: folderName, type: 'folder', children: [] };
+                pointer.push(folderNode);
             }
-        });
+            // 將檔案存入 folder 的 children 中，data 存 Puter 路徑
+            try {
+                const timestamp = Date.now() + '_' + Math.random().toString(36).substr(2,4);
+                const path = `/ChingStudy/${timestamp}_${file.name}`;
+                await puter.fs.write(path, file);
+                const entry = { id: generateId(), name: fileName, type: 'file', data: path, size: file.size };
+                folderNode.children.push(entry);
+            } catch (err) {
+                console.error('Upload failed for', file.name, err);
+            }
+        }
+        saveData();
+        renderChapterFiles();
+        renderChapterList(key);
     };
     input.click();
 }
@@ -2186,21 +2184,47 @@ function openNotif() { document.getElementById('notifModal').classList.add('show
 function closeNotif() { document.getElementById('notifModal').classList.remove('show'); }
 
 function openFile(dataUrl, fileName) {
-    if (dataUrl.startsWith('http')) {
-        window.open(dataUrl, '_blank');
+    // 如果係 Puter 路徑 (以 '/' 開頭)
+    if (dataUrl && typeof dataUrl === 'string' && dataUrl.startsWith('/')) {
+        if (typeof puter === 'undefined') {
+            alert('Puter.js not loaded.');
+            return;
+        }
+        puter.fs.read(dataUrl)
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+                setTimeout(() => URL.revokeObjectURL(url), 10000);
+            })
+            .catch(err => {
+                alert('Cannot open file: ' + err.message);
+                console.error(err);
+            });
         return;
     }
-    fetch(dataUrl).then(response => response.blob()).then(blob => {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        a.rel = 'noopener';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 10000);
-    }).catch(() => { window.open(dataUrl, '_blank'); });
+
+    // 原有邏輯：支援 http / data: URL
+    if (dataUrl && (dataUrl.startsWith('http') || dataUrl.startsWith('data:'))) {
+        fetch(dataUrl)
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_blank';
+                a.rel = 'noopener';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 10000);
+            })
+            .catch(() => {
+                window.open(dataUrl, '_blank');
+            });
+        return;
+    }
+
+    alert('Cannot open file: no valid data.');
 }
 
 // ============================================================
