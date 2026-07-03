@@ -1154,14 +1154,22 @@ async function addChapterFile() {
     const key = document.getElementById('chapterFilesList').dataset.key;
     const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
 
-    // 確保 Puter 已載入
     if (typeof puter === 'undefined') {
         alert('Puter.js not loaded. Please check your internet connection.');
         return;
     }
 
     try {
-        // 用時間戳避免檔案名衝突
+        // 嘗試先建立目錄（如果唔存在）
+        try {
+            await puter.fs.mkdir('/ChingStudy');
+        } catch (e) {
+            // 如果目錄已存在，會拋出錯誤，可以忽略
+            if (!e.message.includes('already exists')) {
+                console.warn('mkdir warning:', e);
+            }
+        }
+
         const timestamp = Date.now();
         const path = `/ChingStudy/${timestamp}_${file.name}`;
         await puter.fs.write(path, file);
@@ -1173,8 +1181,13 @@ async function addChapterFile() {
         renderChapterFiles();
         renderChapterList(key);
     } catch (err) {
-        alert('Upload to Puter failed: ' + err.message);
         console.error(err);
+        // 如果錯誤訊息包含 "not authenticated" 或 "Subject does not exist"，提示用戶登入
+        if (err.message && (err.message.includes('not authenticated') || err.message.includes('Subject does not exist'))) {
+            alert('Please log in to Puter first. A login window should appear. If not, check your popup blocker and refresh the page.');
+        } else {
+            alert('Upload to Puter failed: ' + err.message);
+        }
     }
 }
 
@@ -1191,20 +1204,30 @@ function uploadChapterFolder() {
         if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
         const root = data.chapters[key][chIdx].files;
 
-        // 先建立資料夾結構（只係在 data 中建立，實際檔案仍上傳到 Puter 根目錄）
+        // 確保 Puter 可用
+        if (typeof puter === 'undefined') {
+            alert('Puter.js not loaded.');
+            return;
+        }
+
+        // 建立根目錄
+        try {
+            await puter.fs.mkdir('/ChingStudy');
+        } catch (e) {
+            if (!e.message.includes('already exists')) console.warn(e);
+        }
+
         const folderMap = {};
         for (const file of files) {
             const parts = file.webkitRelativePath.split('/');
             const folderName = parts[0];
             const fileName = parts.slice(1).join('/');
             let pointer = root;
-            // 尋找或建立 folder 節點
             let folderNode = pointer.find(it => it.type === 'folder' && it.name === folderName);
             if (!folderNode) {
                 folderNode = { id: generateId(), name: folderName, type: 'folder', children: [] };
                 pointer.push(folderNode);
             }
-            // 將檔案存入 folder 的 children 中，data 存 Puter 路徑
             try {
                 const timestamp = Date.now() + '_' + Math.random().toString(36).substr(2,4);
                 const path = `/ChingStudy/${timestamp}_${file.name}`;
@@ -1213,6 +1236,11 @@ function uploadChapterFolder() {
                 folderNode.children.push(entry);
             } catch (err) {
                 console.error('Upload failed for', file.name, err);
+                if (err.message && (err.message.includes('not authenticated') || err.message.includes('Subject does not exist'))) {
+                    alert('Please log in to Puter first. A login window should appear. If not, check your popup blocker and refresh.');
+                    // 停止上傳剩餘檔案
+                    break;
+                }
             }
         }
         saveData();
