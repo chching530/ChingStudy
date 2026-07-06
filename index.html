@@ -374,6 +374,11 @@
             Sync now
         </button>
         <div id="syncMessage" style="color:#8ab4f8;font-size:13px;text-align:center;min-height:22px;margin-bottom:12px;"></div>
+        <div style="margin:10px 0;">
+            <button onclick="loginPuter()" style="background:#555;border:none;color:#fff;padding:10px 20px;border-radius:30px;cursor:pointer;width:100%;">
+                🔑 Login to Puter
+            </button>
+        </div>
         <div class="card-grid" id="homeCardGrid"></div>
         <button class="logout-btn" onclick="logout()">Logout</button>
         <div class="footnote">All data saved in this browser</div>
@@ -2295,6 +2300,14 @@ function initApp() {
 }
 
 checkLoginStatus();
+
+function loginPuter() {
+    if (typeof puter !== 'undefined') {
+        puter.auth.signIn();
+    } else {
+        alert('Puter.js not loaded. Please check your internet.');
+    }
+}
 </script>
 </body>
 </html>
