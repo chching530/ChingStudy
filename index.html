@@ -1152,6 +1152,34 @@ function deleteChapterLink(idx) {
 // ============================================================
 // File handling (base64 only, no Storage)
 // ============================================================
+// 確保 Puter 已登入，如果未登入則強制彈出登入視窗並等待完成
+async function ensurePuterSignedIn() {
+    if (typeof puter === 'undefined') {
+        throw new Error('Puter.js not loaded. Please check your internet.');
+    }
+    // 嘗試獲取當前用戶
+    let user = null;
+    try {
+        user = await puter.auth.getUser();
+    } catch (e) {
+        // 未登入或 token 失效
+    }
+    if (!user) {
+        // 嘗試登入
+        try {
+            await puter.auth.signIn();
+            // 再次獲取用戶以確認
+            user = await puter.auth.getUser();
+            if (!user) {
+                throw new Error('Login failed');
+            }
+        } catch (e) {
+            throw new Error('Please log in to Puter first. A login window should appear. If not, check your popup blocker and refresh the page.');
+        }
+    }
+    return user;
+}
+
 async function addChapterFile() {
     // --- 協議檢查 ---
     if (window.__isFileProtocol) {
@@ -1165,20 +1193,11 @@ async function addChapterFile() {
     const key = document.getElementById('chapterFilesList').dataset.key;
     const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
 
-    if (typeof puter === 'undefined') {
-        alert('Puter.js not loaded. Please check your internet connection.');
-        return;
-    }
-
-    // --- 新增：檢查並確保已登入 Puter ---
+    // --- 確保已登入 Puter ---
     try {
-        const signedIn = await puter.auth.isSignedIn();
-        if (!signedIn) {
-            // 未登入，主動彈出登入視窗並等待完成
-            await puter.auth.signIn();
-        }
-    } catch (e) {
-        alert('Please log in to Puter first. A login window should appear. If not, check your popup blocker and refresh the page.');
+        await ensurePuterSignedIn();
+    } catch (err) {
+        alert(err.message);
         return;
     }
 
@@ -1201,11 +1220,7 @@ async function addChapterFile() {
         renderChapterList(key);
     } catch (err) {
         console.error(err);
-        if (err.message && (err.message.includes('not authenticated') || err.message.includes('Subject does not exist'))) {
-            alert('Please log in to Puter first. A login window should appear. If not, check your popup blocker and refresh the page.');
-        } else {
-            alert('Upload to Puter failed: ' + err.message);
-        }
+        alert('Upload to Puter failed: ' + err.message);
     }
 }
 
@@ -1227,19 +1242,11 @@ function uploadChapterFolder() {
         if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
         const root = data.chapters[key][chIdx].files;
 
-        if (typeof puter === 'undefined') {
-            alert('Puter.js not loaded.');
-            return;
-        }
-
-        // --- 新增：檢查並確保已登入 Puter ---
+        // --- 確保已登入 Puter ---
         try {
-            const signedIn = await puter.auth.isSignedIn();
-            if (!signedIn) {
-                await puter.auth.signIn();
-            }
-        } catch (e) {
-            alert('Please log in to Puter first. A login window should appear. If not, check your popup blocker and refresh.');
+            await ensurePuterSignedIn();
+        } catch (err) {
+            alert(err.message);
             return;
         }
 
@@ -1269,10 +1276,8 @@ function uploadChapterFolder() {
                 folderNode.children.push(entry);
             } catch (err) {
                 console.error('Upload failed for', file.name, err);
-                if (err.message && (err.message.includes('not authenticated') || err.message.includes('Subject does not exist'))) {
-                    alert('Please log in to Puter first. A login window should appear. If not, check your popup blocker and refresh.');
-                    break;
-                }
+                alert('Upload failed for ' + file.name + ': ' + err.message);
+                break;
             }
         }
         saveData();
@@ -2334,7 +2339,9 @@ function loginPuter() {
         return;
     }
     if (typeof puter !== 'undefined') {
-        puter.auth.signIn();
+        puter.auth.signIn().catch(err => {
+            alert('Login failed: ' + err.message);
+        });
     } else {
         alert('Puter.js not loaded. Please check your internet.');
     }
