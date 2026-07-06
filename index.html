@@ -1153,30 +1153,64 @@ function deleteChapterLink(idx) {
 // File handling (base64 only, no Storage)
 // ============================================================
 // 確保 Puter 已登入，如果未登入則強制彈出登入視窗並等待完成
+// 確保 Puter 已登入，並強制刷新 token
 async function ensurePuterSignedIn() {
     if (typeof puter === 'undefined') {
         throw new Error('Puter.js not loaded. Please check your internet.');
     }
-    // 嘗試獲取當前用戶
+
+    // 先嘗試獲取當前用戶
     let user = null;
     try {
         user = await puter.auth.getUser();
     } catch (e) {
-        // 未登入或 token 失效
+        // 如果 getUser 失敗，可能 token 失效，直接重新登入
+        console.warn('getUser failed, will re-authenticate:', e);
     }
+
+    // 如果 user 為 null 或 getUser 拋出錯誤，強制重新登入
     if (!user) {
-        // 嘗試登入
         try {
+            // 先嘗試 signOut 清除舊狀態（可選）
+            try {
+                await puter.auth.signOut();
+            } catch (e) {
+                // 忽略 signOut 錯誤
+            }
+            // 彈出登入視窗
             await puter.auth.signIn();
             // 再次獲取用戶以確認
             user = await puter.auth.getUser();
             if (!user) {
-                throw new Error('Login failed');
+                throw new Error('Login failed after signIn');
             }
         } catch (e) {
             throw new Error('Please log in to Puter first. A login window should appear. If not, check your popup blocker and refresh the page.');
         }
     }
+
+    // 額外：嘗試存取一個簡單的 API 來驗證 token 是否有效（可選）
+    try {
+        // 嘗試讀取根目錄，如果 token 無效會拋出錯誤
+        await puter.fs.readdir('/');
+    } catch (e) {
+        // 如果 token 無效，重新登入
+        if (e.message && (e.message.includes('not authenticated') || e.message.includes('Subject does not exist'))) {
+            try {
+                await puter.auth.signOut();
+                await puter.auth.signIn();
+                user = await puter.auth.getUser();
+                if (!user) {
+                    throw new Error('Re-login failed');
+                }
+            } catch (err) {
+                throw new Error('Please log in to Puter first. A login window should appear. If not, check your popup blocker and refresh the page.');
+            }
+        } else {
+            throw e;
+        }
+    }
+
     return user;
 }
 
