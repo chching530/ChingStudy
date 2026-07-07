@@ -1239,17 +1239,33 @@ async function addChapterFile() {
             alert('Please log in to Puter first. Click "Login to Puter" on the home page.');
             return;
         }
+        console.log('Puter user confirmed:', user.username || user.email);
     } catch (e) {
         alert('Please log in to Puter first. Click "Login to Puter" on the home page.');
         return;
     }
 
     try {
-        // 直接寫入根目錄，用時間戳確保檔名唯一
+        // 嘗試建立目錄（使用相對路徑）
+        const dirPath = 'ChingStudy';
+        try {
+            await puter.fs.mkdir(dirPath);
+            console.log('Directory created:', dirPath);
+        } catch (e) {
+            // 如果目錄已存在，繼續執行
+            if (e.message && (e.message.includes('already exists') || e.message.includes('subject_does_not_exist'))) {
+                console.warn('mkdir warning (ignored):', e);
+            } else {
+                console.warn('mkdir failed, will try to write directly:', e);
+            }
+        }
+
         const timestamp = Date.now();
-        const uniqueName = `${timestamp}_${file.name}`;
-        const path = `/${uniqueName}`; // 直接寫入根目錄
+        const fileName = `${timestamp}_${file.name}`;
+        // 使用相對路徑（唔加前導斜線）
+        const path = `ChingStudy/${fileName}`;
         
+        console.log('Uploading to path:', path);
         await puter.fs.write(path, file);
         
         const entry = { id: generateId(), name: file.name, type: 'file', data: path, size: file.size };
@@ -1295,6 +1311,17 @@ function uploadChapterFolder() {
             return;
         }
 
+        const dirPath = 'ChingStudy';
+        try {
+            await puter.fs.mkdir(dirPath);
+        } catch (e) {
+            if (e.message && (e.message.includes('already exists') || e.message.includes('subject_does_not_exist'))) {
+                console.warn('mkdir warning (ignored):', e);
+            } else {
+                console.warn('mkdir failed, will try to write directly:', e);
+            }
+        }
+
         let uploadCount = 0;
         for (const file of files) {
             const parts = file.webkitRelativePath.split('/');
@@ -1308,7 +1335,7 @@ function uploadChapterFolder() {
             }
             try {
                 const timestamp = Date.now() + '_' + Math.random().toString(36).substr(2,4);
-                const path = `/${timestamp}_${file.name}`; // 直接寫入根目錄
+                const path = `ChingStudy/${timestamp}_${file.name}`;
                 await puter.fs.write(path, file);
                 const entry = { id: generateId(), name: fileName, type: 'file', data: path, size: file.size };
                 folderNode.children.push(entry);
@@ -2289,13 +2316,15 @@ function openNotif() { document.getElementById('notifModal').classList.add('show
 function closeNotif() { document.getElementById('notifModal').classList.remove('show'); }
 
 function openFile(dataUrl, fileName) {
-    // 如果係 Puter 路徑 (以 '/' 開頭)
-    if (dataUrl && typeof dataUrl === 'string' && dataUrl.startsWith('/')) {
+    // 如果係 Puter 路徑 (不包含前導斜線，或者以 ChingStudy 開頭)
+    if (dataUrl && typeof dataUrl === 'string' && (dataUrl.startsWith('ChingStudy/') || dataUrl.startsWith('/ChingStudy/'))) {
         if (typeof puter === 'undefined') {
             alert('Puter.js not loaded.');
             return;
         }
-        puter.fs.read(dataUrl)
+        // 確保路徑格式正確（移除可能的多餘斜線）
+        const cleanPath = dataUrl.replace(/^\//, '');
+        puter.fs.read(cleanPath)
             .then(blob => {
                 const url = URL.createObjectURL(blob);
                 window.open(url, '_blank');
