@@ -1245,23 +1245,11 @@ async function addChapterFile() {
     }
 
     try {
-        // 建立目錄（如果不存在）
-        try {
-            await puter.fs.mkdir('/ChingStudy');
-        } catch (e) {
-            // 如果目錄已存在或路徑問題，忽略錯誤
-            if (e.message && (e.message.includes('already exists') || e.message.includes('subject_does_not_exist'))) {
-                // 目錄可能存在但路徑有問題，嘗試直接寫入檔案
-                console.warn('mkdir warning (ignored):', e);
-            } else {
-                throw e;
-            }
-        }
-
+        // 直接寫入根目錄，用時間戳確保檔名唯一
         const timestamp = Date.now();
-        const path = `/ChingStudy/${timestamp}_${file.name}`;
+        const uniqueName = `${timestamp}_${file.name}`;
+        const path = `/${uniqueName}`; // 直接寫入根目錄
         
-        // 直接寫入檔案（如果目錄唔存在，Puter 會自動建立父目錄）
         await puter.fs.write(path, file);
         
         const entry = { id: generateId(), name: file.name, type: 'file', data: path, size: file.size };
@@ -1274,7 +1262,7 @@ async function addChapterFile() {
         alert('Upload successful!');
     } catch (err) {
         console.error('Upload error:', err);
-        alert('Upload failed: ' + err.message);
+        alert('Upload failed: ' + (err.message || 'Unknown error'));
     }
 }
 
@@ -1307,16 +1295,6 @@ function uploadChapterFolder() {
             return;
         }
 
-        try {
-            await puter.fs.mkdir('/ChingStudy');
-        } catch (e) {
-            if (e.message && (e.message.includes('already exists') || e.message.includes('subject_does_not_exist'))) {
-                console.warn('mkdir warning (ignored):', e);
-            } else {
-                console.warn(e);
-            }
-        }
-
         let uploadCount = 0;
         for (const file of files) {
             const parts = file.webkitRelativePath.split('/');
@@ -1330,7 +1308,7 @@ function uploadChapterFolder() {
             }
             try {
                 const timestamp = Date.now() + '_' + Math.random().toString(36).substr(2,4);
-                const path = `/ChingStudy/${timestamp}_${file.name}`;
+                const path = `/${timestamp}_${file.name}`; // 直接寫入根目錄
                 await puter.fs.write(path, file);
                 const entry = { id: generateId(), name: fileName, type: 'file', data: path, size: file.size };
                 folderNode.children.push(entry);
