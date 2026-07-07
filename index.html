@@ -1154,58 +1154,64 @@ function deleteChapterLink(idx) {
 // ============================================================
 // 確保 Puter 已登入，如果未登入則強制彈出登入視窗並等待完成
 // 確保 Puter 已登入，並強制刷新 token
+// 強制清除所有 Puter 相關狀態
+async function resetPuterAuth() {
+    if (typeof puter === 'undefined') return;
+    try {
+        // 嘗試 signOut
+        await puter.auth.signOut();
+    } catch (e) {
+        // 如果 signOut 失敗，忽略
+    }
+    // 清除所有 Puter 相關嘅 localStorage 項目
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('puter:')) {
+            keysToRemove.push(key);
+        }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    console.log('Puter auth state cleared');
+}
+
 async function ensurePuterSignedIn() {
     if (typeof puter === 'undefined') {
         throw new Error('Puter.js not loaded. Please check your internet.');
     }
 
-    // 先嘗試獲取當前用戶
+    // 第一步：完全重置狀態
+    await resetPuterAuth();
+
+    // 第二步：重新初始化用戶會話（直接彈出登入視窗）
     let user = null;
     try {
+        // 強制 signIn（會彈出登入視窗）
+        await puter.auth.signIn();
+        // 獲取用戶確認
         user = await puter.auth.getUser();
-    } catch (e) {
-        // 如果 getUser 失敗，可能 token 失效，直接重新登入
-        console.warn('getUser failed, will re-authenticate:', e);
-    }
-
-    // 如果 user 為 null 或 getUser 拋出錯誤，強制重新登入
-    if (!user) {
-        try {
-            // 先嘗試 signOut 清除舊狀態（可選）
-            try {
-                await puter.auth.signOut();
-            } catch (e) {
-                // 忽略 signOut 錯誤
-            }
-            // 彈出登入視窗
-            await puter.auth.signIn();
-            // 再次獲取用戶以確認
-            user = await puter.auth.getUser();
-            if (!user) {
-                throw new Error('Login failed after signIn');
-            }
-        } catch (e) {
-            throw new Error('Please log in to Puter first. A login window should appear. If not, check your popup blocker and refresh the page.');
+        if (!user) {
+            throw new Error('Login failed: no user returned');
         }
+    } catch (e) {
+        // 如果 signIn 過程失敗（例如用戶關閉視窗），拋出清晰錯誤
+        throw new Error('Please log in to Puter. A login window should appear. If not, check your popup blocker.');
     }
 
-    // 額外：嘗試存取一個簡單的 API 來驗證 token 是否有效（可選）
+    // 第三步：驗證 token 是否有效（嘗試讀取根目錄）
     try {
-        // 嘗試讀取根目錄，如果 token 無效會拋出錯誤
         await puter.fs.readdir('/');
     } catch (e) {
-        // 如果 token 無效，重新登入
+        // 如果 token 仍然無效，嘗試重新登入一次
         if (e.message && (e.message.includes('not authenticated') || e.message.includes('Subject does not exist'))) {
-            try {
-                await puter.auth.signOut();
-                await puter.auth.signIn();
-                user = await puter.auth.getUser();
-                if (!user) {
-                    throw new Error('Re-login failed');
-                }
-            } catch (err) {
-                throw new Error('Please log in to Puter first. A login window should appear. If not, check your popup blocker and refresh the page.');
+            await resetPuterAuth();
+            await puter.auth.signIn();
+            user = await puter.auth.getUser();
+            if (!user) {
+                throw new Error('Re-login failed');
             }
+            // 再次驗證
+            await puter.fs.readdir('/');
         } else {
             throw e;
         }
@@ -1215,7 +1221,6 @@ async function ensurePuterSignedIn() {
 }
 
 async function addChapterFile() {
-    // --- 協議檢查 ---
     if (window.__isFileProtocol) {
         alert('⚠️ 請用伺服器（如 Live Server）打開此頁面才能上載檔案。');
         return;
@@ -1227,16 +1232,16 @@ async function addChapterFile() {
     const key = document.getElementById('chapterFilesList').dataset.key;
     const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
 
-    // --- 確保已登入 Puter ---
     try {
+        // 確保已登入（會自動彈出登入視窗）
         await ensurePuterSignedIn();
     } catch (err) {
         alert(err.message);
         return;
     }
 
-    // --- 原有上傳邏輯 ---
     try {
+        // 建立目錄（如果不存在）
         try {
             await puter.fs.mkdir('/ChingStudy');
         } catch (e) {
@@ -1252,9 +1257,10 @@ async function addChapterFile() {
         input.value = '';
         renderChapterFiles();
         renderChapterList(key);
+        alert('Upload successful!');
     } catch (err) {
         console.error(err);
-        alert('Upload to Puter failed: ' + err.message);
+        alert('Upload failed: ' + err.message);
     }
 }
 
@@ -1276,7 +1282,6 @@ function uploadChapterFolder() {
         if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
         const root = data.chapters[key][chIdx].files;
 
-        // --- 確保已登入 Puter ---
         try {
             await ensurePuterSignedIn();
         } catch (err) {
@@ -1284,7 +1289,6 @@ function uploadChapterFolder() {
             return;
         }
 
-        // 建立根目錄
         try {
             await puter.fs.mkdir('/ChingStudy');
         } catch (e) {
@@ -1292,6 +1296,7 @@ function uploadChapterFolder() {
         }
 
         const folderMap = {};
+        let uploadCount = 0;
         for (const file of files) {
             const parts = file.webkitRelativePath.split('/');
             const folderName = parts[0];
@@ -1308,6 +1313,7 @@ function uploadChapterFolder() {
                 await puter.fs.write(path, file);
                 const entry = { id: generateId(), name: fileName, type: 'file', data: path, size: file.size };
                 folderNode.children.push(entry);
+                uploadCount++;
             } catch (err) {
                 console.error('Upload failed for', file.name, err);
                 alert('Upload failed for ' + file.name + ': ' + err.message);
@@ -1317,6 +1323,7 @@ function uploadChapterFolder() {
         saveData();
         renderChapterFiles();
         renderChapterList(key);
+        if (uploadCount > 0) alert('Uploaded ' + uploadCount + ' files successfully!');
     };
     input.click();
 }
@@ -2373,8 +2380,11 @@ function loginPuter() {
         return;
     }
     if (typeof puter !== 'undefined') {
-        puter.auth.signIn().catch(err => {
-            alert('Login failed: ' + err.message);
+        // 先清除所有舊狀態，然後彈出登入
+        resetPuterAuth().then(() => {
+            puter.auth.signIn().catch(err => {
+                alert('Login failed: ' + err.message);
+            });
         });
     } else {
         alert('Puter.js not loaded. Please check your internet.');
