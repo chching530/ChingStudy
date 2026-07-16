@@ -8,10 +8,10 @@
     <meta name="format-detection" content="telephone=no">
     <title>◇ Ching Study</title>
     <style>
-        /* ===== Full Styles ===== */
+        /* ===== Full Styles (unchanged) ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background: #0b0b0b; color: #f0f0f0; padding: 16px; padding-bottom: 110px; max-width: 1000px; margin: 0 auto; min-height: 100vh; }
-        button, .main-card, .subject-item, .chapter-card, .habit-box, .link-item, .item-card .actions button, .stat-filter-btn, .folder-item, .file-item, .bottom-bar button {
+        button, .main-card, .subject-item, .chapter-card, .habit-box, .link-item, .item-card .actions button, .chapter-file-item .actions button, .stat-filter-btn, .folder-item, .file-item, .bottom-bar button {
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
@@ -81,7 +81,7 @@
         .logout-btn:active { background: #3a3a3a; color: #fff; }
         .footnote { color: #555; font-size: 12px; text-align: center; margin-top: 20px; }
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        /* FOLDER STRUCTURE (for Information only) */
+        /* FOLDER STRUCTURE */
         .folder-item { background: #151515; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 14px; margin-bottom: 6px; cursor: pointer; transition: 0.1s; touch-action: manipulation; }
         .folder-item .folder-header { display: flex; align-items: center; gap: 8px; }
         .folder-item .folder-header .folder-icon { font-size: 20px; }
@@ -185,12 +185,20 @@
         .link-item .link-content a { color: #8ab4f8; text-decoration: none; font-size: 14px; flex: 1; }
         .link-item .link-content a:active { color: #fff; }
         .link-item .del-link { background: none; border: none; color: #e74c3c; font-size: 16px; cursor: pointer; padding: 4px; touch-action: manipulation; }
-        /* CHAPTER LINKS (Quiz only) */
+        /* CHAPTER LINKS & FILES */
         .chapter-link-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .chapter-link-item a { color: #8ab4f8; text-decoration: none; font-size: 14px; flex: 1; }
         .chapter-link-item a:active { color: #fff; }
         .chapter-link-item .del-link { background: none; border: none; color: #e74c3c; font-size: 16px; cursor: pointer; touch-action: manipulation; }
-        /* BOTTOM BAR */
+        .chapter-file-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .chapter-file-item .info { flex: 1; margin-right: 10px; }
+        .chapter-file-item .info .title { font-weight: 400; color: #fff; font-size: 14px; word-break: break-all; }
+        .chapter-file-item .info .sub { font-size: 12px; color: #888; }
+        .chapter-file-item .actions { display: flex; gap: 6px; align-items: center; }
+        .chapter-file-item .actions button { background: none; border: none; color: #e74c3c; font-size: 16px; cursor: pointer; padding: 0 4px; touch-action: manipulation; }
+        .chapter-file-item .actions .open-btn { color: #8ab4f8; font-size: 16px; text-decoration: none; cursor: pointer; background: none; border: none; padding: 0 4px; }
+        .chapter-file-item .actions .download-btn { color: #8ab4f8; font-size: 16px; text-decoration: none; margin-right: 2px; }
+        /* BOTTOM BAR - no emoji, no delete buttons, text only */
         .bottom-bar-wrapper {
             position: fixed;
             bottom: 0;
@@ -361,6 +369,7 @@
             <div style="font-size: 14px; color: #888; margin-bottom: 4px;">Learning Habits</div>
             <div class="habits-container" id="habitsContainer"></div>
         </div>
+        <!-- 同步按鈕改名 + 訊息顯示區 -->
         <button id="syncNowBtn" onclick="syncNow()" style="background:#444;border:none;color:#fff;padding:10px;border-radius:30px;cursor:pointer;margin-bottom:8px;width:100%;">
             Sync now
         </button>
@@ -375,14 +384,14 @@
         <div class="footnote">All data saved in this browser</div>
     </div>
 
-    <!-- PAGE: SUBJECTS (for Information & Quiz) -->
+    <!-- PAGE: SUBJECTS -->
     <div id="page-subjects" class="page">
         <button class="back-btn" onclick="navigateTo('home')">← Back</button>
         <h2 id="categoryTitle" style="font-weight:300; font-size:22px;">Category</h2>
         <div class="subject-grid" id="subjectGrid"></div>
     </div>
 
-    <!-- PAGE: DETAIL (Information) -->
+    <!-- PAGE: DETAIL -->
     <div id="page-detail" class="page">
         <button class="back-btn" onclick="goBackFromDetail()">← Back to subjects</button>
         <h2 id="detailTitle" style="font-weight:300; font-size:20px;">Subject</h2>
@@ -396,7 +405,7 @@
         <div id="quizContent"></div>
     </div>
 
-    <!-- PAGE: CHAPTER LINKS (Quiz only) -->
+    <!-- PAGE: CHAPTER LINKS & FILES -->
     <div id="page-chapter-links" class="page">
         <button class="back-btn" onclick="goBackFromChapterLinks()">← Back</button>
         <h2 id="chapterLinksTitle" style="font-weight:300; font-size:20px;">Chapter</h2>
@@ -409,7 +418,15 @@
             </div>
             <div id="chapterLinksList"></div>
         </div>
-        <!-- File section removed -->
+        <div style="margin-top: 16px;">
+            <div class="section-title" style="font-size:15px;">Files</div>
+            <div class="file-input-wrapper">
+                <input type="file" id="chapterFileInput" />
+                <button onclick="addChapterFile()">Upload</button>
+                <button onclick="uploadChapterFolder()" class="btn-secondary">Upload Folder (keep structure)</button>
+            </div>
+            <div id="chapterFilesList"></div>
+        </div>
     </div>
 
     <!-- PAGE: LINKS -->
@@ -549,7 +566,7 @@
         </div>
     </div>
 
-    <!-- CUSTOM BUTTON MODAL -->
+    <!-- CUSTOM BUTTON MODAL (for the bottom Add button) -->
     <div class="modal-overlay" id="customBtnModal">
         <div class="modal-box">
             <h3>Add Custom Button <button class="close-modal" onclick="closeCustomBtnModal()">✕</button></h3>
@@ -631,9 +648,9 @@ window.storage = storage;
 // ============================================================
 // Data model & helpers
 // ============================================================
-const CATEGORIES = ['Information', 'Quiz'];  // DSE removed
+const CATEGORIES = ['Information', 'Quiz', 'DSE'];
 const SUBJECTS = ['Chinese', 'English', 'Mathematics', 'CS', 'Economics', 'Bafs', 'Ict'];
-const HOME_DEFAULT_ORDER = ['information', 'quiz', 'links', 'objectives', 'statistics', 'tools', 'ai', 'timer'];
+const HOME_DEFAULT_ORDER = ['information', 'quiz', 'dse', 'links', 'objectives', 'statistics', 'tools', 'ai', 'timer'];
 
 function keyFor(category, subject) { return `${category}_${subject}`; }
 function generateId() { return Date.now() + '_' + Math.random().toString(36).substr(2, 6); }
@@ -658,6 +675,7 @@ function loadData() {
         const raw = localStorage.getItem('ching_study_data');
         if (!raw) return defaultData();
         const parsed = JSON.parse(raw);
+
         if (!parsed.chapters) parsed.chapters = {};
         CATEGORIES.forEach(c => SUBJECTS.forEach(s => {
             const k = keyFor(c, s);
@@ -668,13 +686,53 @@ function loadData() {
         if (!parsed.objectives) parsed.objectives = {};
         if (!parsed.customButtons) parsed.customButtons = [];
         if (!parsed.homeOrder) parsed.homeOrder = HOME_DEFAULT_ORDER.slice();
-        // Remove DSE chapters if any
+
+        // Migrate old aiLinks to customButtons
+        if (parsed.aiLinks && parsed.aiLinks.length > 0) {
+            parsed.customButtons = parsed.customButtons.concat(parsed.aiLinks);
+            delete parsed.aiLinks;
+        }
+
+        // Migrate old infoFolders / dseFolders
+        if (parsed.infoFolders) {
+            SUBJECTS.forEach(s => {
+                const arr = parsed.infoFolders[s] || [];
+                const k = keyFor('Information', s);
+                arr.forEach(item => {
+                    if (item.type === 'folder') {
+                        parsed.chapters[k].push({ name: item.name || 'Folder', links: [], files: item.children || [] });
+                    } else {
+                        let defaultCh = parsed.chapters[k].find(ch => ch.name === 'Files');
+                        if (!defaultCh) { defaultCh = { name: 'Files', links: [], files: [] }; parsed.chapters[k].push(defaultCh); }
+                        defaultCh.files.push(item);
+                    }
+                });
+            });
+            delete parsed.infoFolders;
+        }
+        if (parsed.dseFolders) {
+            SUBJECTS.forEach(s => {
+                const arr = parsed.dseFolders[s] || [];
+                const k = keyFor('DSE', s);
+                arr.forEach(item => {
+                    if (item.type === 'folder') {
+                        parsed.chapters[k].push({ name: item.name || 'Folder', links: [], files: item.children || [] });
+                    } else {
+                        let defaultCh = parsed.chapters[k].find(ch => ch.name === 'Files');
+                        if (!defaultCh) { defaultCh = { name: 'Files', links: [], files: [] }; parsed.chapters[k].push(defaultCh); }
+                        defaultCh.files.push(item);
+                    }
+                });
+            });
+            delete parsed.dseFolders;
+        }
+
         SUBJECTS.forEach(s => {
-            const k = keyFor('DSE', s);
-            if (parsed.chapters[k]) delete parsed.chapters[k];
+            if (!parsed.objectives[s]) parsed.objectives[s] = { target: '5', current: '4' };
         });
+
         return parsed;
-    } catch(e) {
+    } catch (e) {
         console.error(e);
         return defaultData();
     }
@@ -712,7 +770,7 @@ window.signInWithEmail = async function() {
     const pw = document.getElementById('authPassword').value;
     const msg = document.getElementById('authMsg');
     try {
-        await auth.signInWithEmailAndPassword(email, pw);
+        const cred = await auth.signInWithEmailAndPassword(email, pw);
         msg.style.color = '#8ab4f8';
         msg.textContent = 'Signed in.';
     } catch (err) {
@@ -797,9 +855,10 @@ function navigateTo(page) {
     const el = document.getElementById(pageMap[page]);
     if (el) el.classList.add('active');
     if (page === 'home') { renderHomeCards(); renderHabits(); renderObjectives(); renderBottomBar(); setTimeout(renderStatPreview, 80); }
+    if (page === 'subjects') { /* nothing */ }
     if (page === 'detail') { renderDetail(); }
     if (page === 'quiz') { openQuiz(); }
-    if (page === 'chapterLinks') { renderChapterLinks(); }
+    if (page === 'chapterLinks') { renderChapterLinks(); renderChapterFiles(); }
     if (page === 'links') { renderLinks(); }
     if (page === 'objectives') renderObjectives();
     if (page === 'statistics') renderStatistics();
@@ -818,7 +877,8 @@ function renderHomeCards() {
     const order = data.homeOrder || HOME_DEFAULT_ORDER.slice();
     const cardMap = {
         information: { title: 'Information', desc: 'Folders & Files' },
-        quiz: { title: 'Quiz', desc: 'Chapters & Links' },
+        quiz: { title: 'Quiz', desc: 'Chapters & Files' },
+        dse: { title: 'DSE', desc: 'Folders & Files' },
         links: { title: 'Links', desc: 'Bookmarks & app shortcuts' },
         objectives: { title: 'Objectives', desc: 'Target & Current Grades' },
         statistics: { title: 'Statistics', desc: 'Study habit trends' },
@@ -907,7 +967,7 @@ function renderHomeCards() {
 }
 
 function handleCardClick(id) {
-    if (id === 'information') openCategory('Information');
+    if (id === 'information' || id === 'dse') openCategory(id.charAt(0).toUpperCase() + id.slice(1));
     else if (id === 'quiz') openQuiz();
     else if (id === 'links') navigateTo('links');
     else if (id === 'objectives') navigateTo('objectives');
@@ -918,10 +978,12 @@ function handleCardClick(id) {
 }
 
 // ============================================================
-// Categories, subjects, chapters (Information only)
+// Categories, subjects, chapters
 // ============================================================
 let currentCategory = null;
 let currentSubject = null;
+let currentChapterKey = null;
+let currentChapterIndex = null;
 
 function openCategory(category) {
     currentCategory = category;
@@ -1024,6 +1086,8 @@ function deleteChapter(key, idx) {
 }
 
 function openChapterLinks(key, chIdx) {
+    currentChapterKey = key;
+    currentChapterIndex = chIdx;
     const ch = data.chapters[key][chIdx];
     document.getElementById('chapterLinksTitle').textContent = ch.name;
     document.getElementById('chapterLinksList').dataset.key = key;
@@ -1086,8 +1150,210 @@ function deleteChapterLink(idx) {
 }
 
 // ============================================================
-// File handling (Information only)
+// File handling (base64 only, no Storage)
 // ============================================================
+// 確保 Puter 已登入，如果未登入則強制彈出登入視窗並等待完成
+// 確保 Puter 已登入，並強制刷新 token
+// 強制清除所有 Puter 相關狀態
+async function resetPuterAuth() {
+    if (typeof puter === 'undefined') return;
+    try {
+        // 嘗試 signOut
+        await puter.auth.signOut();
+    } catch (e) {
+        // 如果 signOut 失敗，忽略
+    }
+    // 清除所有 Puter 相關嘅 localStorage 項目
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('puter:')) {
+            keysToRemove.push(key);
+        }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    console.log('Puter auth state cleared');
+}
+
+async function ensurePuterSignedIn() {
+    if (typeof puter === 'undefined') {
+        throw new Error('Puter.js not loaded. Please check your internet.');
+    }
+
+    // 第一步：完全重置狀態
+    await resetPuterAuth();
+
+    // 第二步：重新初始化用戶會話（直接彈出登入視窗）
+    let user = null;
+    try {
+        // 強制 signIn（會彈出登入視窗）
+        await puter.auth.signIn();
+        // 獲取用戶確認
+        user = await puter.auth.getUser();
+        if (!user) {
+            throw new Error('Login failed: no user returned');
+        }
+    } catch (e) {
+        // 如果 signIn 過程失敗（例如用戶關閉視窗），拋出清晰錯誤
+        throw new Error('Please log in to Puter. A login window should appear. If not, check your popup blocker.');
+    }
+
+    // 第三步：驗證 token 是否有效（嘗試讀取根目錄）
+    try {
+        await puter.fs.readdir('/');
+    } catch (e) {
+        // 如果 token 仍然無效，嘗試重新登入一次
+        if (e.message && (e.message.includes('not authenticated') || e.message.includes('Subject does not exist'))) {
+            await resetPuterAuth();
+            await puter.auth.signIn();
+            user = await puter.auth.getUser();
+            if (!user) {
+                throw new Error('Re-login failed');
+            }
+            // 再次驗證
+            await puter.fs.readdir('/');
+        } else {
+            throw e;
+        }
+    }
+
+    return user;
+}
+
+async function addChapterFile() {
+    if (window.__isFileProtocol) {
+        alert('⚠️ 請用伺服器（如 Live Server）打開此頁面才能上載檔案。');
+        return;
+    }
+
+    const input = document.getElementById('chapterFileInput');
+    const file = input.files[0];
+    if (!file) return alert('Please select a file.');
+    const key = document.getElementById('chapterFilesList').dataset.key;
+    const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+
+    // 確保已登入 Puter
+    try {
+        const user = await puter.auth.getUser();
+        if (!user) {
+            alert('Please log in to Puter first. Click "Login to Puter" on the home page.');
+            return;
+        }
+        console.log('Puter user confirmed:', user.username || user.email);
+    } catch (e) {
+        alert('Please log in to Puter first. Click "Login to Puter" on the home page.');
+        return;
+    }
+
+    try {
+        // 嘗試建立目錄（使用相對路徑）
+        const dirPath = 'ChingStudy';
+        try {
+            await puter.fs.mkdir(dirPath);
+            console.log('Directory created:', dirPath);
+        } catch (e) {
+            // 如果目錄已存在，繼續執行
+            if (e.message && (e.message.includes('already exists') || e.message.includes('subject_does_not_exist'))) {
+                console.warn('mkdir warning (ignored):', e);
+            } else {
+                console.warn('mkdir failed, will try to write directly:', e);
+            }
+        }
+
+        const timestamp = Date.now();
+        const fileName = `${timestamp}_${file.name}`;
+        // 使用相對路徑（唔加前導斜線）
+        const path = `ChingStudy/${fileName}`;
+        
+        console.log('Uploading to path:', path);
+        await puter.fs.write(path, file);
+        
+        const entry = { id: generateId(), name: file.name, type: 'file', data: path, size: file.size };
+        if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
+        data.chapters[key][chIdx].files.push(entry);
+        saveData();
+        input.value = '';
+        renderChapterFiles();
+        renderChapterList(key);
+        alert('Upload successful!');
+    } catch (err) {
+        console.error('Upload error:', err);
+        alert('Upload failed: ' + (err.message || 'Unknown error'));
+    }
+}
+
+function uploadChapterFolder() {
+    if (window.__isFileProtocol) {
+        alert('⚠️ 請用伺服器打開此頁面才能上載 Folder。');
+        return;
+    }
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.webkitdirectory = true;
+    input.multiple = true;
+    input.onchange = async function(e) {
+        const files = Array.from(e.target.files);
+        if (!files || files.length === 0) return;
+        const key = document.getElementById('chapterFilesList').dataset.key;
+        const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
+        if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
+        const root = data.chapters[key][chIdx].files;
+
+        try {
+            const user = await puter.auth.getUser();
+            if (!user) {
+                alert('Please log in to Puter first.');
+                return;
+            }
+        } catch (e) {
+            alert('Please log in to Puter first.');
+            return;
+        }
+
+        const dirPath = 'ChingStudy';
+        try {
+            await puter.fs.mkdir(dirPath);
+        } catch (e) {
+            if (e.message && (e.message.includes('already exists') || e.message.includes('subject_does_not_exist'))) {
+                console.warn('mkdir warning (ignored):', e);
+            } else {
+                console.warn('mkdir failed, will try to write directly:', e);
+            }
+        }
+
+        let uploadCount = 0;
+        for (const file of files) {
+            const parts = file.webkitRelativePath.split('/');
+            const folderName = parts[0];
+            const fileName = parts.slice(1).join('/');
+            let pointer = root;
+            let folderNode = pointer.find(it => it.type === 'folder' && it.name === folderName);
+            if (!folderNode) {
+                folderNode = { id: generateId(), name: folderName, type: 'folder', children: [] };
+                pointer.push(folderNode);
+            }
+            try {
+                const timestamp = Date.now() + '_' + Math.random().toString(36).substr(2,4);
+                const path = `ChingStudy/${timestamp}_${file.name}`;
+                await puter.fs.write(path, file);
+                const entry = { id: generateId(), name: fileName, type: 'file', data: path, size: file.size };
+                folderNode.children.push(entry);
+                uploadCount++;
+            } catch (err) {
+                console.error('Upload failed for', file.name, err);
+                alert('Upload failed for ' + file.name + ': ' + err.message);
+                break;
+            }
+        }
+        saveData();
+        renderChapterFiles();
+        renderChapterList(key);
+        if (uploadCount > 0) alert('Uploaded ' + uploadCount + ' files successfully!');
+    };
+    input.click();
+}
+
 function renderChapterFiles() {
     const container = document.getElementById('chapterFilesList');
     const key = container.dataset.key;
@@ -1205,262 +1471,6 @@ function renameFolderById(id) {
         return false;
     }
     recurse(chapter.files || []);
-}
-
-// ============================================================
-// Upload functions (Information only)
-// ============================================================
-async function resetPuterAuth() {
-    if (typeof puter === 'undefined') return;
-    try { await puter.auth.signOut(); } catch(e) {}
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('puter:')) keysToRemove.push(key);
-    }
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    console.log('Puter auth state cleared');
-}
-
-async function addChapterFile() {
-    if (window.__isFileProtocol) {
-        alert('⚠️ 請用伺服器（如 Live Server）打開此頁面才能上載檔案。');
-        return;
-    }
-
-    const input = document.getElementById('chapterFileInput');
-    const file = input.files[0];
-    if (!file) return alert('Please select a file.');
-    const key = document.getElementById('chapterFilesList').dataset.key;
-    const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
-
-    try {
-        const user = await puter.auth.getUser();
-        if (!user) {
-            alert('Please log in to Puter first. Click "Login to Puter" on the home page.');
-            return;
-        }
-    } catch (e) {
-        alert('Please log in to Puter first. Click "Login to Puter" on the home page.');
-        return;
-    }
-
-    try {
-        const dirPath = 'ChingStudy';
-        try {
-            await puter.fs.mkdir(dirPath);
-        } catch (e) {
-            if (e.message && (e.message.includes('already exists') || e.message.includes('subject_does_not_exist'))) {
-                console.warn('mkdir warning (ignored):', e);
-            } else {
-                console.warn('mkdir failed, will try to write directly:', e);
-            }
-        }
-
-        const timestamp = Date.now();
-        const fileName = `${timestamp}_${file.name}`;
-        const path = `ChingStudy/${fileName}`;
-        await puter.fs.write(path, file);
-        
-        const entry = { id: generateId(), name: file.name, type: 'file', data: path, size: file.size };
-        if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
-        data.chapters[key][chIdx].files.push(entry);
-        saveData();
-        input.value = '';
-        renderChapterFiles();
-        renderChapterList(key);
-        alert('Upload successful!');
-    } catch (err) {
-        console.error('Upload error:', err);
-        alert('Upload failed: ' + (err.message || 'Unknown error'));
-    }
-}
-
-function uploadChapterFolder() {
-    if (window.__isFileProtocol) {
-        alert('⚠️ 請用伺服器打開此頁面才能上載 Folder。');
-        return;
-    }
-
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.webkitdirectory = true;
-    input.multiple = true;
-    input.onchange = async function(e) {
-        const files = Array.from(e.target.files);
-        if (!files || files.length === 0) return;
-        const key = document.getElementById('chapterFilesList').dataset.key;
-        const chIdx = parseInt(document.getElementById('chapterFilesList').dataset.chIdx);
-        if (!data.chapters[key][chIdx].files) data.chapters[key][chIdx].files = [];
-        const root = data.chapters[key][chIdx].files;
-
-        try {
-            const user = await puter.auth.getUser();
-            if (!user) {
-                alert('Please log in to Puter first.');
-                return;
-            }
-        } catch (e) {
-            alert('Please log in to Puter first.');
-            return;
-        }
-
-        const dirPath = 'ChingStudy';
-        try {
-            await puter.fs.mkdir(dirPath);
-        } catch (e) {
-            if (e.message && (e.message.includes('already exists') || e.message.includes('subject_does_not_exist'))) {
-                console.warn('mkdir warning (ignored):', e);
-            } else {
-                console.warn('mkdir failed, will try to write directly:', e);
-            }
-        }
-
-        let uploadCount = 0;
-        for (const file of files) {
-            const parts = file.webkitRelativePath.split('/');
-            const folderName = parts[0];
-            const fileName = parts.slice(1).join('/');
-            let pointer = root;
-            let folderNode = pointer.find(it => it.type === 'folder' && it.name === folderName);
-            if (!folderNode) {
-                folderNode = { id: generateId(), name: folderName, type: 'folder', children: [] };
-                pointer.push(folderNode);
-            }
-            try {
-                const timestamp = Date.now() + '_' + Math.random().toString(36).substr(2,4);
-                const path = `ChingStudy/${timestamp}_${file.name}`;
-                await puter.fs.write(path, file);
-                const entry = { id: generateId(), name: fileName, type: 'file', data: path, size: file.size };
-                folderNode.children.push(entry);
-                uploadCount++;
-            } catch (err) {
-                console.error('Upload failed for', file.name, err);
-                alert('Upload failed for ' + file.name + ': ' + err.message);
-                break;
-            }
-        }
-        saveData();
-        renderChapterFiles();
-        renderChapterList(key);
-        if (uploadCount > 0) alert('Uploaded ' + uploadCount + ' files successfully!');
-    };
-    input.click();
-}
-
-// ============================================================
-// Quiz (Chapter Links only, no Files)
-// ============================================================
-function openQuiz() {
-    currentCategory = 'Quiz';
-    document.getElementById('quizTitle').innerText = 'Quiz';
-    const container = document.getElementById('quizContent');
-    container.innerHTML = `<div class="subject-grid" id="quizSubjectGrid"></div>`;
-    const grid2 = document.getElementById('quizSubjectGrid');
-    grid2.innerHTML = '';
-    SUBJECTS.forEach(subj => {
-        const div = document.createElement('div');
-        div.className = 'subject-item';
-        div.innerHTML = `<div class="subj-name">${subj}</div>`;
-        div.onclick = () => openQuizSubject(subj);
-        grid2.appendChild(div);
-    });
-    navigateTo('quiz');
-}
-function goBackFromQuiz() { navigateTo('home'); }
-
-function openQuizSubject(subject) {
-    document.getElementById('quizTitle').innerText = subject;
-    const key = 'Quiz_' + subject;
-    const container = document.getElementById('quizContent');
-    container.innerHTML = renderQuizChapters(key);
-    navigateTo('quiz');
-}
-
-function renderQuizChapters(key) {
-    let html = `
-        <div class="flex-between" style="margin:8px 0 12px;">
-            <span class="section-title" style="border-bottom:none; margin:0;">Chapters</span>
-            <button class="btn-secondary" onclick="openChapterModal('${key}')">+ New Chapter</button>
-        </div>
-        <div id="chapterList_${key}"></div>
-    `;
-    setTimeout(() => renderQuizChapterList(key), 0);
-    return html;
-}
-
-function renderQuizChapterList(key) {
-    const container = document.getElementById('chapterList_' + key);
-    if (!container) return;
-    const chapters = data.chapters[key] || [];
-    if (chapters.length === 0) {
-        container.innerHTML = '<div class="empty-state">No chapters yet. Create one!</div>';
-        return;
-    }
-    container.innerHTML = chapters.map((ch, idx) => {
-        const linkCount = ch.links ? ch.links.length : 0;
-        return `
-            <div class="chapter-card" onclick="openQuizChapterLinks('${key}', ${idx})">
-                <div class="flex-between">
-                    <span class="ch-title">${ch.name}</span>
-                    <span class="ch-count">${linkCount} links</span>
-                </div>
-                <div style="display:flex; gap:8px; margin-top:6px;">
-                    <button class="btn-secondary" onclick="event.stopPropagation(); openChapterModal('${key}', ${idx})">Rename</button>
-                    <button class="btn-secondary" style="background:#e74c3c" onclick="event.stopPropagation(); deleteChapter('${key}', ${idx})">Delete</button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function openQuizChapterLinks(key, chIdx) {
-    const ch = data.chapters[key][chIdx];
-    document.getElementById('chapterLinksTitle').textContent = ch.name;
-    document.getElementById('chapterLinksList').dataset.key = key;
-    document.getElementById('chapterLinksList').dataset.chIdx = chIdx;
-    renderQuizChapterLinks();
-    navigateTo('chapterLinks');
-}
-
-function goBackFromChapterLinks() {
-    // Go back to quiz subject view
-    const quizPage = document.getElementById('page-quiz');
-    if (quizPage.classList.contains('active')) {
-        openQuiz();
-    } else {
-        navigateTo('home');
-    }
-}
-
-function renderQuizChapterLinks() {
-    const container = document.getElementById('chapterLinksList');
-    const key = container.dataset.key;
-    const chIdx = parseInt(container.dataset.chIdx);
-    const chapters = data.chapters[key] || [];
-    if (chIdx >= chapters.length) return;
-    const links = chapters[chIdx].links || [];
-    if (links.length === 0) {
-        container.innerHTML = '<div class="empty-state">No links in this chapter.</div>';
-        return;
-    }
-    container.innerHTML = links.map((link, idx) =>
-        `<div class="chapter-link-item">
-            <a href="${escapeAttr(link.url)}" target="_blank">${link.name}</a>
-            <button class="del-link" onclick="deleteQuizChapterLink(${idx})">✕</button>
-        </div>`
-    ).join('');
-}
-
-function deleteQuizChapterLink(idx) {
-    if (!confirm('Delete this link?')) return;
-    const container = document.getElementById('chapterLinksList');
-    const key = container.dataset.key;
-    const chIdx = parseInt(container.dataset.chIdx);
-    data.chapters[key][chIdx].links.splice(idx, 1);
-    saveData();
-    renderQuizChapterLinks();
-    renderQuizChapterList(key);
 }
 
 // ============================================================
@@ -2009,7 +2019,7 @@ function saveCustomButton() {
 }
 
 // ============================================================
-// Bottom Bar Render
+// Bottom Bar Render (text only, no emoji, no delete button)
 // ============================================================
 function renderBottomBar() {
     const container = document.getElementById('customButtonsContainer');
@@ -2025,6 +2035,27 @@ function renderBottomBar() {
         `;
     }).join('');
 }
+
+// ============================================================
+// Quiz
+// ============================================================
+function openQuiz() {
+    currentCategory = 'Quiz';
+    document.getElementById('quizTitle').innerText = 'Quiz';
+    const container = document.getElementById('quizContent');
+    container.innerHTML = `<div class="subject-grid" id="quizSubjectGrid"></div>`;
+    const grid2 = document.getElementById('quizSubjectGrid');
+    grid2.innerHTML = '';
+    SUBJECTS.forEach(subj => {
+        const div = document.createElement('div');
+        div.className = 'subject-item';
+        div.innerHTML = `<div class="subj-name">${subj}</div>`;
+        div.onclick = () => openSubjectDetail('Quiz', subj);
+        grid2.appendChild(div);
+    });
+    navigateTo('quiz');
+}
+function goBackFromQuiz() { navigateTo('home'); }
 
 // ============================================================
 // Timer
@@ -2165,13 +2196,14 @@ function updateCircleProgress() {
 }
 
 // ============================================================
-// Sync
+// Sync - 靜音版本（無彈窗）
 // ============================================================
 function setSyncMessage(text, isSuccess = true) {
     const el = document.getElementById('syncMessage');
     if (!el) return;
     el.textContent = text;
     el.style.color = isSuccess ? '#8ab4f8' : '#e74c3c';
+    // 5秒後自動清除
     clearTimeout(el._timer);
     el._timer = setTimeout(() => { el.textContent = ''; }, 5000);
 }
@@ -2201,6 +2233,7 @@ window.syncNow = async function() {
                 if (document.getElementById('page-ai').classList.contains('active')) renderCustomButtonsList();
                 setSyncMessage('Sync complete!');
             } else {
+                // 無遠端資料，上傳本地
                 await docRef.set({ appData: window.data }, { merge: true });
                 setSyncMessage('Uploaded local data to cloud.');
             }
@@ -2214,6 +2247,7 @@ window.syncNow = async function() {
     }
 };
 
+// 自動推送（靜音）
 let syncTimeout = null;
 function debouncedSync() {
     if (!auth.currentUser) return;
@@ -2282,11 +2316,13 @@ function openNotif() { document.getElementById('notifModal').classList.add('show
 function closeNotif() { document.getElementById('notifModal').classList.remove('show'); }
 
 function openFile(dataUrl, fileName) {
+    // 如果係 Puter 路徑 (不包含前導斜線，或者以 ChingStudy 開頭)
     if (dataUrl && typeof dataUrl === 'string' && (dataUrl.startsWith('ChingStudy/') || dataUrl.startsWith('/ChingStudy/'))) {
         if (typeof puter === 'undefined') {
             alert('Puter.js not loaded.');
             return;
         }
+        // 確保路徑格式正確（移除可能的多餘斜線）
         const cleanPath = dataUrl.replace(/^\//, '');
         puter.fs.read(cleanPath)
             .then(blob => {
@@ -2301,6 +2337,7 @@ function openFile(dataUrl, fileName) {
         return;
     }
 
+    // 原有邏輯：支援 http / data: URL
     if (dataUrl && (dataUrl.startsWith('http') || dataUrl.startsWith('data:'))) {
         fetch(dataUrl)
             .then(response => response.blob())
@@ -2324,22 +2361,6 @@ function openFile(dataUrl, fileName) {
     alert('Cannot open file: no valid data.');
 }
 
-function loginPuter() {
-    if (window.__isFileProtocol) {
-        alert('⚠️ 請用伺服器打開此頁面才能使用 Puter 登入。');
-        return;
-    }
-    if (typeof puter !== 'undefined') {
-        resetPuterAuth().then(() => {
-            puter.auth.signIn().catch(err => {
-                alert('Login failed: ' + err.message);
-            });
-        });
-    } else {
-        alert('Puter.js not loaded. Please check your internet.');
-    }
-}
-
 // ============================================================
 // Init
 // ============================================================
@@ -2356,6 +2377,7 @@ function initApp() {
 
     document.addEventListener('visibilitychange', function() {
         if (!document.hidden && auth.currentUser) {
+            // 自動同步，但唔彈窗（靜音）
             setTimeout(() => { window.syncNow(); }, 300);
         }
     });
@@ -2379,6 +2401,24 @@ function initApp() {
 }
 
 checkLoginStatus();
+
+function loginPuter() {
+    if (window.__isFileProtocol) {
+        alert('⚠️ 請用伺服器打開此頁面才能使用 Puter 登入。');
+        return;
+    }
+    if (typeof puter !== 'undefined') {
+        // 先清除所有舊狀態，然後彈出登入
+        resetPuterAuth().then(() => {
+            puter.auth.signIn().catch(err => {
+                alert('Login failed: ' + err.message);
+            });
+        });
+    } else {
+        alert('Puter.js not loaded. Please check your internet.');
+    }
+}
+
 </script>
 </body>
 </html>
